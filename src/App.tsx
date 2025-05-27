@@ -10,6 +10,7 @@ import { Layout } from "@/components/Layout";
 import { Login } from "@/pages/auth/Login";
 import { Dashboard } from "@/pages/Dashboard";
 import { IdososList } from "@/pages/idosos/IdososList";
+import { NovoIdoso } from "@/pages/idosos/NovoIdoso";
 import { AtividadesList } from "@/pages/atividades/AtividadesList";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="idosos" element={<IdososList />} />
+              <Route path="idosos/novo" element={<NovoIdoso />} />
               <Route path="atividades" element={<AtividadesList />} />
             </Route>
             

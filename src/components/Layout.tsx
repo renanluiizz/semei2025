@@ -9,7 +9,8 @@ import {
   Users, 
   Calendar,
   Settings,
-  LogOut
+  LogOut,
+  UserPlus
 } from 'lucide-react';
 
 export function Layout() {
@@ -25,6 +26,7 @@ export function Layout() {
   const menuItems = [
     { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
     { icon: Users, label: 'Idosos', path: '/idosos' },
+    { icon: UserPlus, label: 'Novo Cadastro', path: '/idosos/novo' },
     { icon: Calendar, label: 'Atividades', path: '/atividades' },
     { icon: Settings, label: 'Configurações', path: '/configuracoes' },
   ];
@@ -47,7 +49,8 @@ export function Layout() {
         <nav className="flex-1 p-4 space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive = location.pathname === item.path || 
+              (item.path === '/idosos' && location.pathname.startsWith('/idosos'));
             
             return (
               <Link

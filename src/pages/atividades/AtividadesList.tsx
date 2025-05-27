@@ -132,7 +132,7 @@ export function AtividadesList() {
                             </Badge>
                             <div className="flex items-center text-sm text-gray-500">
                               <Clock className="h-4 w-4 mr-1" />
-                              {format(new Date(atividade.check_in_time), 'dd/MM/yyyy', { locale: ptBR })}
+                              {format(new Date(atividade.check_in_time), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
                             </div>
                           </div>
                         </div>
