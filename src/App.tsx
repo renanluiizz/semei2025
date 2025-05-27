@@ -14,8 +14,11 @@ import { Suspense, lazy } from "react";
 // Lazy loading das páginas para code splitting
 const Dashboard = lazy(() => import("@/pages/Dashboard").then(module => ({ default: module.Dashboard })));
 const IdososList = lazy(() => import("@/pages/idosos/IdososList").then(module => ({ default: module.IdososList })));
+const IdosoDetails = lazy(() => import("@/pages/idosos/IdosoDetails"));
+const EditIdoso = lazy(() => import("@/pages/idosos/EditIdoso"));
 const NovoIdoso = lazy(() => import("@/pages/idosos/NovoIdoso").then(module => ({ default: module.NovoIdoso })));
 const AtividadesList = lazy(() => import("@/pages/atividades/AtividadesList").then(module => ({ default: module.AtividadesList })));
+const Configuracoes = lazy(() => import("@/pages/Configuracoes"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 // Configuração otimizada do React Query
@@ -63,9 +66,24 @@ const App = () => (
                   <NovoIdoso />
                 </Suspense>
               } />
+              <Route path="idosos/:id" element={
+                <Suspense fallback={<PageLoading />}>
+                  <IdosoDetails />
+                </Suspense>
+              } />
+              <Route path="idosos/:id/editar" element={
+                <Suspense fallback={<PageLoading />}>
+                  <EditIdoso />
+                </Suspense>
+              } />
               <Route path="atividades" element={
                 <Suspense fallback={<PageLoading />}>
                   <AtividadesList />
+                </Suspense>
+              } />
+              <Route path="configuracoes" element={
+                <Suspense fallback={<PageLoading />}>
+                  <Configuracoes />
                 </Suspense>
               } />
             </Route>

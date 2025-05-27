@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { Idoso, Atividade, Usuario, DashboardStats } from '@/types/models';
 
@@ -76,13 +75,13 @@ export const dbHelpers = {
       .from('elders')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
     
     if (data && !error) {
       setCache(cacheKey, data);
     }
     
-    return { data: data as Idoso, error };
+    return { data: data as Idoso | null, error };
   },
 
   createIdoso: async (idoso: Omit<Idoso, 'id' | 'created_at'>) => {

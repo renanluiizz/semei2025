@@ -10,12 +10,14 @@ import { Calendar, Plus, Trash2, User, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { NovaAtividadeDialog } from '@/components/atividades/NovaAtividadeDialog';
 import type { Atividade } from '@/types/models';
 
 export function AtividadesList() {
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; atividade?: Atividade }>({
     open: false
   });
+  const [novaAtividadeOpen, setNovaAtividadeOpen] = useState(false);
   
   const queryClient = useQueryClient();
 
@@ -95,7 +97,7 @@ export function AtividadesList() {
             Gerencie as atividades dos idosos
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setNovaAtividadeOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Nova Atividade
         </Button>
@@ -179,7 +181,7 @@ export function AtividadesList() {
               <p className="text-gray-500 mb-6">
                 Comece cadastrando a primeira atividade.
               </p>
-              <Button>
+              <Button onClick={() => setNovaAtividadeOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Cadastrar Primeira Atividade
               </Button>
@@ -187,6 +189,12 @@ export function AtividadesList() {
           </Card>
         )}
       </div>
+
+      {/* Nova Atividade Dialog */}
+      <NovaAtividadeDialog 
+        open={novaAtividadeOpen} 
+        onOpenChange={setNovaAtividadeOpen}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open })}>
