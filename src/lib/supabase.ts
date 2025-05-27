@@ -44,9 +44,42 @@ export const dbHelpers = {
   },
 
   createIdoso: async (idoso: Omit<Idoso, 'id' | 'created_at'>) => {
+    // Map the data to match database schema
+    const dbData = {
+      name: idoso.name,
+      birth_date: idoso.birth_date,
+      cpf: idoso.cpf,
+      gender: idoso.gender,
+      birthplace: idoso.birthplace,
+      marital_status: idoso.marital_status,
+      father_name: idoso.father_name,
+      mother_name: idoso.mother_name,
+      rg: idoso.rg,
+      address: idoso.address,
+      neighborhood: idoso.neighborhood,
+      state: idoso.state,
+      zone: idoso.zone,
+      blood_type: idoso.blood_type,
+      has_illness: idoso.has_illness,
+      has_allergy: idoso.has_allergy,
+      medication_type: idoso.medication_type,
+      health_plan: idoso.health_plan,
+      phone: idoso.phone,
+      mobile_phone: idoso.mobile_phone,
+      emergency_phone: idoso.emergency_phone,
+      guardian_name: idoso.guardian_name,
+      has_children: idoso.has_children,
+      family_constitution: idoso.family_constitution,
+      time_in_cabo_frio: idoso.time_in_cabo_frio,
+      notes: idoso.notes,
+      photo_url: idoso.photo_url,
+      registration_date: idoso.registration_date,
+      responsible_staff_id: idoso.responsible_staff_id,
+    };
+
     const { data, error } = await supabase
       .from('elders')
-      .insert([idoso])
+      .insert([dbData])
       .select()
       .single();
     return { data: data as Idoso, error };
@@ -89,9 +122,17 @@ export const dbHelpers = {
   },
 
   createAtividade: async (atividade: Omit<Atividade, 'id' | 'created_at'>) => {
+    const dbData = {
+      elder_id: atividade.elder_id,
+      staff_id: atividade.staff_id,
+      activity_type: atividade.activity_type,
+      check_in_time: atividade.check_in_time,
+      observation: atividade.observation,
+    };
+
     const { data, error } = await supabase
       .from('check_ins')
-      .insert([atividade])
+      .insert([dbData])
       .select()
       .single();
     return { data: data as Atividade, error };
@@ -169,9 +210,9 @@ export const dbHelpers = {
         total_idosos: idosos?.length || 0,
         idosos_ativos: idosos?.length || 0,
         atividades_mes: atividadesMes?.length || 0,
-        aniversariantes_mes: aniversariantes,
+        aniversariantes_mes: aniversariantes as Idoso[],
         distribuicao_idade: distribuicaoIdade,
-        atividades_recentes: atividadesRecentes || [],
+        atividades_recentes: (atividadesRecentes || []) as Atividade[],
       };
 
       return { data: stats, error: null };

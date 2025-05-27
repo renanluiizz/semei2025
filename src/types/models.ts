@@ -2,70 +2,69 @@
 export interface Idoso {
   id: string;
   created_at: string;
-  updated_at: string;
   
   // Dados pessoais
-  nome: string;
-  data_nascimento: string;
-  naturalidade: string;
-  estado_civil: 'solteiro' | 'casado' | 'viuvo' | 'divorciado';
-  escolaridade: string;
-  profissao: string;
+  name: string;
+  birth_date: string;
+  birthplace?: string;
+  marital_status?: string;
+  father_name?: string;
+  mother_name?: string;
+  gender: 'masculino' | 'feminino' | 'outro';
   
   // Documentação
-  rg: string;
+  rg?: string;
   cpf: string;
-  nis: string;
-  titulo_eleitor?: string;
   
   // Endereço
-  logradouro: string;
-  numero: string;
-  complemento?: string;
-  bairro: string;
-  municipio: string;
-  zona: 'urbana' | 'rural';
-  cep: string;
+  address?: string;
+  neighborhood?: string;
+  state?: string;
+  zone?: string;
   
   // Saúde
-  comorbidades: string[];
-  medicamentos: string[];
-  mobilidade: 'independente' | 'parcial' | 'dependente';
-  observacoes_saude?: string;
+  age?: number;
+  blood_type?: string;
+  has_illness?: boolean;
+  has_allergy?: boolean;
+  medication_type?: string;
+  health_plan?: string;
   
   // Contatos
-  telefone?: string;
-  responsavel_nome?: string;
-  responsavel_telefone?: string;
-  responsavel_parentesco?: string;
+  phone?: string;
+  mobile_phone?: string;
+  emergency_phone?: string;
+  guardian_name?: string;
   
-  // Sistema
-  ativo: boolean;
-  usuario_cadastro: string;
+  // Outros
+  has_children?: boolean;
+  family_constitution?: string;
+  time_in_cabo_frio?: string;
+  notes?: string;
+  photo_url?: string;
+  registration_date?: string;
+  responsible_staff_id?: string;
 }
 
 export interface Atividade {
   id: string;
   created_at: string;
-  updated_at: string;
   
-  idoso_id: string;
-  titulo: string;
-  descricao: string;
-  data_atividade: string;
-  responsavel: string;
-  tipo: 'social' | 'saude' | 'educacional' | 'lazer' | 'outros';
+  elder_id: string;
+  staff_id: string;
+  activity_type: string;
+  check_in_time: string;
+  observation?: string;
   
   // Relacionamentos
-  idoso?: Idoso;
+  elder?: { name: string };
 }
 
 export interface Usuario {
   id: string;
   email: string;
-  nome: string;
-  role: 'admin' | 'comum';
-  municipio: string;
+  full_name: string;
+  role: 'admin' | 'operator';
   created_at: string;
 }
 

@@ -33,7 +33,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq('id', session.user.id)
           .single();
         
-        setUserProfile(profile);
+        if (profile) {
+          setUserProfile({
+            id: profile.id,
+            email: profile.email,
+            full_name: profile.full_name,
+            role: profile.role as 'admin' | 'operator',
+            created_at: profile.created_at
+          });
+        }
       }
       
       setLoading(false);
@@ -53,7 +61,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq('id', session.user.id)
             .single();
           
-          setUserProfile(profile);
+          if (profile) {
+            setUserProfile({
+              id: profile.id,
+              email: profile.email,
+              full_name: profile.full_name,
+              role: profile.role as 'admin' | 'operator',
+              created_at: profile.created_at
+            });
+          }
         } else {
           setUserProfile(null);
         }
