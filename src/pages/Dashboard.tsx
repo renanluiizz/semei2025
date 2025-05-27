@@ -132,13 +132,13 @@ export function Dashboard() {
                     <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {atividade.titulo}
+                        {atividade.activity_type}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {atividade.idoso?.nome} • {format(new Date(atividade.data_atividade), 'dd/MM/yyyy', { locale: ptBR })}
+                        {atividade.elder?.name} • {format(new Date(atividade.check_in_time), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        Responsável: {atividade.responsavel}
+                        Staff ID: {atividade.staff_id}
                       </p>
                     </div>
                   </div>
@@ -170,9 +170,9 @@ export function Dashboard() {
                     <Users className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{idoso.nome}</p>
+                    <p className="font-medium text-gray-900">{idoso.name}</p>
                     <p className="text-sm text-gray-500">
-                      {format(new Date(idoso.data_nascimento), 'dd/MM', { locale: ptBR })}
+                      {format(new Date(idoso.birth_date), 'dd/MM', { locale: ptBR })}
                     </p>
                   </div>
                 </div>

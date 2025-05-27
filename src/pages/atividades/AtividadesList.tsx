@@ -124,32 +124,32 @@ export function AtividadesList() {
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900">
-                            {atividade.titulo}
+                            {atividade.activity_type}
                           </h3>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge className={getTipoColor(atividade.tipo)}>
-                              {atividade.tipo}
+                            <Badge className={getTipoColor(atividade.activity_type)}>
+                              {atividade.activity_type}
                             </Badge>
                             <div className="flex items-center text-sm text-gray-500">
                               <Clock className="h-4 w-4 mr-1" />
-                              {format(new Date(atividade.data_atividade), 'dd/MM/yyyy', { locale: ptBR })}
+                              {format(new Date(atividade.check_in_time), 'dd/MM/yyyy', { locale: ptBR })}
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <p className="text-gray-700">{atividade.descricao}</p>
+                      <p className="text-gray-700">{atividade.observation || 'Sem observações'}</p>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div className="flex items-center text-gray-600">
                           <User className="h-4 w-4 mr-2" />
                           <span className="font-medium">Idoso:</span>
-                          <span className="ml-1">{atividade.idoso?.nome}</span>
+                          <span className="ml-1">{atividade.elder?.name || 'N/A'}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
                           <User className="h-4 w-4 mr-2" />
-                          <span className="font-medium">Responsável:</span>
-                          <span className="ml-1">{atividade.responsavel}</span>
+                          <span className="font-medium">Staff ID:</span>
+                          <span className="ml-1">{atividade.staff_id}</span>
                         </div>
                       </div>
                     </div>
@@ -194,7 +194,7 @@ export function AtividadesList() {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir a atividade "{deleteDialog.atividade?.titulo}"?
+              Tem certeza que deseja excluir a atividade "{deleteDialog.atividade?.activity_type}"?
               Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>

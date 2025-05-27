@@ -25,7 +25,7 @@ export function IdososList() {
   });
 
   const filteredIdosos = idosos?.filter(idoso =>
-    idoso.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    idoso.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     idoso.cpf.includes(searchTerm)
   ) || [];
 
@@ -107,10 +107,10 @@ export function IdososList() {
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
                         <h3 className="text-lg font-semibold text-gray-900">
-                          {idoso.nome}
+                          {idoso.name}
                         </h3>
                         <Badge variant="secondary">
-                          {getAge(idoso.data_nascimento)} anos
+                          {getAge(idoso.birth_date)} anos
                         </Badge>
                       </div>
                       
@@ -120,31 +120,31 @@ export function IdososList() {
                         </div>
                         <div>
                           <span className="font-medium">Nascimento:</span>{' '}
-                          {format(new Date(idoso.data_nascimento), 'dd/MM/yyyy', { locale: ptBR })}
+                          {format(new Date(idoso.birth_date), 'dd/MM/yyyy', { locale: ptBR })}
                         </div>
                         <div>
                           <span className="font-medium">Telefone:</span>{' '}
-                          {idoso.telefone || 'Não informado'}
+                          {idoso.phone || 'Não informado'}
                         </div>
                         <div>
-                          <span className="font-medium">Bairro:</span> {idoso.bairro}
+                          <span className="font-medium">Bairro:</span> {idoso.neighborhood || 'Não informado'}
                         </div>
                         <div>
-                          <span className="font-medium">Mobilidade:</span>{' '}
+                          <span className="font-medium">Gênero:</span>{' '}
                           <Badge variant="outline" className="ml-1">
-                            {idoso.mobilidade}
+                            {idoso.gender}
                           </Badge>
                         </div>
                         <div>
-                          <span className="font-medium">Estado Civil:</span> {idoso.estado_civil}
+                          <span className="font-medium">Estado Civil:</span> {idoso.marital_status || 'Não informado'}
                         </div>
                       </div>
 
-                      {idoso.responsavel_nome && (
+                      {idoso.guardian_name && (
                         <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
-                          <span className="font-medium">Responsável:</span> {idoso.responsavel_nome}
-                          {idoso.responsavel_telefone && (
-                            <span className="ml-2">• {idoso.responsavel_telefone}</span>
+                          <span className="font-medium">Responsável:</span> {idoso.guardian_name}
+                          {idoso.emergency_phone && (
+                            <span className="ml-2">• {idoso.emergency_phone}</span>
                           )}
                         </div>
                       )}
