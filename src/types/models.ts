@@ -1,4 +1,3 @@
-
 export interface Idoso {
   id: string;
   created_at: string;
@@ -23,7 +22,7 @@ export interface Idoso {
   zone?: string;
   
   // Saúde
-  age?: number;
+  age?: number; // Agora calculada automaticamente
   blood_type?: string;
   has_illness?: boolean;
   has_allergy?: boolean;
@@ -58,6 +57,7 @@ export interface Atividade {
   
   // Relacionamentos
   elder?: { name: string };
+  staff?: { full_name: string }; // Adicionado para mostrar quem fez o check-in
 }
 
 export interface Usuario {

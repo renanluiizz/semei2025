@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dbHelpers } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,13 +15,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { ArrowLeft, ArrowRight, User, MapPin, Heart, Phone } from 'lucide-react';
+import { validateCPF, formatCPF } from '@/utils/cpfValidator';
+import { calculateAge } from '@/utils/dateUtils';
 import type { Idoso } from '@/types/models';
 
 const idosoSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   birth_date: z.string().min(1, 'Data de nascimento é obrigatória'),
   gender: z.enum(['masculino', 'feminino', 'outro']),
-  cpf: z.string().min(11, 'CPF deve ter 11 dígitos'),
+  cpf: z.string().min(11, 'CPF deve ter 11 dígitos').refine(validateCPF, 'CPF inválido'),
   rg: z.string().optional(),
   birthplace: z.string().optional(),
   marital_status: z.string().optional(),
@@ -61,6 +63,16 @@ export function NovoIdoso() {
   const { userProfile } = useAuth();
   const queryClient = useQueryClient();
 
+  // Verificar CPFs existentes
+  const { data: idososExistentes } = useQuery({
+    queryKey: ['idosos'],
+    queryFn: async () => {
+      const { data, error } = await dbHelpers.getIdosos();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const form = useForm<IdosoForm>({
     resolver: zodResolver(idosoSchema),
     defaultValues: {
@@ -71,52 +83,64 @@ export function NovoIdoso() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: Omit<Idoso, 'id' | 'created_at'>) => dbHelpers.createIdoso(data),
+    mutationFn: async (data: IdosoForm) => {
+      // Verificar se CPF já existe
+      const cpfLimpo = data.cpf.replace(/\D/g, '');
+      const cpfExiste = idososExistentes?.some(idoso => 
+        idoso.cpf.replace(/\D/g, '') === cpfLimpo
+      );
+
+      if (cpfExiste) {
+        throw new Error('CPF já cadastrado no sistema');
+      }
+
+      const idosoData: Omit<Idoso, 'id' | 'created_at'> = {
+        name: data.name,
+        birth_date: data.birth_date,
+        gender: data.gender,
+        cpf: formatCPF(data.cpf),
+        rg: data.rg || null,
+        birthplace: data.birthplace || null,
+        marital_status: data.marital_status || null,
+        father_name: data.father_name || null,
+        mother_name: data.mother_name || null,
+        address: data.address || null,
+        neighborhood: data.neighborhood || null,
+        state: data.state || null,
+        zone: data.zone || null,
+        age: calculateAge(data.birth_date),
+        blood_type: data.blood_type || null,
+        has_illness: data.has_illness || false,
+        has_allergy: data.has_allergy || false,
+        medication_type: data.medication_type || null,
+        health_plan: data.health_plan || null,
+        phone: data.phone || null,
+        mobile_phone: data.mobile_phone || null,
+        emergency_phone: data.emergency_phone || null,
+        guardian_name: data.guardian_name || null,
+        has_children: data.has_children || false,
+        family_constitution: data.family_constitution || null,
+        time_in_cabo_frio: data.time_in_cabo_frio || null,
+        notes: data.notes || null,
+        photo_url: null,
+        registration_date: new Date().toISOString(),
+        responsible_staff_id: userProfile?.id || null,
+      };
+      
+      return dbHelpers.createIdoso(idosoData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['idosos'] });
       toast.success('Idoso cadastrado com sucesso!');
       navigate('/idosos');
     },
-    onError: () => {
-      toast.error('Erro ao cadastrar idoso');
+    onError: (error: any) => {
+      toast.error(error.message || 'Erro ao cadastrar idoso');
     }
   });
 
   const onSubmit = (data: IdosoForm) => {
-    const idosoData: Omit<Idoso, 'id' | 'created_at'> = {
-      name: data.name,
-      birth_date: data.birth_date,
-      gender: data.gender,
-      cpf: data.cpf,
-      rg: data.rg || null,
-      birthplace: data.birthplace || null,
-      marital_status: data.marital_status || null,
-      father_name: data.father_name || null,
-      mother_name: data.mother_name || null,
-      address: data.address || null,
-      neighborhood: data.neighborhood || null,
-      state: data.state || null,
-      zone: data.zone || null,
-      age: null,
-      blood_type: data.blood_type || null,
-      has_illness: data.has_illness || false,
-      has_allergy: data.has_allergy || false,
-      medication_type: data.medication_type || null,
-      health_plan: data.health_plan || null,
-      phone: data.phone || null,
-      mobile_phone: data.mobile_phone || null,
-      emergency_phone: data.emergency_phone || null,
-      guardian_name: data.guardian_name || null,
-      has_children: data.has_children || false,
-      family_constitution: data.family_constitution || null,
-      time_in_cabo_frio: data.time_in_cabo_frio || null,
-      notes: data.notes || null,
-      photo_url: null,
-      registration_date: new Date().toISOString(),
-      responsible_staff_id: userProfile?.id || null,
-    };
-    
-    createMutation.mutate(idosoData);
+    createMutation.mutate(data);
   };
 
   const nextStep = () => {
@@ -186,6 +210,10 @@ export function NovoIdoso() {
                   {...form.register('cpf')}
                   id="cpf"
                   placeholder="000.000.000-00"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    form.setValue('cpf', formatCPF(value));
+                  }}
                 />
                 {form.formState.errors.cpf && (
                   <p className="text-sm text-red-500">{form.formState.errors.cpf.message}</p>
@@ -506,12 +534,21 @@ export function NovoIdoso() {
               </Button>
 
               {currentStep === steps.length - 1 ? (
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending}
-                >
-                  {createMutation.isPending ? 'Cadastrando...' : 'Finalizar Cadastro'}
-                </Button>
+                <div className="space-y-4">
+                  {userProfile && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <strong>Responsável pelo cadastro:</strong> {userProfile.full_name}
+                      </p>
+                    </div>
+                  )}
+                  <Button
+                    type="submit"
+                    disabled={createMutation.isPending}
+                  >
+                    {createMutation.isPending ? 'Cadastrando...' : 'Finalizar Cadastro'}
+                  </Button>
+                </div>
               ) : (
                 <Button
                   type="button"

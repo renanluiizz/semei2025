@@ -100,6 +100,7 @@ export const dbHelpers = {
       neighborhood: idoso.neighborhood,
       state: idoso.state,
       zone: idoso.zone,
+      age: idoso.age, // Agora incluindo a idade calculada
       blood_type: idoso.blood_type,
       has_illness: idoso.has_illness,
       has_allergy: idoso.has_allergy,
@@ -168,7 +169,8 @@ export const dbHelpers = {
       .from('check_ins')
       .select(`
         *,
-        elder:elders(name)
+        elder:elders(name),
+        staff:staff(full_name)
       `)
       .order('check_in_time', { ascending: false });
 
@@ -230,6 +232,29 @@ export const dbHelpers = {
     cache.delete(getCacheKey('atividades'));
     
     return { data, error };
+  },
+
+  // Função para atualizar perfil do staff
+  updateStaffProfile: async (id: string, updates: { full_name?: string; email?: string }) => {
+    const { data, error } = await supabase
+      .from('staff')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    return { data, error };
+  },
+
+  // Verificar se CPF já existe
+  checkCPFExists: async (cpf: string) => {
+    const { data, error } = await supabase
+      .from('elders')
+      .select('id')
+      .eq('cpf', cpf)
+      .maybeSingle();
+    
+    return { exists: !!data, error };
   },
 
   // Dashboard com cache otimizado
