@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase, authHelpers } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Usuario } from '@/types/models';
 
 interface AuthContextType {
@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         // Buscar perfil do usuário
         const { data: profile } = await supabase
-          .from('usuarios')
+          .from('staff')
           .select('*')
           .eq('id', session.user.id)
           .single();
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (session?.user) {
           const { data: profile } = await supabase
-            .from('usuarios')
+            .from('staff')
             .select('*')
             .eq('id', session.user.id)
             .single();
@@ -66,12 +66,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await authHelpers.signIn(email, password);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     return { error };
   };
 
   const signOut = async () => {
-    await authHelpers.signOut();
+    await supabase.auth.signOut();
     setUser(null);
     setUserProfile(null);
   };

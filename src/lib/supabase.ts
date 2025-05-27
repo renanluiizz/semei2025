@@ -1,11 +1,6 @@
 
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import type { Idoso, Atividade, Usuario, DashboardStats } from '@/types/models';
-
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Auth helpers
 export const authHelpers = {
@@ -33,25 +28,24 @@ export const dbHelpers = {
   // Idosos
   getIdosos: async () => {
     const { data, error } = await supabase
-      .from('idosos')
+      .from('elders')
       .select('*')
-      .eq('ativo', true)
-      .order('nome');
+      .order('name');
     return { data: data as Idoso[], error };
   },
 
   getIdoso: async (id: string) => {
     const { data, error } = await supabase
-      .from('idosos')
+      .from('elders')
       .select('*')
       .eq('id', id)
       .single();
     return { data: data as Idoso, error };
   },
 
-  createIdoso: async (idoso: Omit<Idoso, 'id' | 'created_at' | 'updated_at'>) => {
+  createIdoso: async (idoso: Omit<Idoso, 'id' | 'created_at'>) => {
     const { data, error } = await supabase
-      .from('idosos')
+      .from('elders')
       .insert([idoso])
       .select()
       .single();
@@ -60,8 +54,8 @@ export const dbHelpers = {
 
   updateIdoso: async (id: string, updates: Partial<Idoso>) => {
     const { data, error } = await supabase
-      .from('idosos')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .from('elders')
+      .update(updates)
       .eq('id', id)
       .select()
       .single();
@@ -70,8 +64,8 @@ export const dbHelpers = {
 
   deleteIdoso: async (id: string) => {
     const { data, error } = await supabase
-      .from('idosos')
-      .update({ ativo: false, updated_at: new Date().toISOString() })
+      .from('elders')
+      .delete()
       .eq('id', id);
     return { data, error };
   },
@@ -79,24 +73,24 @@ export const dbHelpers = {
   // Atividades
   getAtividades: async (idosoId?: string) => {
     let query = supabase
-      .from('atividades')
+      .from('check_ins')
       .select(`
         *,
-        idoso:idosos(nome)
+        elder:elders(name)
       `)
-      .order('data_atividade', { ascending: false });
+      .order('check_in_time', { ascending: false });
 
     if (idosoId) {
-      query = query.eq('idoso_id', idosoId);
+      query = query.eq('elder_id', idosoId);
     }
 
     const { data, error } = await query;
     return { data: data as Atividade[], error };
   },
 
-  createAtividade: async (atividade: Omit<Atividade, 'id' | 'created_at' | 'updated_at'>) => {
+  createAtividade: async (atividade: Omit<Atividade, 'id' | 'created_at'>) => {
     const { data, error } = await supabase
-      .from('atividades')
+      .from('check_ins')
       .insert([atividade])
       .select()
       .single();
@@ -105,8 +99,8 @@ export const dbHelpers = {
 
   updateAtividade: async (id: string, updates: Partial<Atividade>) => {
     const { data, error } = await supabase
-      .from('atividades')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .from('check_ins')
+      .update(updates)
       .eq('id', id)
       .select()
       .single();
@@ -115,7 +109,7 @@ export const dbHelpers = {
 
   deleteAtividade: async (id: string) => {
     const { data, error } = await supabase
-      .from('atividades')
+      .from('check_ins')
       .delete()
       .eq('id', id);
     return { data, error };
@@ -126,16 +120,15 @@ export const dbHelpers = {
     try {
       // Buscar estatísticas básicas
       const { data: idosos, error: idososError } = await supabase
-        .from('idosos')
-        .select('*')
-        .eq('ativo', true);
+        .from('elders')
+        .select('*');
 
       if (idososError) throw idososError;
 
       // Aniversariantes do mês
       const currentMonth = new Date().getMonth() + 1;
       const aniversariantes = idosos?.filter(idoso => {
-        const birthMonth = new Date(idoso.data_nascimento).getMonth() + 1;
+        const birthMonth = new Date(idoso.birth_date).getMonth() + 1;
         return birthMonth === currentMonth;
       }) || [];
 
@@ -148,7 +141,7 @@ export const dbHelpers = {
       ];
 
       idosos?.forEach(idoso => {
-        const idade = new Date().getFullYear() - new Date(idoso.data_nascimento).getFullYear();
+        const idade = new Date().getFullYear() - new Date(idoso.birth_date).getFullYear();
         if (idade >= 60 && idade < 70) distribuicaoIdade[0].quantidade++;
         else if (idade >= 70 && idade < 80) distribuicaoIdade[1].quantidade++;
         else if (idade >= 80 && idade < 90) distribuicaoIdade[2].quantidade++;
@@ -158,23 +151,23 @@ export const dbHelpers = {
       // Atividades do mês
       const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
       const { data: atividadesMes } = await supabase
-        .from('atividades')
+        .from('check_ins')
         .select('*')
-        .gte('data_atividade', firstDayOfMonth);
+        .gte('check_in_time', firstDayOfMonth);
 
       // Atividades recentes
       const { data: atividadesRecentes } = await supabase
-        .from('atividades')
+        .from('check_ins')
         .select(`
           *,
-          idoso:idosos(nome)
+          elder:elders(name)
         `)
         .order('created_at', { ascending: false })
         .limit(5);
 
       const stats: DashboardStats = {
         total_idosos: idosos?.length || 0,
-        idosos_ativos: idosos?.filter(i => i.ativo).length || 0,
+        idosos_ativos: idosos?.length || 0,
         atividades_mes: atividadesMes?.length || 0,
         aniversariantes_mes: aniversariantes,
         distribuicao_idade: distribuicaoIdade,
@@ -187,3 +180,6 @@ export const dbHelpers = {
     }
   },
 };
+
+// Re-export the supabase client for convenience
+export { supabase };
