@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -85,9 +84,36 @@ export function NovoIdoso() {
 
   const onSubmit = (data: IdosoForm) => {
     const idosoData: Omit<Idoso, 'id' | 'created_at'> = {
-      ...data,
+      name: data.name,
+      birth_date: data.birth_date,
+      gender: data.gender,
+      cpf: data.cpf,
+      rg: data.rg || null,
+      birthplace: data.birthplace || null,
+      marital_status: data.marital_status || null,
+      father_name: data.father_name || null,
+      mother_name: data.mother_name || null,
+      address: data.address || null,
+      neighborhood: data.neighborhood || null,
+      state: data.state || null,
+      zone: data.zone || null,
+      age: null,
+      blood_type: data.blood_type || null,
+      has_illness: data.has_illness || false,
+      has_allergy: data.has_allergy || false,
+      medication_type: data.medication_type || null,
+      health_plan: data.health_plan || null,
+      phone: data.phone || null,
+      mobile_phone: data.mobile_phone || null,
+      emergency_phone: data.emergency_phone || null,
+      guardian_name: data.guardian_name || null,
+      has_children: data.has_children || false,
+      family_constitution: data.family_constitution || null,
+      time_in_cabo_frio: data.time_in_cabo_frio || null,
+      notes: data.notes || null,
+      photo_url: null,
       registration_date: new Date().toISOString(),
-      responsible_staff_id: userProfile?.id,
+      responsible_staff_id: userProfile?.id || null,
     };
     
     createMutation.mutate(idosoData);
