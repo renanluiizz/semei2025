@@ -8,13 +8,27 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Layout } from "@/components/Layout";
 import { Login } from "@/pages/auth/Login";
-import { Dashboard } from "@/pages/Dashboard";
-import { IdososList } from "@/pages/idosos/IdososList";
-import { NovoIdoso } from "@/pages/idosos/NovoIdoso";
-import { AtividadesList } from "@/pages/atividades/AtividadesList";
-import NotFound from "./pages/NotFound";
+import { PageLoading } from "@/components/ui/page-loading";
+import { Suspense, lazy } from "react";
 
-const queryClient = new QueryClient();
+// Lazy loading das páginas para code splitting
+const Dashboard = lazy(() => import("@/pages/Dashboard").then(module => ({ default: module.Dashboard })));
+const IdososList = lazy(() => import("@/pages/idosos/IdososList").then(module => ({ default: module.IdososList })));
+const NovoIdoso = lazy(() => import("@/pages/idosos/NovoIdoso").then(module => ({ default: module.NovoIdoso })));
+const AtividadesList = lazy(() => import("@/pages/atividades/AtividadesList").then(module => ({ default: module.AtividadesList })));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+
+// Configuração otimizada do React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      gcTime: 10 * 60 * 1000, // 10 minutos
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -34,14 +48,34 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="idosos" element={<IdososList />} />
-              <Route path="idosos/novo" element={<NovoIdoso />} />
-              <Route path="atividades" element={<AtividadesList />} />
+              <Route path="dashboard" element={
+                <Suspense fallback={<PageLoading />}>
+                  <Dashboard />
+                </Suspense>
+              } />
+              <Route path="idosos" element={
+                <Suspense fallback={<PageLoading />}>
+                  <IdososList />
+                </Suspense>
+              } />
+              <Route path="idosos/novo" element={
+                <Suspense fallback={<PageLoading />}>
+                  <NovoIdoso />
+                </Suspense>
+              } />
+              <Route path="atividades" element={
+                <Suspense fallback={<PageLoading />}>
+                  <AtividadesList />
+                </Suspense>
+              } />
             </Route>
             
             {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={
+              <Suspense fallback={<PageLoading />}>
+                <NotFound />
+              </Suspense>
+            } />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

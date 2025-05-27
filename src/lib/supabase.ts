@@ -2,6 +2,30 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Idoso, Atividade, Usuario, DashboardStats } from '@/types/models';
 
+// Cache para requests frequentes
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+function getCacheKey(key: string, params?: any): string {
+  return params ? `${key}_${JSON.stringify(params)}` : key;
+}
+
+function setCache(key: string, data: any): void {
+  cache.set(key, {
+    data,
+    timestamp: Date.now(),
+  });
+}
+
+function getCache(key: string): any | null {
+  const cached = cache.get(key);
+  if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+    return cached.data;
+  }
+  cache.delete(key);
+  return null;
+}
+
 // Auth helpers
 export const authHelpers = {
   signIn: async (email: string, password: string) => {
@@ -23,23 +47,41 @@ export const authHelpers = {
   },
 };
 
-// Database helpers
+// Database helpers com cache otimizado
 export const dbHelpers = {
   // Idosos
   getIdosos: async () => {
+    const cacheKey = getCacheKey('idosos');
+    const cached = getCache(cacheKey);
+    if (cached) return { data: cached, error: null };
+
     const { data, error } = await supabase
       .from('elders')
       .select('*')
       .order('name');
+    
+    if (data && !error) {
+      setCache(cacheKey, data);
+    }
+    
     return { data: data as Idoso[], error };
   },
 
   getIdoso: async (id: string) => {
+    const cacheKey = getCacheKey('idoso', id);
+    const cached = getCache(cacheKey);
+    if (cached) return { data: cached, error: null };
+
     const { data, error } = await supabase
       .from('elders')
       .select('*')
       .eq('id', id)
       .single();
+    
+    if (data && !error) {
+      setCache(cacheKey, data);
+    }
+    
     return { data: data as Idoso, error };
   },
 
@@ -82,6 +124,10 @@ export const dbHelpers = {
       .insert([dbData])
       .select()
       .single();
+    
+    // Limpar cache relacionado
+    cache.delete(getCacheKey('idosos'));
+    
     return { data: data as Idoso, error };
   },
 
@@ -92,6 +138,11 @@ export const dbHelpers = {
       .eq('id', id)
       .select()
       .single();
+    
+    // Limpar cache relacionado
+    cache.delete(getCacheKey('idosos'));
+    cache.delete(getCacheKey('idoso', id));
+    
     return { data: data as Idoso, error };
   },
 
@@ -100,11 +151,20 @@ export const dbHelpers = {
       .from('elders')
       .delete()
       .eq('id', id);
+    
+    // Limpar cache relacionado
+    cache.delete(getCacheKey('idosos'));
+    cache.delete(getCacheKey('idoso', id));
+    
     return { data, error };
   },
 
   // Atividades
   getAtividades: async (idosoId?: string) => {
+    const cacheKey = getCacheKey('atividades', idosoId);
+    const cached = getCache(cacheKey);
+    if (cached) return { data: cached, error: null };
+
     let query = supabase
       .from('check_ins')
       .select(`
@@ -118,6 +178,11 @@ export const dbHelpers = {
     }
 
     const { data, error } = await query;
+    
+    if (data && !error) {
+      setCache(cacheKey, data);
+    }
+    
     return { data: data as Atividade[], error };
   },
 
@@ -135,6 +200,10 @@ export const dbHelpers = {
       .insert([dbData])
       .select()
       .single();
+    
+    // Limpar cache relacionado
+    cache.delete(getCacheKey('atividades'));
+    
     return { data: data as Atividade, error };
   },
 
@@ -145,6 +214,10 @@ export const dbHelpers = {
       .eq('id', id)
       .select()
       .single();
+    
+    // Limpar cache relacionado
+    cache.delete(getCacheKey('atividades'));
+    
     return { data: data as Atividade, error };
   },
 
@@ -153,17 +226,28 @@ export const dbHelpers = {
       .from('check_ins')
       .delete()
       .eq('id', id);
+    
+    // Limpar cache relacionado
+    cache.delete(getCacheKey('atividades'));
+    
     return { data, error };
   },
 
-  // Dashboard
+  // Dashboard com cache otimizado
   getDashboardStats: async (): Promise<{ data: DashboardStats | null, error: any }> => {
-    try {
-      // Buscar estatísticas básicas
-      const { data: idosos, error: idososError } = await supabase
-        .from('elders')
-        .select('*');
+    const cacheKey = getCacheKey('dashboard-stats');
+    const cached = getCache(cacheKey);
+    if (cached) return { data: cached, error: null };
 
+    try {
+      // Usar Promise.all para requests paralelos
+      const [idososResult, atividadesMesResult, atividadesRecentesResult] = await Promise.all([
+        supabase.from('elders').select('*'),
+        supabase.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+        supabase.from('check_ins').select(`*, elder:elders(name)`).order('created_at', { ascending: false }).limit(5)
+      ]);
+
+      const { data: idosos, error: idososError } = idososResult;
       if (idososError) throw idososError;
 
       // Aniversariantes do mês
@@ -189,32 +273,16 @@ export const dbHelpers = {
         else if (idade >= 90) distribuicaoIdade[3].quantidade++;
       });
 
-      // Atividades do mês
-      const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-      const { data: atividadesMes } = await supabase
-        .from('check_ins')
-        .select('*')
-        .gte('check_in_time', firstDayOfMonth);
-
-      // Atividades recentes
-      const { data: atividadesRecentes } = await supabase
-        .from('check_ins')
-        .select(`
-          *,
-          elder:elders(name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
       const stats: DashboardStats = {
         total_idosos: idosos?.length || 0,
         idosos_ativos: idosos?.length || 0,
-        atividades_mes: atividadesMes?.length || 0,
+        atividades_mes: atividadesMesResult.data?.length || 0,
         aniversariantes_mes: aniversariantes as Idoso[],
         distribuicao_idade: distribuicaoIdade,
-        atividades_recentes: (atividadesRecentes || []) as Atividade[],
+        atividades_recentes: (atividadesRecentesResult.data || []) as Atividade[],
       };
 
+      setCache(cacheKey, stats);
       return { data: stats, error: null };
     } catch (error) {
       return { data: null, error };

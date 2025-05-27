@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { User, Lock } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -35,7 +36,9 @@ export function Login() {
     },
   });
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = useCallback(async (data: LoginForm) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     
     try {
@@ -53,11 +56,12 @@ export function Login() {
       toast.success('Login realizado com sucesso!');
       navigate(from, { replace: true });
     } catch (error) {
+      console.error('Erro inesperado:', error);
       toast.error('Erro inesperado ao fazer login');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [signIn, navigate, from, isLoading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -82,6 +86,7 @@ export function Login() {
                   placeholder="seu.email@municipio.gov.br"
                   className="pl-10"
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
               {form.formState.errors.email && (
@@ -102,6 +107,7 @@ export function Login() {
                   placeholder="••••••••"
                   className="pl-10"
                   disabled={isLoading}
+                  autoComplete="current-password"
                 />
               </div>
               {form.formState.errors.password && (
@@ -118,7 +124,14 @@ export function Login() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Entrando...' : 'Entrar'}
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <LoadingSpinner size="sm" />
+                  Entrando...
+                </div>
+              ) : (
+                'Entrar'
+              )}
             </Button>
           </CardFooter>
         </form>
