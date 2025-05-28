@@ -1,0 +1,62 @@
+
+import { supabase } from '@/integrations/supabase/client';
+import { getCacheKey, getCache, setCache } from './cache';
+import type { DashboardStats, Idoso, Atividade } from '@/types/models';
+
+// Dashboard statistics
+export const dashboardHelpers = {
+  getDashboardStats: async (): Promise<{ data: DashboardStats | null, error: any }> => {
+    const cacheKey = getCacheKey('dashboard-stats');
+    const cached = getCache(cacheKey);
+    if (cached) return { data: cached, error: null };
+
+    try {
+      // Usar Promise.all para requests paralelos
+      const [idososResult, atividadesMesResult, atividadesRecentesResult] = await Promise.all([
+        supabase.from('elders').select('*'),
+        supabase.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+        supabase.from('check_ins').select(`*, elder:elders(name)`).order('created_at', { ascending: false }).limit(5)
+      ]);
+
+      const { data: idosos, error: idososError } = idososResult;
+      if (idososError) throw idososError;
+
+      // Aniversariantes do mês
+      const currentMonth = new Date().getMonth() + 1;
+      const aniversariantes = idosos?.filter(idoso => {
+        const birthMonth = new Date(idoso.birth_date).getMonth() + 1;
+        return birthMonth === currentMonth;
+      }) || [];
+
+      // Distribuição por idade
+      const distribuicaoIdade = [
+        { faixa: '60-69 anos', quantidade: 0 },
+        { faixa: '70-79 anos', quantidade: 0 },
+        { faixa: '80-89 anos', quantidade: 0 },
+        { faixa: '90+ anos', quantidade: 0 },
+      ];
+
+      idosos?.forEach(idoso => {
+        const idade = new Date().getFullYear() - new Date(idoso.birth_date).getFullYear();
+        if (idade >= 60 && idade < 70) distribuicaoIdade[0].quantidade++;
+        else if (idade >= 70 && idade < 80) distribuicaoIdade[1].quantidade++;
+        else if (idade >= 80 && idade < 90) distribuicaoIdade[2].quantidade++;
+        else if (idade >= 90) distribuicaoIdade[3].quantidade++;
+      });
+
+      const stats: DashboardStats = {
+        total_idosos: idosos?.length || 0,
+        idosos_ativos: idosos?.length || 0,
+        atividades_mes: atividadesMesResult.data?.length || 0,
+        aniversariantes_mes: aniversariantes as Idoso[],
+        distribuicao_idade: distribuicaoIdade,
+        atividades_recentes: (atividadesRecentesResult.data || []) as Atividade[],
+      };
+
+      setCache(cacheKey, stats);
+      return { data: stats, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+};
