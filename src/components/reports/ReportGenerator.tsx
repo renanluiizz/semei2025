@@ -17,6 +17,11 @@ interface ReportGeneratorProps {
   onClose: () => void;
 }
 
+interface FrequencyData {
+  total: number;
+  activities: Record<string, number>;
+}
+
 export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
   const [reportType, setReportType] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -181,7 +186,7 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
           yPosition += 7;
 
           Object.entries(elderStats)
-            .sort(([,a], [,b]) => b - a)
+            .sort(([, a], [, b]) => (b as number) - (a as number))
             .slice(0, 10) // Top 10
             .forEach(([elder, count]) => {
               doc.text(`${elder}: ${count} atividades`, 25, yPosition);
@@ -212,19 +217,22 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
           acc[elderName].total += 1;
           acc[elderName].activities[atividade.activity_type] = (acc[elderName].activities[atividade.activity_type] || 0) + 1;
           return acc;
-        }, {} as Record<string, { total: number; activities: Record<string, number> }>);
+        }, {} as Record<string, FrequencyData>);
 
         const tableData = Object.entries(frequencyByElder)
-          .sort(([,a], [,b]) => b.total - a.total)
-          .map(([elderName, data]) => [
-            elderName,
-            data.total.toString(),
-            Object.entries(data.activities)
-              .sort(([,a], [,b]) => b - a)
-              .slice(0, 3)
-              .map(([activity, count]) => `${activity} (${count})`)
-              .join(', ')
-          ]);
+          .sort(([, a], [, b]) => (b as FrequencyData).total - (a as FrequencyData).total)
+          .map(([elderName, data]) => {
+            const frequencyData = data as FrequencyData;
+            return [
+              elderName,
+              frequencyData.total.toString(),
+              Object.entries(frequencyData.activities)
+                .sort(([, a], [, b]) => (b as number) - (a as number))
+                .slice(0, 3)
+                .map(([activity, count]) => `${activity} (${count})`)
+                .join(', ')
+            ];
+          });
 
         (doc as any).autoTable({
           head: [['Idoso', 'Total de Atividades', 'Principais Atividades']],
@@ -238,7 +246,8 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
         yPosition = (doc as any).lastAutoTable.finalY + 20;
         doc.setFontSize(12);
         doc.text(`Total de idosos com atividades: ${Object.keys(frequencyByElder).length}`, 20, yPosition);
-        doc.text(`Média de atividades por idoso: ${(filteredAtividades.length / Math.max(Object.keys(frequencyByElder).length, 1)).toFixed(1)}`, 20, yPosition + 7);
+        const avgActivities = filteredAtividades.length / Math.max(Object.keys(frequencyByElder).length, 1);
+        doc.text(`Média de atividades por idoso: ${avgActivities.toFixed(1)}`, 20, yPosition + 7);
       }
 
       // Footer
