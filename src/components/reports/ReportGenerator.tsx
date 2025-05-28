@@ -145,8 +145,8 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
         });
       }
 
-      // Footer
-      const pageCount = doc.internal.getNumberOfPages();
+      // Footer - Fix the TypeScript error by using a type assertion
+      const pageCount = (doc as any).internal.getNumberOfPages();
       doc.setFontSize(8);
       doc.setTextColor(150);
       for (let i = 1; i <= pageCount; i++) {
