@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { User, Lock } from 'lucide-react';
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 const loginSchema = z.object({
@@ -22,6 +22,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,10 +46,25 @@ export function Login() {
       const { error } = await signIn(data.email, data.password);
       
       if (error) {
-        toast.error('Erro ao fazer login', {
-          description: error.message === 'Invalid login credentials' 
-            ? 'Email ou senha incorretos' 
-            : 'Erro interno do servidor',
+        console.error('Erro de login:', error);
+        
+        // Mensagens de erro mais específicas e seguras
+        let errorMessage = 'Erro ao fazer login';
+        let errorDescription = 'Verifique suas credenciais e tente novamente';
+
+        if (error.message === 'Invalid login credentials') {
+          errorMessage = 'Credenciais inválidas';
+          errorDescription = 'Email ou senha incorretos. Verifique os dados e tente novamente.';
+        } else if (error.message === 'Email not confirmed') {
+          errorMessage = 'Email não confirmado';
+          errorDescription = 'Verifique sua caixa de entrada e confirme seu email antes de fazer login.';
+        } else if (error.message === 'Too many requests') {
+          errorMessage = 'Muitas tentativas';
+          errorDescription = 'Aguarde alguns minutos antes de tentar novamente.';
+        }
+
+        toast.error(errorMessage, {
+          description: errorDescription,
         });
         return;
       }
@@ -56,8 +72,10 @@ export function Login() {
       toast.success('Login realizado com sucesso!');
       navigate(from, { replace: true });
     } catch (error) {
-      console.error('Erro inesperado:', error);
-      toast.error('Erro inesperado ao fazer login');
+      console.error('Erro inesperado no login:', error);
+      toast.error('Erro interno do sistema', {
+        description: 'Tente novamente em alguns instantes ou contate o administrador.',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +85,11 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">Bem-vindo</CardTitle>
+          <CardTitle className="text-2xl font-bold">Acesso ao Sistema</CardTitle>
           <CardDescription>
-            Sistema de Gestão de Idosos - Secretaria de Assistência Social
+            Sistema de Gestão de Idosos
+            <br />
+            Secretaria de Assistência Social
           </CardDescription>
         </CardHeader>
         
@@ -103,18 +123,37 @@ export function Login() {
                 <Input
                   {...form.register('password')}
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="pl-10"
+                  className="pl-10 pr-10"
                   disabled={isLoading}
                   autoComplete="current-password"
                 />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </Button>
               </div>
               {form.formState.errors.password && (
                 <p className="text-sm text-red-500">
                   {form.formState.errors.password.message}
                 </p>
               )}
+            </div>
+
+            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
+              <strong>Importante:</strong> Use apenas as credenciais fornecidas pelo administrador do sistema. 
+              Mantenha suas informações de acesso seguras.
             </div>
           </CardContent>
           
@@ -130,7 +169,7 @@ export function Login() {
                   Entrando...
                 </div>
               ) : (
-                'Entrar'
+                'Entrar no Sistema'
               )}
             </Button>
           </CardFooter>

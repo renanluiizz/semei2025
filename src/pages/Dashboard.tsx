@@ -192,11 +192,13 @@ export function Dashboard() {
                         {atividade.activity_type}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {atividade.elder?.name} • {format(new Date(atividade.check_in_time), 'dd/MM/yyyy', { locale: ptBR })}
+                        {atividade.elder?.name} • {format(new Date(atividade.check_in_time), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Staff ID: {atividade.staff_id}
-                      </p>
+                      {atividade.staff?.full_name && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          Responsável: {atividade.staff.full_name}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))
@@ -229,7 +231,7 @@ export function Dashboard() {
                   <div>
                     <p className="font-medium text-gray-900">{idoso.name}</p>
                     <p className="text-sm text-gray-500">
-                      {format(new Date(idoso.birth_date), 'dd/MM', { locale: ptBR })}
+                      {format(new Date(idoso.birth_date), 'dd/MM', { locale: ptBR })} • {idoso.age || 0} anos
                     </p>
                   </div>
                 </div>

@@ -63,12 +63,13 @@ export function CheckInDialog({ open, onOpenChange }: CheckInDialogProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['atividades'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
       toast.success('Check-in realizado com sucesso!');
       form.reset();
       onOpenChange(false);
     },
-    onError: () => {
-      toast.error('Erro ao realizar check-in');
+    onError: (error: any) => {
+      toast.error('Erro ao realizar check-in: ' + error.message);
     }
   });
 
@@ -155,7 +156,10 @@ export function CheckInDialog({ open, onOpenChange }: CheckInDialogProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                form.reset();
+                onOpenChange(false);
+              }}
             >
               Cancelar
             </Button>

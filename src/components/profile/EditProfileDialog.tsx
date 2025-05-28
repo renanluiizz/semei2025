@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { User, Save } from 'lucide-react';
+import { User, Save, X } from 'lucide-react';
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -50,7 +50,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileForm) => {
-      // Atualizar dados no Supabase
+      // Atualizar dados na tabela staff
       const updates: any = {
         full_name: data.full_name,
         email: data.email,
@@ -64,7 +64,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
       if (staffError) throw staffError;
 
       // Se uma nova senha foi fornecida, atualizar a senha de autenticação
-      if (data.password) {
+      if (data.password && data.password.trim() !== '') {
         const { error: authError } = await supabase.auth.updateUser({
           email: data.email,
           password: data.password,
@@ -91,8 +91,11 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
         confirmPassword: '',
       });
       onOpenChange(false);
+      // Recarregar a página para atualizar os dados do usuário
+      window.location.reload();
     },
     onError: (error: any) => {
+      console.error('Erro ao atualizar perfil:', error);
       toast.error('Erro ao atualizar perfil: ' + (error.message || 'Erro desconhecido'));
     }
   });
@@ -105,10 +108,15 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Editar Perfil
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Editar Perfil
+            </DialogTitle>
+            <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
           <DialogDescription>
             Atualize suas informações pessoais e senha
           </DialogDescription>
@@ -179,7 +187,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
               disabled={updateProfileMutation.isPending}
             >
               <Save className="h-4 w-4 mr-2" />
-              {updateProfileMutation.isPending ? 'Salvando...' : 'Salvar'}
+              {updateProfileMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </div>
         </form>

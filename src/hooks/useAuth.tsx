@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           }, 5000);
 
-          const { data: profile } = await supabase
+          const { data: profile, error } = await supabase
             .from('staff')
             .select('*')
             .eq('id', session.user.id)
@@ -47,14 +47,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           clearTimeout(timeoutId);
           
-          if (mounted && profile) {
-            setUserProfile({
-              id: profile.id,
-              email: profile.email,
-              full_name: profile.full_name,
-              role: profile.role as 'admin' | 'operator',
-              created_at: profile.created_at
-            });
+          if (mounted) {
+            if (profile && !error) {
+              setUserProfile({
+                id: profile.id,
+                email: profile.email,
+                full_name: profile.full_name,
+                role: profile.role as 'admin' | 'operator',
+                created_at: profile.created_at
+              });
+            } else if (error) {
+              console.error('Erro ao buscar perfil do usuário:', error);
+              // Se não encontrar o perfil na tabela staff, fazer logout
+              await supabase.auth.signOut();
+            }
           }
         }
         
@@ -76,28 +82,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         if (!mounted) return;
         
+        console.log('Auth state changed:', event, session?.user?.email);
+        
         setUser(session?.user ?? null);
         
-        if (session?.user) {
+        if (session?.user && event !== 'SIGNED_OUT') {
           // Buscar perfil do usuário de forma assíncrona
           setTimeout(async () => {
             if (!mounted) return;
             
             try {
-              const { data: profile } = await supabase
+              const { data: profile, error } = await supabase
                 .from('staff')
                 .select('*')
                 .eq('id', session.user.id)
                 .single();
               
-              if (mounted && profile) {
-                setUserProfile({
-                  id: profile.id,
-                  email: profile.email,
-                  full_name: profile.full_name,
-                  role: profile.role as 'admin' | 'operator',
-                  created_at: profile.created_at
-                });
+              if (mounted) {
+                if (profile && !error) {
+                  setUserProfile({
+                    id: profile.id,
+                    email: profile.email,
+                    full_name: profile.full_name,
+                    role: profile.role as 'admin' | 'operator',
+                    created_at: profile.created_at
+                  });
+                } else if (error) {
+                  console.error('Erro ao buscar perfil:', error);
+                  // Se não encontrar o perfil na tabela staff, fazer logout
+                  await supabase.auth.signOut();
+                }
               }
             } catch (error) {
               console.error('Erro ao buscar perfil:', error);
@@ -119,23 +133,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
         password,
       });
-      return { error };
+
+      if (error) {
+        console.error('Erro no signIn:', error);
+        return { error };
+      }
+
+      // Verificar se o usuário existe na tabela staff
+      if (data.user) {
+        const { data: staffProfile, error: staffError } = await supabase
+          .from('staff')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        if (staffError || !staffProfile) {
+          console.error('Usuário não encontrado na tabela staff:', staffError);
+          await supabase.auth.signOut();
+          return { 
+            error: { 
+              message: 'User not authorized',
+              description: 'Usuário não autorizado a acessar o sistema.'
+            } 
+          };
+        }
+      }
+
+      return { error: null };
     } catch (error) {
+      console.error('Erro inesperado no signIn:', error);
       return { error };
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
     try {
+      setLoading(true);
       await supabase.auth.signOut();
       setUser(null);
       setUserProfile(null);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
