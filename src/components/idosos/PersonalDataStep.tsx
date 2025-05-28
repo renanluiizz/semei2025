@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,7 +20,7 @@ export function PersonalDataStep({ form }: PersonalDataStepProps) {
             placeholder="Nome completo do idoso"
           />
           {form.formState.errors.name && (
-            <p className="text-sm text-red-500">{form.formState.errors.name.message}</p>
+            <p className="text-sm text-red-500">{String(form.formState.errors.name.message)}</p>
           )}
         </div>
         
@@ -33,7 +32,7 @@ export function PersonalDataStep({ form }: PersonalDataStepProps) {
             type="date"
           />
           {form.formState.errors.birth_date && (
-            <p className="text-sm text-red-500">{form.formState.errors.birth_date.message}</p>
+            <p className="text-sm text-red-500">{String(form.formState.errors.birth_date.message)}</p>
           )}
         </div>
       </div>
@@ -52,7 +51,7 @@ export function PersonalDataStep({ form }: PersonalDataStepProps) {
             </SelectContent>
           </Select>
           {form.formState.errors.gender && (
-            <p className="text-sm text-red-500">{form.formState.errors.gender.message}</p>
+            <p className="text-sm text-red-500">{String(form.formState.errors.gender.message)}</p>
           )}
         </div>
 
@@ -68,7 +67,7 @@ export function PersonalDataStep({ form }: PersonalDataStepProps) {
             }}
           />
           {form.formState.errors.cpf && (
-            <p className="text-sm text-red-500">{form.formState.errors.cpf.message}</p>
+            <p className="text-sm text-red-500">{String(form.formState.errors.cpf.message)}</p>
           )}
         </div>
       </div>
