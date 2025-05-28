@@ -1,11 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dbHelpers } from '@/lib/supabase';
-import { useAuth } from '@/hooks/useAuth';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,13 +25,13 @@ const atividadeSchema = z.object({
 
 type AtividadeForm = z.infer<typeof atividadeSchema>;
 
-interface NovaAtividadeDialogProps {
+interface EditAtividadeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  atividade: Atividade | null;
 }
 
-export function NovaAtividadeDialog({ open, onOpenChange }: NovaAtividadeDialogProps) {
-  const { userProfile } = useAuth();
+export function EditAtividadeDialog({ open, onOpenChange, atividade }: EditAtividadeDialogProps) {
   const queryClient = useQueryClient();
 
   const { data: idosos } = useQuery({
@@ -49,37 +48,48 @@ export function NovaAtividadeDialog({ open, onOpenChange }: NovaAtividadeDialogP
     defaultValues: {
       elder_id: '',
       activity_type: '',
-      check_in_time: new Date().toISOString().slice(0, 16),
+      check_in_time: '',
       status: 'presente',
       observation: '',
     },
   });
 
-  const createMutation = useMutation({
+  useEffect(() => {
+    if (atividade && open) {
+      form.reset({
+        elder_id: atividade.elder_id,
+        activity_type: atividade.activity_type,
+        check_in_time: new Date(atividade.check_in_time).toISOString().slice(0, 16),
+        status: (atividade as any).status || 'presente',
+        observation: atividade.observation || '',
+      });
+    }
+  }, [atividade, open, form]);
+
+  const updateMutation = useMutation({
     mutationFn: (data: AtividadeForm) => {
-      const atividadeData: Omit<Atividade, 'id' | 'created_at' | 'elder'> & { status?: string } = {
+      if (!atividade) throw new Error('Atividade não encontrada');
+      
+      return dbHelpers.updateAtividade(atividade.id, {
         elder_id: data.elder_id,
-        staff_id: userProfile?.id || '',
         activity_type: data.activity_type,
         check_in_time: data.check_in_time,
         status: data.status,
         observation: data.observation || null,
-      };
-      return dbHelpers.createAtividade(atividadeData);
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['atividades'] });
-      toast.success('Atividade cadastrada com sucesso!');
-      form.reset();
+      toast.success('Atividade atualizada com sucesso!');
       onOpenChange(false);
     },
     onError: () => {
-      toast.error('Erro ao cadastrar atividade');
+      toast.error('Erro ao atualizar atividade');
     }
   });
 
   const onSubmit = (data: AtividadeForm) => {
-    createMutation.mutate(data);
+    updateMutation.mutate(data);
   };
 
   const activityTypes = [
@@ -95,20 +105,22 @@ export function NovaAtividadeDialog({ open, onOpenChange }: NovaAtividadeDialogP
     'Outros'
   ];
 
+  if (!atividade) return null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Nova Atividade</DialogTitle>
+          <DialogTitle>Editar Atividade</DialogTitle>
           <DialogDescription>
-            Cadastre uma nova atividade para um idoso
+            Edite os dados da atividade
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <Label htmlFor="elder_id">Idoso *</Label>
-            <Select onValueChange={(value) => form.setValue('elder_id', value)}>
+            <Select onValueChange={(value) => form.setValue('elder_id', value)} value={form.watch('elder_id')}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um idoso" />
               </SelectTrigger>
@@ -127,7 +139,7 @@ export function NovaAtividadeDialog({ open, onOpenChange }: NovaAtividadeDialogP
 
           <div>
             <Label htmlFor="activity_type">Tipo de Atividade *</Label>
-            <Select onValueChange={(value) => form.setValue('activity_type', value)}>
+            <Select onValueChange={(value) => form.setValue('activity_type', value)} value={form.watch('activity_type')}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o tipo de atividade" />
               </SelectTrigger>
@@ -146,7 +158,7 @@ export function NovaAtividadeDialog({ open, onOpenChange }: NovaAtividadeDialogP
 
           <div>
             <Label htmlFor="status">Status de Presença</Label>
-            <Select onValueChange={(value: 'presente' | 'falta' | 'ausencia_justificada') => form.setValue('status', value)} defaultValue="presente">
+            <Select onValueChange={(value: 'presente' | 'falta' | 'ausencia_justificada') => form.setValue('status', value)} value={form.watch('status')}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
@@ -190,10 +202,10 @@ export function NovaAtividadeDialog({ open, onOpenChange }: NovaAtividadeDialogP
             </Button>
             <Button
               type="submit"
-              disabled={createMutation.isPending}
+              disabled={updateMutation.isPending}
             >
               <Save className="h-4 w-4 mr-2" />
-              {createMutation.isPending ? 'Salvando...' : 'Salvar'}
+              {updateMutation.isPending ? 'Salvando...' : 'Salvar'}
             </Button>
           </div>
         </form>

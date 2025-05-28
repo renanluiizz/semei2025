@@ -6,15 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Calendar, Plus, Trash2, User, Clock } from 'lucide-react';
+import { Calendar, Plus, Trash2, User, Clock, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { NovaAtividadeDialog } from '@/components/atividades/NovaAtividadeDialog';
+import { EditAtividadeDialog } from '@/components/atividades/EditAtividadeDialog';
 import type { Atividade } from '@/types/models';
 
 export function AtividadesList() {
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; atividade?: Atividade }>({
+    open: false
+  });
+  const [editDialog, setEditDialog] = useState<{ open: boolean; atividade?: Atividade }>({
     open: false
   });
   const [novaAtividadeOpen, setNovaAtividadeOpen] = useState(false);
@@ -46,10 +50,25 @@ export function AtividadesList() {
     setDeleteDialog({ open: true, atividade });
   };
 
+  const handleEdit = (atividade: Atividade) => {
+    setEditDialog({ open: true, atividade });
+  };
+
   const confirmDelete = () => {
     if (deleteDialog.atividade) {
       deleteMutation.mutate(deleteDialog.atividade.id);
     }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      presente: { label: 'Presente', className: 'bg-green-100 text-green-800' },
+      falta: { label: 'Falta', className: 'bg-red-100 text-red-800' },
+      ausencia_justificada: { label: 'Ausência Justificada', className: 'bg-yellow-100 text-yellow-800' }
+    };
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.presente;
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
   const getTipoColor = (tipo: string) => {
@@ -94,7 +113,7 @@ export function AtividadesList() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Atividades</h1>
           <p className="text-gray-500 mt-1">
-            Gerencie as atividades dos idosos
+            Gerencie as atividades e presença dos idosos
           </p>
         </div>
         <Button onClick={() => setNovaAtividadeOpen(true)}>
@@ -132,6 +151,7 @@ export function AtividadesList() {
                             <Badge className={getTipoColor(atividade.activity_type)}>
                               {atividade.activity_type}
                             </Badge>
+                            {(atividade as any).status && getStatusBadge((atividade as any).status)}
                             <div className="flex items-center text-sm text-gray-500">
                               <Clock className="h-4 w-4 mr-1" />
                               {format(new Date(atividade.check_in_time), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
@@ -158,6 +178,14 @@ export function AtividadesList() {
                   </div>
 
                   <div className="flex gap-2 ml-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(atividade)}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -194,6 +222,13 @@ export function AtividadesList() {
       <NovaAtividadeDialog 
         open={novaAtividadeOpen} 
         onOpenChange={setNovaAtividadeOpen}
+      />
+
+      {/* Edit Atividade Dialog */}
+      <EditAtividadeDialog
+        open={editDialog.open}
+        onOpenChange={(open) => setEditDialog({ open, atividade: open ? editDialog.atividade : undefined })}
+        atividade={editDialog.atividade || null}
       />
 
       {/* Delete Confirmation Dialog */}

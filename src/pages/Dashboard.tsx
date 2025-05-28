@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { StatCard } from '@/components/dashboard/DashboardStats';
 import { ActivityChart } from '@/components/dashboard/ActivityChart';
 import { QuickActions } from '@/components/dashboard/QuickActions';
-import { CheckInDialog } from '@/components/checkin/CheckInDialog';
+import { AttendanceDialog } from '@/components/checkin/AttendanceDialog';
 import { ReportGenerator } from '@/components/reports/ReportGenerator';
 import { QRCodeGenerator } from '@/components/checkin/QRCodeGenerator';
 import { Users, Calendar, Activity, TrendingUp, Clock, AlertTriangle } from 'lucide-react';
@@ -80,7 +80,7 @@ const DashboardSkeleton = () => (
 );
 
 export function Dashboard() {
-  const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
+  const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
   const [reportGeneratorOpen, setReportGeneratorOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -188,7 +188,7 @@ export function Dashboard() {
 
         {/* Quick Actions */}
         <QuickActions
-          onCheckIn={() => setCheckInDialogOpen(true)}
+          onCheckIn={() => setAttendanceDialogOpen(true)}
           onGenerateReport={() => setReportGeneratorOpen(true)}
           onViewIdosos={() => navigate('/idosos')}
           onViewActivities={() => navigate('/atividades')}
@@ -196,9 +196,6 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* QR Code Generator */}
-        <QRCodeGenerator />
-
         {/* Recent Activities */}
         <Card>
           <CardHeader>
@@ -268,9 +265,9 @@ export function Dashboard() {
       )}
 
       {/* Dialogs */}
-      <CheckInDialog 
-        open={checkInDialogOpen} 
-        onOpenChange={setCheckInDialogOpen} 
+      <AttendanceDialog 
+        open={attendanceDialogOpen} 
+        onOpenChange={setAttendanceDialogOpen} 
       />
       
       <ReportGenerator 

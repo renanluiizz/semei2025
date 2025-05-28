@@ -1,3 +1,4 @@
+
 export interface Idoso {
   id: string;
   created_at: string;
@@ -53,6 +54,7 @@ export interface Atividade {
   staff_id: string;
   activity_type: string;
   check_in_time: string;
+  status?: 'presente' | 'falta' | 'ausencia_justificada';
   observation?: string;
   
   // Relacionamentos
