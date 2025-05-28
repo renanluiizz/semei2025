@@ -7,7 +7,15 @@ import { useQuery } from '@tanstack/react-query';
 import { dbHelpers } from '@/lib/supabase';
 import { QrCode, Download } from 'lucide-react';
 
-export function QRCodeGenerator() {
+interface QRCodeGeneratorProps {
+  data?: {
+    type: string;
+    timestamp: number;
+    location: string;
+  };
+}
+
+export function QRCodeGenerator({ data }: QRCodeGeneratorProps) {
   const [selectedElder, setSelectedElder] = useState('');
   const [qrCodeData, setQrCodeData] = useState('');
 
@@ -26,8 +34,15 @@ export function QRCodeGenerator() {
     const elder = idosos?.find(i => i.id === selectedElder);
     if (!elder) return;
 
+    // Use the passed data if available, otherwise create default data
+    const qrData = data || {
+      type: 'checkin',
+      timestamp: Date.now(),
+      location: window.location.origin
+    };
+
     // Dados para o QR Code (URL que direciona para check-in automático)
-    const checkInUrl = `${window.location.origin}/checkin?elder=${selectedElder}&name=${encodeURIComponent(elder.name)}`;
+    const checkInUrl = `${qrData.location}/checkin?elder=${selectedElder}&name=${encodeURIComponent(elder.name)}&type=${qrData.type}&timestamp=${qrData.timestamp}`;
     setQrCodeData(checkInUrl);
   };
 
