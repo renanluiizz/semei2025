@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dbHelpers } from '@/lib/supabase';
@@ -46,6 +45,135 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
       return data;
     },
   });
+
+  const exportToCSV = (data: any[], filename: string) => {
+    if (!data.length) return;
+    
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${filename}.csv`;
+    link.click();
+  };
+
+  const exportToExcel = (data: any[], filename: string) => {
+    // Simulação de exportação Excel (em produção usar biblioteca como xlsx)
+    const headers = Object.keys(data[0] || {});
+    const csvContent = [
+      headers.join('\t'),
+      ...data.map(row => headers.map(header => row[header] || '').join('\t'))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${filename}.xlsx`;
+    link.click();
+  };
+
+  const handleExportCSV = () => {
+    if (!reportType || !startDate || !endDate) {
+      toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    let data: any[] = [];
+    let filename = '';
+
+    if (reportType === 'idosos') {
+      const filteredIdosos = idosos?.filter(idoso => {
+        const registrationDate = new Date(idoso.registration_date || idoso.created_at);
+        return registrationDate >= new Date(startDate) && registrationDate <= new Date(endDate);
+      }) || [];
+
+      data = filteredIdosos.map(idoso => ({
+        Nome: idoso.name,
+        'Data Nascimento': new Date(idoso.birth_date).toLocaleDateString('pt-BR'),
+        Idade: `${idoso.age || 0} anos`,
+        Gênero: idoso.gender,
+        CPF: idoso.cpf,
+        'Data Cadastro': new Date(idoso.registration_date || idoso.created_at).toLocaleDateString('pt-BR')
+      }));
+      filename = `idosos_${startDate}_${endDate}`;
+    } else if (reportType === 'atividades') {
+      let filteredAtividades = atividades?.filter(atividade => {
+        const activityDate = new Date(atividade.check_in_time);
+        const inDateRange = activityDate >= new Date(startDate) && activityDate <= new Date(endDate);
+        if (selectedElder) {
+          return inDateRange && atividade.elder_id === selectedElder;
+        }
+        return inDateRange;
+      }) || [];
+
+      data = filteredAtividades.map(atividade => ({
+        Idoso: atividade.elder?.name || 'N/A',
+        Atividade: atividade.activity_type,
+        Data: new Date(atividade.check_in_time).toLocaleDateString('pt-BR'),
+        Hora: new Date(atividade.check_in_time).toLocaleTimeString('pt-BR'),
+        Responsável: atividade.staff?.full_name || 'N/A',
+        Observações: atividade.observation || '-'
+      }));
+      filename = `atividades_${startDate}_${endDate}`;
+    }
+
+    exportToCSV(data, filename);
+    toast.success('Arquivo CSV exportado com sucesso!');
+  };
+
+  const handleExportExcel = () => {
+    if (!reportType || !startDate || !endDate) {
+      toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    let data: any[] = [];
+    let filename = '';
+
+    if (reportType === 'idosos') {
+      const filteredIdosos = idosos?.filter(idoso => {
+        const registrationDate = new Date(idoso.registration_date || idoso.created_at);
+        return registrationDate >= new Date(startDate) && registrationDate <= new Date(endDate);
+      }) || [];
+
+      data = filteredIdosos.map(idoso => ({
+        Nome: idoso.name,
+        'Data Nascimento': new Date(idoso.birth_date).toLocaleDateString('pt-BR'),
+        Idade: `${idoso.age || 0} anos`,
+        Gênero: idoso.gender,
+        CPF: idoso.cpf,
+        'Data Cadastro': new Date(idoso.registration_date || idoso.created_at).toLocaleDateString('pt-BR')
+      }));
+      filename = `idosos_${startDate}_${endDate}`;
+    } else if (reportType === 'atividades') {
+      let filteredAtividades = atividades?.filter(atividade => {
+        const activityDate = new Date(atividade.check_in_time);
+        const inDateRange = activityDate >= new Date(startDate) && activityDate <= new Date(endDate);
+        if (selectedElder) {
+          return inDateRange && atividade.elder_id === selectedElder;
+        }
+        return inDateRange;
+      }) || [];
+
+      data = filteredAtividades.map(atividade => ({
+        Idoso: atividade.elder?.name || 'N/A',
+        Atividade: atividade.activity_type,
+        Data: new Date(atividade.check_in_time).toLocaleDateString('pt-BR'),
+        Hora: new Date(atividade.check_in_time).toLocaleTimeString('pt-BR'),
+        Responsável: atividade.staff?.full_name || 'N/A',
+        Observações: atividade.observation || '-'
+      }));
+      filename = `atividades_${startDate}_${endDate}`;
+    }
+
+    exportToExcel(data, filename);
+    toast.success('Arquivo Excel exportado com sucesso!');
+  };
 
   const generatePDF = async () => {
     if (!reportType || !startDate || !endDate) {
@@ -277,7 +405,7 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-      <Card className="w-full max-w-md mx-4">
+      <Card className="w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -289,70 +417,100 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="reportType">Tipo de Relatório *</Label>
-            <Select onValueChange={setReportType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="idosos">Relatório de Idosos</SelectItem>
-                <SelectItem value="atividades">Relatório de Atividades</SelectItem>
-                <SelectItem value="frequencia">Relatório de Frequência</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="startDate">Data Inicial *</Label>
-            <Input
-              id="startDate"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="endDate">Data Final *</Label>
-            <Input
-              id="endDate"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-
-          {reportType === 'atividades' && (
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="selectedElder">Idoso (opcional)</Label>
-              <Select onValueChange={setSelectedElder}>
+              <Label htmlFor="reportType">Tipo de Relatório *</Label>
+              <Select onValueChange={setReportType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Todos os idosos" />
+                  <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os idosos</SelectItem>
-                  {idosos?.map((idoso) => (
-                    <SelectItem key={idoso.id} value={idoso.id}>
-                      {idoso.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="idosos">Relatório de Idosos</SelectItem>
+                  <SelectItem value="atividades">Relatório de Atividades</SelectItem>
+                  <SelectItem value="frequencia">Relatório de Frequência</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          )}
 
-          <div className="flex justify-end gap-4 pt-4">
+            <div>
+              <Label htmlFor="startDate">Data Inicial *</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="endDate">Data Final *</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+
+            {reportType === 'atividades' && (
+              <div>
+                <Label htmlFor="selectedElder">Idoso (opcional)</Label>
+                <Select onValueChange={setSelectedElder}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos os idosos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos os idosos</SelectItem>
+                    {idosos?.map((idoso) => (
+                      <SelectItem key={idoso.id} value={idoso.id}>
+                        {idoso.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+
+          {/* Export Options */}
+          <div className="border-t pt-4">
+            <h3 className="font-semibold mb-3">Formatos de Exportação</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button 
+                onClick={generatePDF} 
+                disabled={isGenerating}
+                className="flex items-center justify-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                {isGenerating ? 'Gerando...' : 'PDF'}
+              </Button>
+              
+              <Button 
+                onClick={handleExportExcel} 
+                disabled={isGenerating}
+                variant="outline"
+                className="flex items-center justify-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Excel
+              </Button>
+              
+              <Button 
+                onClick={handleExportCSV} 
+                disabled={isGenerating}
+                variant="outline"
+                className="flex items-center justify-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                CSV
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-4 pt-4 border-t">
             <Button variant="outline" onClick={onClose}>
               Cancelar
-            </Button>
-            <Button 
-              onClick={generatePDF} 
-              disabled={isGenerating}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              {isGenerating ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </CardContent>

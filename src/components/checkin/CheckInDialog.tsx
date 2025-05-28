@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -31,6 +30,7 @@ interface CheckInDialogProps {
 export function CheckInDialog({ open, onOpenChange }: CheckInDialogProps) {
   const { userProfile } = useAuth();
   const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data: idosos } = useQuery({
     queryKey: ['idosos'],
@@ -90,9 +90,29 @@ export function CheckInDialog({ open, onOpenChange }: CheckInDialogProps) {
     'Outros'
   ];
 
+  const filteredIdosos = idosos?.filter(idoso => 
+    idoso.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    idoso.cpf.includes(searchTerm)
+  ) || [];
+
+  const checkTodayCheckIn = (elderId: string) => {
+    if (!atividades) return false;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return atividades.some(atividade => {
+      const checkInDate = new Date(atividade.check_in_time);
+      checkInDate.setHours(0, 0, 0, 0);
+      return atividade.elder_id === elderId && checkInDate.getTime() === today.getTime();
+    });
+  };
+
+  const selectedElderHasCheckIn = form.watch('elder_id') ? checkTodayCheckIn(form.watch('elder_id')) : false;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
@@ -105,21 +125,36 @@ export function CheckInDialog({ open, onOpenChange }: CheckInDialogProps) {
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label htmlFor="elder_id">Idoso *</Label>
+            <Label htmlFor="elder_search">Buscar Idoso *</Label>
+            <Input
+              id="elder_search"
+              placeholder="Digite o nome ou CPF do idoso..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mb-2"
+            />
             <Select onValueChange={(value) => form.setValue('elder_id', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um idoso" />
               </SelectTrigger>
               <SelectContent>
-                {idosos?.map((idoso) => (
+                {filteredIdosos.map((idoso) => (
                   <SelectItem key={idoso.id} value={idoso.id}>
-                    {idoso.name}
+                    <div className="flex flex-col">
+                      <span>{idoso.name}</span>
+                      <span className="text-xs text-gray-500">CPF: {idoso.cpf}</span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {form.formState.errors.elder_id && (
               <p className="text-sm text-red-500">{form.formState.errors.elder_id.message}</p>
+            )}
+            {selectedElderHasCheckIn && (
+              <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                ⚠️ Este idoso já realizou check-in hoje
+              </div>
             )}
           </div>
 
@@ -152,12 +187,19 @@ export function CheckInDialog({ open, onOpenChange }: CheckInDialogProps) {
             />
           </div>
 
+          {/* Staff Info */}
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <Label className="text-sm font-medium text-gray-700">Responsável pelo Check-in</Label>
+            <p className="text-sm text-gray-600">{userProfile?.full_name || 'Usuário não identificado'}</p>
+          </div>
+
           <div className="flex justify-end gap-4 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => {
                 form.reset();
+                setSearchTerm('');
                 onOpenChange(false);
               }}
             >
@@ -165,7 +207,7 @@ export function CheckInDialog({ open, onOpenChange }: CheckInDialogProps) {
             </Button>
             <Button
               type="submit"
-              disabled={checkInMutation.isPending}
+              disabled={checkInMutation.isPending || selectedElderHasCheckIn}
             >
               <Save className="h-4 w-4 mr-2" />
               {checkInMutation.isPending ? 'Realizando...' : 'Confirmar Check-in'}
