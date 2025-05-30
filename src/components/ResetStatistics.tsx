@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { RotateCcw, AlertTriangle, X, CheckCircle2, Shield } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ResetStatisticsProps {
   open: boolean;
@@ -17,6 +18,7 @@ export function ResetStatistics({ open, onClose }: ResetStatisticsProps) {
   const [confirmationText, setConfirmationText] = useState('');
   const [isResetting, setIsResetting] = useState(false);
   const [step, setStep] = useState<'confirmation' | 'processing' | 'success'>('confirmation');
+  const queryClient = useQueryClient();
 
   const handleReset = async () => {
     if (confirmationText.toLowerCase() !== 'resetar') {
@@ -31,7 +33,17 @@ export function ResetStatistics({ open, onClose }: ResetStatisticsProps) {
       // Simular processo de reset com feedback visual
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Aqui seria a chamada real para o backend
+      // Limpar cache do React Query
+      queryClient.clear();
+      
+      // Limpar localStorage (mantendo tipos de atividade)
+      const tiposAtividade = localStorage.getItem('tipos-atividade');
+      localStorage.clear();
+      if (tiposAtividade) {
+        localStorage.setItem('tipos-atividade', tiposAtividade);
+      }
+      
+      // Aqui seria a chamada real para o backend resetar estatísticas
       // Apenas resetar estatísticas, mantendo cadastros
       
       setStep('success');

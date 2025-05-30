@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,44 +10,22 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Save, X, Activity, CheckCircle2, AlertCircle } from 'lucide-react';
+import { tiposAtividadeHelpers, type TipoAtividade } from '@/lib/tiposAtividade';
 
-interface TipoAtividade {
-  id: string;
-  nome: string;
-  descricao?: string;
-  ativo: boolean;
-  criado_em: string;
-}
-
-export function TiposAtividade() {
-  const [tiposAtividade] = useState<TipoAtividade[]>([
-    {
-      id: '1',
-      nome: 'Exercícios Físicos',
-      descricao: 'Atividades de exercício físico adaptado para idosos',
-      ativo: true,
-      criado_em: new Date().toISOString()
-    },
-    {
-      id: '2',
-      nome: 'Artesanato',
-      descricao: 'Oficinas de trabalhos manuais e artesanato',
-      ativo: true,
-      criado_em: new Date().toISOString()
-    },
-    {
-      id: '3',
-      nome: 'Música',
-      descricao: 'Atividades musicais e terapia através da música',
-      ativo: true,
-      criado_em: new Date().toISOString()
-    }
-  ]);
-
+export default function TiposAtividade() {
   const [novoTipo, setNovoTipo] = useState({ nome: '', descricao: '' });
   const [editingTipo, setEditingTipo] = useState<TipoAtividade | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const queryClient = useQueryClient();
+
+  const { data: tiposAtividade, isLoading } = useQuery({
+    queryKey: ['tipos-atividade'],
+    queryFn: async () => {
+      const { data, error } = await tiposAtividadeHelpers.getTiposAtividade();
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const validateForm = (data: { nome: string; descricao?: string }, isEditing = false) => {
     const newErrors: { [key: string]: string } = {};
@@ -63,7 +41,7 @@ export function TiposAtividade() {
     }
 
     // Verificar duplicatas
-    const exists = tiposAtividade.some(tipo => 
+    const exists = tiposAtividade?.some(tipo => 
       tipo.nome.toLowerCase() === data.nome.trim().toLowerCase() &&
       (!isEditing || tipo.id !== editingTipo?.id)
     );
@@ -77,11 +55,12 @@ export function TiposAtividade() {
   };
 
   const createMutation = useMutation({
-    mutationFn: async (data: { nome: string; descricao?: string }) => {
-      // Simular delay da API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return { ...data, id: Date.now().toString(), ativo: true, criado_em: new Date().toISOString() };
-    },
+    mutationFn: (data: { nome: string; descricao?: string }) => 
+      tiposAtividadeHelpers.createTipoAtividade({
+        nome: data.nome.trim(),
+        descricao: data.descricao?.trim(),
+        ativo: true
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tipos-atividade'] });
       toast.success('Tipo de atividade criado com sucesso!', {
@@ -98,10 +77,11 @@ export function TiposAtividade() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { id: string; nome: string; descricao?: string }) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return data;
-    },
+    mutationFn: (data: { id: string; nome: string; descricao?: string }) =>
+      tiposAtividadeHelpers.updateTipoAtividade(data.id, {
+        nome: data.nome.trim(),
+        descricao: data.descricao?.trim()
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tipos-atividade'] });
       toast.success('Tipo de atividade atualizado com sucesso!');
@@ -116,10 +96,7 @@ export function TiposAtividade() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return id;
-    },
+    mutationFn: (id: string) => tiposAtividadeHelpers.deleteTipoAtividade(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tipos-atividade'] });
       toast.success('Tipo de atividade removido com sucesso!');
@@ -138,10 +115,7 @@ export function TiposAtividade() {
       });
       return;
     }
-    createMutation.mutate({
-      nome: novoTipo.nome.trim(),
-      descricao: novoTipo.descricao?.trim()
-    });
+    createMutation.mutate(novoTipo);
   };
 
   const handleUpdate = () => {
@@ -154,8 +128,8 @@ export function TiposAtividade() {
     }
     updateMutation.mutate({
       id: editingTipo.id,
-      nome: editingTipo.nome.trim(),
-      descricao: editingTipo.descricao?.trim()
+      nome: editingTipo.nome,
+      descricao: editingTipo.descricao
     });
   };
 
@@ -166,6 +140,26 @@ export function TiposAtividade() {
   };
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
+        <div className="grid gap-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -269,11 +263,11 @@ export function TiposAtividade() {
             Tipos Cadastrados
           </CardTitle>
           <CardDescription>
-            {tiposAtividade.length} tipos de atividade cadastrados
+            {tiposAtividade?.length || 0} tipos de atividade cadastrados
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {tiposAtividade.length > 0 ? (
+          {tiposAtividade && tiposAtividade.length > 0 ? (
             <div className="space-y-4">
               {tiposAtividade.map((tipo) => (
                 <div key={tipo.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">

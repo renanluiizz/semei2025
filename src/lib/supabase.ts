@@ -8,6 +8,7 @@ export { idososHelpers } from './idosos';
 export { atividadesHelpers } from './atividades';
 export { staffHelpers } from './staff';
 export { dashboardHelpers } from './dashboard';
+export { tiposAtividadeHelpers } from './tiposAtividade';
 
 // Consolidated database helpers object for backward compatibility
 export const dbHelpers = {
@@ -24,6 +25,12 @@ export const dbHelpers = {
   createAtividade: async (atividade: any) => (await import('./atividades')).atividadesHelpers.createAtividade(atividade),
   updateAtividade: async (id: string, updates: any) => (await import('./atividades')).atividadesHelpers.updateAtividade(id, updates),
   deleteAtividade: async (id: string) => (await import('./atividades')).atividadesHelpers.deleteAtividade(id),
+  
+  // Tipos de Atividade
+  getTiposAtividade: async () => (await import('./tiposAtividade')).tiposAtividadeHelpers.getTiposAtividade(),
+  createTipoAtividade: async (tipo: any) => (await import('./tiposAtividade')).tiposAtividadeHelpers.createTipoAtividade(tipo),
+  updateTipoAtividade: async (id: string, updates: any) => (await import('./tiposAtividade')).tiposAtividadeHelpers.updateTipoAtividade(id, updates),
+  deleteTipoAtividade: async (id: string) => (await import('./tiposAtividade')).tiposAtividadeHelpers.deleteTipoAtividade(id),
   
   // Staff
   updateStaffProfile: async (id: string, updates: any) => (await import('./staff')).staffHelpers.updateStaffProfile(id, updates),
