@@ -10,7 +10,9 @@ import {
   Calendar,
   Settings,
   LogOut,
-  UserPlus
+  UserPlus,
+  Activity,
+  Heart
 } from 'lucide-react';
 
 export function Layout() {
@@ -28,21 +30,29 @@ export function Layout() {
     { icon: Users, label: 'Idosos', path: '/idosos' },
     { icon: UserPlus, label: 'Novo Cadastro', path: '/idosos/novo' },
     { icon: Calendar, label: 'Atividades', path: '/atividades' },
+    { icon: Activity, label: 'Tipos de Atividade', path: '/tipos-atividade' },
     { icon: Settings, label: 'Configurações', path: '/configuracoes' },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div className="w-64 bg-white/95 backdrop-blur-sm border-r border-border/50 flex flex-col shadow-lg">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-gray-900">
-            Sistema de Gestão
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Assistência Social
-          </p>
+        <div className="p-6 border-b border-border/50 semei-header">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <Heart className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">
+                SEMEI
+              </h1>
+              <p className="text-xs text-white/80">
+                Secretaria da Melhor Idade
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -56,10 +66,10 @@ export function Layout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
                   isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-primary/10 hover:to-secondary/10 hover:text-primary'
                 }`}
               >
                 <Icon size={18} />
@@ -73,16 +83,16 @@ export function Layout() {
 
         {/* User Info */}
         <div className="p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <User size={16} className="text-primary-foreground" />
+          <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-gradient-to-r from-primary/5 to-secondary/5">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
+              <User size={18} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
                 {userProfile?.full_name || 'Usuário'}
               </p>
               <p className="text-xs text-gray-500 truncate">
-                {userProfile?.role || 'Role'}
+                {userProfile?.role === 'admin' ? 'Administrador' : 'Servidor'}
               </p>
             </div>
           </div>
@@ -91,19 +101,27 @@ export function Layout() {
             variant="ghost"
             size="sm"
             onClick={handleSignOut}
-            className="w-full justify-start text-gray-700"
+            className="w-full justify-start text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"
           >
             <LogOut size={16} className="mr-2" />
-            Sair
+            Sair do Sistema
           </Button>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 overflow-auto">
           <Outlet />
         </main>
+        
+        {/* Footer */}
+        <footer className="px-6 py-4 border-t border-border/50 bg-white/50 backdrop-blur-sm">
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span>© 2024 Secretaria da Melhor Idade - SEMEI</span>
+            <span>Sistema de Gestão Institucional</span>
+          </div>
+        </footer>
       </div>
     </div>
   );

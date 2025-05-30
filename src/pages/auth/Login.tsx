@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { User, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, Heart } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 const loginSchema = z.object({
@@ -48,7 +48,6 @@ export function Login() {
       if (error) {
         console.error('Erro de login:', error);
         
-        // Mensagens de erro mais específicas e seguras
         let errorMessage = 'Erro ao fazer login';
         let errorDescription = 'Verifique suas credenciais e tente novamente';
 
@@ -82,29 +81,41 @@ export function Login() {
   }, [signIn, navigate, from, isLoading]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">Acesso ao Sistema</CardTitle>
-          <CardDescription>
-            Sistema de Gestão de Idosos
-            <br />
-            Secretaria de Assistência Social
-          </CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5" />
+      
+      <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+        <CardHeader className="space-y-4 text-center pb-8">
+          <div className="flex justify-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
+              <Heart className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          <div>
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              SEMEI
+            </CardTitle>
+            <CardDescription className="text-lg font-medium text-gray-700 mt-2">
+              Secretaria da Melhor Idade
+            </CardDescription>
+            <p className="text-sm text-gray-500 mt-1">
+              Sistema de Gestão Institucional
+            </p>
+          </div>
         </CardHeader>
         
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   {...form.register('email')}
                   id="email"
                   type="email"
-                  placeholder="seu.email@municipio.gov.br"
-                  className="pl-10"
+                  placeholder="seu.email@semei.gov.br"
+                  className="pl-10 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
                   disabled={isLoading}
                   autoComplete="email"
                 />
@@ -117,7 +128,7 @@ export function Login() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -125,7 +136,7 @@ export function Login() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="pl-10 pr-10"
+                  className="pl-10 pr-10 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
                   disabled={isLoading}
                   autoComplete="current-password"
                 />
@@ -133,7 +144,7 @@ export function Login() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent rounded-xl"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                 >
@@ -151,25 +162,25 @@ export function Login() {
               )}
             </div>
 
-            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-md">
-              <strong>Importante:</strong> Use apenas as credenciais fornecidas pelo administrador do sistema. 
+            <div className="text-xs text-gray-500 bg-gradient-to-r from-primary/5 to-secondary/5 p-4 rounded-xl border border-primary/10">
+              <strong>Importante:</strong> Use apenas as credenciais fornecidas pelo administrador do sistema SEMEI. 
               Mantenha suas informações de acesso seguras.
             </div>
           </CardContent>
           
-          <CardFooter>
+          <CardFooter className="pt-0">
             <Button
               type="submit"
-              className="w-full"
+              className="w-full semei-button bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium"
               disabled={isLoading}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <LoadingSpinner size="sm" />
-                  Entrando...
+                  Entrando no Sistema...
                 </div>
               ) : (
-                'Entrar no Sistema'
+                'Entrar no Sistema SEMEI'
               )}
             </Button>
           </CardFooter>

@@ -18,6 +18,7 @@ const IdosoDetails = lazy(() => import("@/pages/idosos/IdosoDetails"));
 const EditIdoso = lazy(() => import("@/pages/idosos/EditIdoso"));
 const NovoIdoso = lazy(() => import("@/pages/idosos/NovoIdoso").then(module => ({ default: module.NovoIdoso })));
 const AtividadesList = lazy(() => import("@/pages/atividades/AtividadesList").then(module => ({ default: module.AtividadesList })));
+const TiposAtividade = lazy(() => import("@/pages/TiposAtividade").then(module => ({ default: module.TiposAtividade })));
 const Configuracoes = lazy(() => import("@/pages/Configuracoes"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
@@ -79,6 +80,11 @@ const App = () => (
               <Route path="atividades" element={
                 <Suspense fallback={<PageLoading />}>
                   <AtividadesList />
+                </Suspense>
+              } />
+              <Route path="tipos-atividade" element={
+                <Suspense fallback={<PageLoading />}>
+                  <TiposAtividade />
                 </Suspense>
               } />
               <Route path="configuracoes" element={
