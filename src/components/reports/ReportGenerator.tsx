@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { FileText, Download, Filter, Calendar, Users, BarChart3 } from 'lucide-react';
+import { FileText, Download, Filter, Calendar, Users, BarChart3, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import jsPDF from 'jspdf';
@@ -50,18 +50,19 @@ interface GenderStats {
 }
 
 export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [activityType, setActivityType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   const { data: activitiesData, isLoading, error } = useQuery({
     queryKey: ['activities'],
     queryFn: () => dbHelpers.getAtividades(),
   });
 
-  // Extract activities array from the response data
-  const activities: Activity[] = activitiesData?.data || [];
+  // Validação e extração segura dos dados
+  const activities: Activity[] = Array.isArray(activitiesData?.data) ? activitiesData.data : [];
 
   const formatDate = (dateString: string): string => {
     try {
@@ -72,23 +73,36 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
     }
   };
 
+  const validateDateRange = (): boolean => {
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (start > end) {
+        toast.error('A data de início deve ser anterior à data de fim');
+        return false;
+      }
+    }
+    return true;
+  };
+
   const filteredActivities = activities.filter((atividade) => {
+    if (!validateDateRange()) return false;
+    
     const activityDate = new Date(atividade.data_atividade);
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
 
-    if (start && activityDate < start) {
-      return false;
+    if (start && activityDate < start) return false;
+    if (end && activityDate > end) return false;
+    if (activityType !== 'all' && atividade.tipo_atividade !== activityType) return false;
+    
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesName = atividade.idoso?.nome?.toLowerCase().includes(searchLower);
+      const matchesType = atividade.tipo_atividade?.toLowerCase().includes(searchLower);
+      if (!matchesName && !matchesType) return false;
     }
-    if (end && activityDate > end) {
-      return false;
-    }
-    if (activityType !== 'all' && atividade.tipo_atividade !== activityType) {
-      return false;
-    }
-    if (searchTerm && !atividade.idoso?.nome.toLowerCase().includes(searchTerm.toLowerCase()) && !atividade.tipo_atividade.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
+    
     return true;
   });
 
@@ -111,35 +125,56 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
     return stats;
   }, {});
 
-  const generateXLSX = () => {
+  const generateXLSX = async () => {
     if (!filteredActivities || filteredActivities.length === 0) {
-      toast.error('Nenhuma atividade para exportar.');
+      toast.error('Nenhuma atividade encontrada para exportar');
       return;
     }
 
-    const data = filteredActivities.map((atividade) => ({
-      Data: format(new Date(atividade.data_atividade), 'dd/MM/yyyy', { locale: ptBR }),
-      Tipo: atividade.tipo_atividade || 'N/A',
-      Participante: atividade.idoso?.nome || 'N/A',
-      Observações: atividade.observacoes || 'N/A',
-    }));
+    setIsGenerating(true);
+    
+    try {
+      const data = filteredActivities.map((atividade) => ({
+        Data: format(new Date(atividade.data_atividade), 'dd/MM/yyyy', { locale: ptBR }),
+        Tipo: atividade.tipo_atividade || 'N/A',
+        Participante: atividade.idoso?.nome || 'N/A',
+        Observações: atividade.observacoes || 'N/A',
+      }));
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Atividades');
-    XLSX.writeFile(wb, `relatorio_atividades_${format(new Date(), 'yyyyMMdd_HHmm')}.xlsx`);
-    toast.success('Relatório XLSX gerado com sucesso!');
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Atividades');
+      
+      const fileName = `relatorio_atividades_${format(new Date(), 'yyyyMMdd_HHmm')}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      toast.success('Relatório XLSX gerado com sucesso!', {
+        description: `Arquivo: ${fileName}`
+      });
+    } catch (error) {
+      console.error('Erro ao gerar XLSX:', error);
+      toast.error('Erro ao gerar relatório XLSX');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
+    if (!filteredActivities || filteredActivities.length === 0) {
+      toast.error('Nenhuma atividade encontrada para exportar');
+      return;
+    }
+
+    setIsGenerating(true);
+    
     try {
       const doc = new jsPDF();
       const margin = 20;
       let yPosition = margin;
       
-      // Header
+      // Header melhorado
       doc.setFontSize(20);
-      doc.setTextColor(88, 28, 135); // Primary color
+      doc.setTextColor(88, 28, 135);
       doc.text('SEMEI - Secretaria da Melhor Idade', margin, yPosition);
       yPosition += 10;
       
@@ -148,11 +183,14 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
       doc.text('Relatório de Atividades', margin, yPosition);
       yPosition += 15;
       
-      // Filters info
+      // Informações do filtro
       doc.setFontSize(12);
       doc.setTextColor(100, 100, 100);
-      doc.text(`Período: ${startDate || 'Início'} até ${endDate || 'Fim'}`, margin, yPosition);
-      yPosition += 6;
+      
+      if (startDate || endDate) {
+        doc.text(`Período: ${startDate || 'Início'} até ${endDate || 'Fim'}`, margin, yPosition);
+        yPosition += 6;
+      }
       
       if (activityType !== 'all') {
         doc.text(`Tipo de Atividade: ${activityType}`, margin, yPosition);
@@ -167,61 +205,42 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
       doc.text(`Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPosition);
       yPosition += 15;
       
-      // Summary
+      // Resumo estatístico
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
-      doc.text('Resumo:', margin, yPosition);
+      doc.text('Resumo Estatístico:', margin, yPosition);
       yPosition += 8;
       
       doc.setFontSize(11);
       doc.text(`• Total de atividades: ${filteredActivities.length}`, margin + 10, yPosition);
       yPosition += 5;
       doc.text(`• Participantes únicos: ${filteredIdosos.length}`, margin + 10, yPosition);
-      yPosition += 5;
+      yPosition += 10;
       
-      // Activity types summary
-      if (activityTypeStats && Object.keys(activityTypeStats).length > 0) {
+      // Estatísticas por tipo
+      if (Object.keys(activityTypeStats).length > 0) {
         doc.text('• Distribuição por tipo de atividade:', margin + 10, yPosition);
         yPosition += 5;
         
         Object.entries(activityTypeStats).forEach(([type, count]) => {
-          const numericCount = Number(count) || 0;
-          const percentage = filteredActivities.length > 0 
-            ? ((numericCount / filteredActivities.length) * 100).toFixed(1)
-            : '0.0';
-          doc.text(`  - ${type}: ${numericCount} (${percentage}%)`, margin + 15, yPosition);
+          const percentage = ((count / filteredActivities.length) * 100).toFixed(1);
+          doc.text(`  - ${type}: ${count} (${percentage}%)`, margin + 15, yPosition);
           yPosition += 5;
         });
-      }
-      
-      // Gender statistics
-      if (genderStats && Object.keys(genderStats).length > 0) {
-        doc.text('• Distribuição por gênero:', margin + 10, yPosition);
         yPosition += 5;
-        
-        Object.entries(genderStats).forEach(([gender, count]) => {
-          const numericCount = Number(count) || 0;
-          const percentage = filteredIdosos.length > 0 
-            ? ((numericCount / filteredIdosos.length) * 100).toFixed(1)
-            : '0.0';
-          doc.text(`  - ${gender}: ${numericCount} (${percentage}%)`, margin + 15, yPosition);
-          yPosition += 5;
-        });
       }
       
-      yPosition += 10;
-      
-      // Activities table
+      // Tabela de atividades
       if (filteredActivities.length > 0) {
         doc.setFontSize(14);
         doc.text('Detalhamento das Atividades:', margin, yPosition);
         yPosition += 10;
         
-        const tableData = filteredActivities.slice(0, 50).map((atividade: any) => [
+        const tableData = filteredActivities.slice(0, 100).map((atividade) => [
           format(new Date(atividade.data_atividade), 'dd/MM/yyyy', { locale: ptBR }),
           atividade.tipo_atividade || 'N/A',
           atividade.idoso?.nome || 'N/A',
-          atividade.observacoes?.substring(0, 30) + (atividade.observacoes?.length > 30 ? '...' : '') || 'N/A'
+          (atividade.observacoes?.substring(0, 40) + (atividade.observacoes?.length > 40 ? '...' : '')) || 'N/A'
         ]);
         
         (doc as any).autoTable({
@@ -229,16 +248,16 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
           body: tableData,
           startY: yPosition,
           margin: { left: margin, right: margin },
-          styles: { fontSize: 9 },
-          headStyles: { fillColor: [88, 28, 135] },
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [88, 28, 135], textColor: 255 },
           alternateRowStyles: { fillColor: [245, 245, 245] }
         });
         
-        if (filteredActivities.length > 50) {
+        if (filteredActivities.length > 100) {
           const finalY = (doc as any).lastAutoTable.finalY + 10;
           doc.setFontSize(10);
           doc.setTextColor(100, 100, 100);
-          doc.text(`Exibindo primeiras 50 atividades de ${filteredActivities.length} total.`, margin, finalY);
+          doc.text(`Exibindo primeiras 100 atividades de ${filteredActividades.length} total.`, margin, finalY);
         }
       }
       
@@ -249,20 +268,41 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
       doc.text('SEMEI - Sistema de Gestão da Melhor Idade', margin, pageHeight - 15);
       doc.text(`Página 1 de 1 - ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, pageHeight - 10);
       
-      doc.save(`relatorio_atividades_${format(new Date(), 'yyyyMMdd_HHmm')}.pdf`);
-      toast.success('Relatório PDF gerado com sucesso!');
+      const fileName = `relatorio_atividades_${format(new Date(), 'yyyyMMdd_HHmm')}.pdf`;
+      doc.save(fileName);
+      
+      toast.success('Relatório PDF gerado com sucesso!', {
+        description: `Arquivo: ${fileName}`
+      });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      toast.error('Erro ao gerar relatório PDF. Tente novamente.');
+      toast.error('Erro ao gerar relatório PDF');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
   if (isLoading) {
-    return <div className="text-center">Carregando atividades...</div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando atividades...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-500">Erro ao carregar atividades.</div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-500 mb-2">Erro ao carregar atividades</p>
+          <p className="text-gray-500 text-sm">Tente recarregar a página</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -276,17 +316,17 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
           Filtre e gere relatórios detalhados das atividades realizadas.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4">
+      <CardContent className="space-y-6">
+        {/* Filtros */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="startDate">Data de Início</Label>
             <Input
               type="date"
               id="startDate"
-              value={startDate || ''}
+              value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              max={endDate || ''}
-              placeholder="Data de início"
+              max={endDate || undefined}
               className="rounded-xl"
             />
           </div>
@@ -295,11 +335,10 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
             <Input
               type="date"
               id="endDate"
-              value={endDate || ''}
+              value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              min={startDate || ''}
+              min={startDate || undefined}
               max={formatDate(new Date().toISOString())}
-              placeholder="Data de fim"
               className="rounded-xl"
             />
           </div>
@@ -340,88 +379,130 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
 
         <Separator />
 
+        {/* Estatísticas resumidas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="shadow-md border-0">
-            <CardHeader>
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-500" />
+          <Card className="border-0 bg-blue-50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-bold flex items-center gap-2 text-blue-700">
+                <Calendar className="h-4 w-4" />
                 Atividades Encontradas
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Badge variant="secondary" className="w-full rounded-xl text-base font-medium p-4">
-                {filteredActivities.length} atividades
-              </Badge>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-blue-700">{filteredActivities.length}</span>
+                <span className="text-sm text-blue-600">atividades</span>
+                {filteredActivities.length > 0 && (
+                  <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+                )}
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-md border-0">
-            <CardHeader>
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <Users className="h-4 w-4 text-gray-500" />
+          <Card className="border-0 bg-green-50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-bold flex items-center gap-2 text-green-700">
+                <Users className="h-4 w-4" />
                 Participantes Únicos
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Badge variant="secondary" className="w-full rounded-xl text-base font-medium p-4">
-                {filteredIdosos.length} idosos
-              </Badge>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-green-700">{filteredIdosos.length}</span>
+                <span className="text-sm text-green-600">idosos</span>
+                {filteredIdosos.length > 0 && (
+                  <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
 
+        {/* Estatísticas detalhadas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="shadow-md border-0">
-            <CardHeader>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-2">
               <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-gray-500" />
-                Estatísticas por Tipo
+                <BarChart3 className="h-4 w-4 text-purple-600" />
+                Por Tipo de Atividade
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {Object.entries(activityTypeStats).map(([type, count]) => (
-                <div key={type} className="flex items-center justify-between text-sm">
-                  <span>{type}:</span>
-                  <Badge variant="outline" className="rounded-xl">
-                    {count}
-                  </Badge>
-                </div>
-              ))}
+              <div className="space-y-2">
+                {Object.keys(activityTypeStats).length > 0 ? (
+                  Object.entries(activityTypeStats).map(([type, count]) => (
+                    <div key={type} className="flex items-center justify-between text-sm">
+                      <span className="truncate flex-1">{type}:</span>
+                      <Badge variant="outline" className="rounded-full ml-2">
+                        {count}
+                      </Badge>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">Nenhum dado disponível</p>
+                )}
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-md border-0">
-            <CardHeader>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-2">
               <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <Users className="h-4 w-4 text-gray-500" />
-                Estatísticas por Gênero
+                <Users className="h-4 w-4 text-pink-600" />
+                Por Gênero
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {Object.entries(genderStats).map(([gender, count]) => (
-                <div key={gender} className="flex items-center justify-between text-sm">
-                  <span>{gender}:</span>
-                  <Badge variant="outline" className="rounded-xl">
-                    {count}
-                  </Badge>
-                </div>
-              ))}
+              <div className="space-y-2">
+                {Object.keys(genderStats).length > 0 ? (
+                  Object.entries(genderStats).map(([gender, count]) => (
+                    <div key={gender} className="flex items-center justify-between text-sm">
+                      <span className="truncate flex-1">{gender}:</span>
+                      <Badge variant="outline" className="rounded-full ml-2">
+                        {count}
+                      </Badge>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">Nenhum dado disponível</p>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
 
         <Separator />
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" className="rounded-xl" onClick={generateXLSX}>
+        {/* Botões de ação */}
+        <div className="flex flex-col sm:flex-row justify-end gap-3">
+          <Button 
+            variant="outline" 
+            className="rounded-xl flex-1 sm:flex-none" 
+            onClick={generateXLSX}
+            disabled={isGenerating || filteredActivities.length === 0}
+          >
             <Download className="h-4 w-4 mr-2" />
-            Exportar XLSX
+            {isGenerating ? 'Gerando...' : 'Exportar XLSX'}
           </Button>
-          <Button className="semei-button rounded-xl bg-gradient-to-r from-primary to-secondary text-white" onClick={generatePDF}>
+          <Button 
+            className="semei-button rounded-xl bg-gradient-to-r from-primary to-secondary text-white flex-1 sm:flex-none" 
+            onClick={generatePDF}
+            disabled={isGenerating || filteredActivities.length === 0}
+          >
             <FileText className="h-4 w-4 mr-2" />
-            Gerar PDF
+            {isGenerating ? 'Gerando...' : 'Gerar PDF'}
           </Button>
         </div>
+
+        {filteredActivities.length === 0 && !isLoading && (
+          <div className="text-center py-8 bg-gray-50 rounded-xl">
+            <AlertCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-600 font-medium">Nenhuma atividade encontrada</p>
+            <p className="text-gray-500 text-sm mt-1">
+              Ajuste os filtros para encontrar atividades
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

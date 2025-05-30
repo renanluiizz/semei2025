@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +10,7 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 import { AttendanceDialog } from '@/components/checkin/AttendanceDialog';
 import { ReportGenerator } from '@/components/reports/ReportGenerator';
 import { QRCodeGenerator } from '@/components/checkin/QRCodeGenerator';
-import { Users, Calendar, Activity, TrendingUp, Clock, AlertTriangle, Heart } from 'lucide-react';
+import { Users, Calendar, Activity, TrendingUp, Clock, AlertTriangle, Heart, X } from 'lucide-react';
 import { format, subDays, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -155,38 +154,39 @@ export function Dashboard() {
   ];
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header Melhorado */}
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 p-4 md:p-6">
+      {/* Header com melhor responsividade */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Dashboard SEMEI
           </h1>
-          <p className="text-gray-600 mt-1 flex items-center gap-2">
+          <p className="text-gray-600 mt-1 flex items-center gap-2 text-sm md:text-base">
             <Heart className="h-4 w-4 text-primary" />
             Secretaria da Melhor Idade - {format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}
           </p>
         </div>
-        <div className="flex items-center space-x-2 text-sm text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-border/50">
+        <div className="flex items-center space-x-2 text-sm text-gray-500 bg-white/60 backdrop-blur-sm px-3 py-2 rounded-xl border border-border/50">
           <Clock className="h-4 w-4" />
-          <span>Atualizado: {format(new Date(), 'HH:mm', { locale: ptBR })}</span>
+          <span className="hidden sm:inline">Atualizado:</span>
+          <span>{format(new Date(), 'HH:mm', { locale: ptBR })}</span>
         </div>
       </div>
 
-      {/* Statistics Cards com Visual Melhorado */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Cards de estatísticas com melhor responsividade */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {statisticCards.map((stat) => (
           <Card key={stat.title} className="semei-card hover:shadow-xl transition-all duration-300 border-l-4 border-l-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 {stat.title}
               </CardTitle>
-              <div className="w-10 h-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center">
-                <stat.icon className="h-5 w-5 text-primary" />
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center">
+                <stat.icon className="h-4 w-4 md:h-5 md:w-5 text-primary" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <div className="text-xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 {stat.value}
               </div>
               <p className="text-xs text-gray-500 mt-1">
@@ -195,7 +195,7 @@ export function Dashboard() {
               {stat.trend && (
                 <div className={`text-xs mt-2 flex items-center ${stat.trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
                   <span>{stat.trend.isPositive ? '↗' : '↘'} {Math.abs(stat.trend.value)}%</span>
-                  <span className="ml-1 text-gray-500">vs mês anterior</span>
+                  <span className="ml-1 text-gray-500 hidden sm:inline">vs mês anterior</span>
                 </div>
               )}
             </CardContent>
@@ -203,17 +203,20 @@ export function Dashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activity Chart com Visual Melhorado */}
-        <Card className="col-span-2 semei-card">
+      {/* Layout responsivo para gráficos e ações rápidas */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        {/* Activity Chart melhorado */}
+        <Card className="col-span-1 lg:col-span-2 semei-card">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
-              Atividades vs Presença (Últimos 7 dias)
+              <span className="hidden sm:inline">Atividades vs Presença</span>
+              <span className="sm:hidden">Atividades</span>
+              <span className="text-sm font-normal text-gray-500">(7 dias)</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={250}>
               <BarChart data={activityData}>
                 <defs>
                   <linearGradient id="primaryGradient" x1="0" y1="0" x2="0" y2="1">
@@ -226,8 +229,8 @@ export function Dashboard() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" stroke="#666" />
-                <YAxis stroke="#666" />
+                <XAxis dataKey="name" stroke="#666" fontSize={12} />
+                <YAxis stroke="#666" fontSize={12} />
                 <Tooltip 
                   formatter={(value, name) => [value, name === 'atividades' ? 'Atividades' : 'Presença']}
                   labelFormatter={(label) => `Dia: ${label}`}
@@ -235,7 +238,8 @@ export function Dashboard() {
                     backgroundColor: 'white',
                     border: '1px solid #e2e8f0',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    fontSize: '12px'
                   }}
                 />
                 <Bar dataKey="atividades" fill="url(#primaryGradient)" name="atividades" radius={[4, 4, 0, 0]} />
@@ -245,7 +249,7 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions Melhoradas */}
+        {/* Quick Actions melhoradas */}
         <QuickActions
           onCheckIn={() => setAttendanceDialogOpen(true)}
           onGenerateReport={() => setReportGeneratorOpen(true)}
@@ -254,21 +258,21 @@ export function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activities */}
-        <Card>
+      {/* Seção de atividades recentes melhorada */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <Card className="semei-card">
           <CardHeader>
-            <CardTitle>Atividades Recentes</CardTitle>
+            <CardTitle className="text-base md:text-lg">Atividades Recentes</CardTitle>
             <CardDescription>
               Últimas atividades cadastradas
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {stats?.data?.atividades_recentes?.length ? (
                 stats.data.atividades_recentes.map((atividade) => (
                   <div key={atividade.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
                         {atividade.activity_type}
@@ -285,20 +289,23 @@ export function Dashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500 text-center py-8">
-                  Nenhuma atividade recente encontrada
-                </p>
+                <div className="text-center py-8">
+                  <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">
+                    Nenhuma atividade recente encontrada
+                  </p>
+                </div>
               )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Birthday Section Melhorada */}
+      {/* Seção de aniversariantes melhorada */}
       {stats?.data?.aniversariantes_mes && stats.data.aniversariantes_mes.length > 0 && (
         <Card className="semei-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
               🎉 Aniversariantes do Mês
               <span className="text-sm font-normal text-gray-500">({stats.data.aniversariantes_mes.length})</span>
             </CardTitle>
@@ -307,15 +314,15 @@ export function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {stats.data.aniversariantes_mes.map((idoso) => (
                 <div key={idoso.id} className="flex items-center space-x-3 p-4 bg-gradient-to-r from-yellow-50 via-orange-50 to-red-50 border border-yellow-200/50 rounded-xl hover:shadow-md transition-all duration-300">
-                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
-                    <Heart className="h-6 w-6 text-white" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                    <Heart className="h-5 w-5 md:h-6 md:w-6 text-white" />
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{idoso.name}</p>
-                    <p className="text-sm text-gray-600">
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-900 text-sm md:text-base truncate">{idoso.name}</p>
+                    <p className="text-xs md:text-sm text-gray-600">
                       {format(new Date(idoso.birth_date), 'dd/MM', { locale: ptBR })} • {idoso.age || 0} anos
                     </p>
                   </div>
@@ -332,18 +339,18 @@ export function Dashboard() {
         onOpenChange={setAttendanceDialogOpen} 
       />
       
-      {/* Updated ReportGenerator without problematic props */}
+      {/* Modal melhorado para relatórios */}
       {reportGeneratorOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Gerador de Relatórios</h2>
+          <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-auto">
+            <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg md:text-xl font-semibold">Gerador de Relatórios</h2>
               <Button
                 variant="ghost"
                 onClick={() => setReportGeneratorOpen(false)}
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 hover:bg-gray-100"
               >
-                ×
+                <X className="h-4 w-4" />
               </Button>
             </div>
             <div className="p-4">
