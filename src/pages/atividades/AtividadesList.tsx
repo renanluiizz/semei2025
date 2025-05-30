@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, Plus, Trash2, User, Clock, Edit } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { NovaAtividadeDialog } from '@/components/atividades/NovaAtividadeDialog';
@@ -82,6 +82,33 @@ export function AtividadesList() {
     return colors[tipo as keyof typeof colors] || colors.outros;
   };
 
+  const formatDateTime = (dateString: string | null | undefined) => {
+    if (!dateString) {
+      return 'Data não informada';
+    }
+    
+    try {
+      // Tentar criar a data diretamente
+      let date = new Date(dateString);
+      
+      // Se não for válida, tentar parseISO
+      if (!isValid(date)) {
+        date = parseISO(dateString);
+      }
+      
+      // Verificar se a data é válida
+      if (!isValid(date)) {
+        console.warn('Data inválida encontrada:', dateString);
+        return 'Data inválida';
+      }
+      
+      return format(date, 'dd/MM/yyyy HH:mm', { locale: ptBR });
+    } catch (error) {
+      console.error('Erro ao formatar data:', dateString, error);
+      return 'Erro na data';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -154,7 +181,7 @@ export function AtividadesList() {
                             {(atividade as any).status && getStatusBadge((atividade as any).status)}
                             <div className="flex items-center text-sm text-gray-500">
                               <Clock className="h-4 w-4 mr-1" />
-                              {format(new Date(atividade.check_in_time), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                              {formatDateTime(atividade.check_in_time)}
                             </div>
                           </div>
                         </div>
