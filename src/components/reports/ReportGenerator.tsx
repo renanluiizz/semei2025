@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dbHelpers } from '@/lib/supabase';
@@ -189,7 +188,8 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
           yPosition += 5;
           
           Object.entries(genderStats).forEach(([gender, count]) => {
-            doc.text(`• ${gender}: ${count} (${((count / filteredIdosos.length) * 100).toFixed(1)}%)`, margin + 10, yPosition);
+            const percentage = ((count / filteredIdosos.length) * 100).toFixed(1);
+            doc.text(`• ${gender}: ${count} (${percentage}%)`, margin + 10, yPosition);
             yPosition += 5;
           });
         }
