@@ -23,7 +23,7 @@ export interface Idoso {
   zone?: string;
   
   // Saúde
-  age?: number; // Agora calculada automaticamente
+  age?: number;
   blood_type?: string;
   has_illness?: boolean;
   has_allergy?: boolean;
@@ -59,7 +59,21 @@ export interface Atividade {
   
   // Relacionamentos
   elder?: { name: string };
-  staff?: { full_name: string }; // Adicionado para mostrar quem fez o check-in
+  staff?: { full_name: string };
+}
+
+// Interface compatível com o ReportGenerator
+export interface Activity {
+  id: string;
+  data_atividade: string;
+  tipo_atividade: string;
+  observacoes: string;
+  idoso_id: string;
+  idoso?: {
+    id: string;
+    nome: string;
+    sexo: string;
+  };
 }
 
 export interface Usuario {

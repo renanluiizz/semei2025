@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { getCacheKey, getCache, setCache, clearCache } from './cache';
-import type { Atividade } from '@/types/models';
+import type { Atividade, Activity } from '@/types/models';
 
 // Atividades database operations
 export const atividadesHelpers = {
@@ -26,10 +26,25 @@ export const atividadesHelpers = {
     const { data, error } = await query;
     
     if (data && !error) {
-      setCache(cacheKey, data);
+      // Transformar os dados para o formato compatível com ReportGenerator
+      const transformedData: Activity[] = data.map((item: any) => ({
+        id: item.id,
+        data_atividade: item.check_in_time,
+        tipo_atividade: item.activity_type,
+        observacoes: item.observation || '',
+        idoso_id: item.elder_id,
+        idoso: item.elder ? {
+          id: item.elder_id,
+          nome: item.elder.name,
+          sexo: 'não informado' // Será preenchido com dados reais quando necessário
+        } : undefined
+      }));
+      
+      setCache(cacheKey, transformedData);
+      return { data: transformedData, error: null };
     }
     
-    return { data: data as Atividade[], error };
+    return { data: [], error };
   },
 
   createAtividade: async (atividade: Omit<Atividade, 'id' | 'created_at'>) => {

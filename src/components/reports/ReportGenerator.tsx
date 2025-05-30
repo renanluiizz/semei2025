@@ -56,9 +56,11 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
-  const { data: activitiesData, isLoading, error } = useQuery({
+  const { data: activitiesData, isLoading, error, refetch } = useQuery({
     queryKey: ['activities'],
     queryFn: () => dbHelpers.getAtividades(),
+    retry: 3,
+    staleTime: 0, // Sempre buscar dados frescos
   });
 
   // Validação e extração segura dos dados
@@ -282,6 +284,11 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
     }
   };
 
+  const handleRefresh = () => {
+    refetch();
+    toast.success('Dados atualizados com sucesso!');
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -299,7 +306,10 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <p className="text-red-500 mb-2">Erro ao carregar atividades</p>
-          <p className="text-gray-500 text-sm">Tente recarregar a página</p>
+          <p className="text-gray-500 text-sm mb-4">Tente recarregar a página</p>
+          <Button onClick={handleRefresh} variant="outline">
+            Tentar Novamente
+          </Button>
         </div>
       </div>
     );
@@ -350,7 +360,7 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os tipos</SelectItem>
-                {activities && [...new Set(activities.map((atividade) => atividade.tipo_atividade))].map(
+                {activities && [...new Set(activities.map((atividade) => atividade.tipo_atividade))].filter(Boolean).map(
                   (type, index) => (
                     <SelectItem key={index} value={type || ''}>
                       {type}
@@ -474,24 +484,35 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
         <Separator />
 
         {/* Botões de ação */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3">
+        <div className="flex flex-col sm:flex-row justify-between gap-3">
           <Button 
             variant="outline" 
-            className="rounded-xl flex-1 sm:flex-none" 
-            onClick={generateXLSX}
-            disabled={isGenerating || filteredActivities.length === 0}
+            className="rounded-xl" 
+            onClick={handleRefresh}
+            disabled={isLoading}
           >
-            <Download className="h-4 w-4 mr-2" />
-            {isGenerating ? 'Gerando...' : 'Exportar XLSX'}
+            Atualizar Dados
           </Button>
-          <Button 
-            className="semei-button rounded-xl bg-gradient-to-r from-primary to-secondary text-white flex-1 sm:flex-none" 
-            onClick={generatePDF}
-            disabled={isGenerating || filteredActivities.length === 0}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            {isGenerating ? 'Gerando...' : 'Gerar PDF'}
-          </Button>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              variant="outline" 
+              className="rounded-xl" 
+              onClick={generateXLSX}
+              disabled={isGenerating || filteredActivities.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              {isGenerating ? 'Gerando...' : 'Exportar XLSX'}
+            </Button>
+            <Button 
+              className="semei-button rounded-xl bg-gradient-to-r from-primary to-secondary text-white" 
+              onClick={generatePDF}
+              disabled={isGenerating || filteredActivities.length === 0}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              {isGenerating ? 'Gerando...' : 'Gerar PDF'}
+            </Button>
+          </div>
         </div>
 
         {filteredActivities.length === 0 && !isLoading && (
