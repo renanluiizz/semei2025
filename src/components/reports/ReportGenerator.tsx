@@ -16,6 +16,11 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
+interface ReportGeneratorProps {
+  open?: boolean;
+  onClose?: () => void;
+}
+
 interface Activity {
   id: string;
   data_atividade: string;
@@ -43,15 +48,16 @@ interface GenderStats {
   [gender: string]: number;
 }
 
-export function ReportGenerator() {
+export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [activityType, setActivityType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const { data: activities, isLoading, error } = useQuery<Activity[]>('activities', () =>
-    dbHelpers.getAtividades()
-  );
+  const { data: activities, isLoading, error } = useQuery({
+    queryKey: ['activities'],
+    queryFn: () => dbHelpers.getAtividades(),
+  });
 
   const formatDate = (dateString: string): string => {
     try {
@@ -303,7 +309,7 @@ export function ReportGenerator() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os tipos</SelectItem>
-                {[...new Set(activities?.map((atividade) => atividade.tipo_atividade))].map(
+                {activities && [...new Set(activities.map((atividade) => atividade.tipo_atividade))].map(
                   (type, index) => (
                     <SelectItem key={index} value={type || ''}>
                       {type}

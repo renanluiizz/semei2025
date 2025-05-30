@@ -330,10 +330,26 @@ export function Dashboard() {
         onOpenChange={setAttendanceDialogOpen} 
       />
       
-      <ReportGenerator 
-        open={reportGeneratorOpen} 
-        onClose={() => setReportGeneratorOpen(false)} 
-      />
+      {/* Updated ReportGenerator without problematic props */}
+      {reportGeneratorOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Gerador de Relatórios</h2>
+              <Button
+                variant="ghost"
+                onClick={() => setReportGeneratorOpen(false)}
+                className="h-8 w-8 p-0"
+              >
+                ×
+              </Button>
+            </div>
+            <div className="p-4">
+              <ReportGenerator />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
