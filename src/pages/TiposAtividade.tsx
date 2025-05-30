@@ -42,7 +42,7 @@ export function TiposAtividade() {
     },
   });
 
-  const validateForm = (data: { nome: string; descricao: string }, isEditing = false) => {
+  const validateForm = (data: { nome: string; descricao?: string }, isEditing = false) => {
     const newErrors: { [key: string]: string } = {};
     
     if (!data.nome.trim()) {
@@ -93,7 +93,7 @@ export function TiposAtividade() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { id: string; nome: string; descricao: string }) => {
+    mutationFn: async (data: { id: string; nome: string; descricao?: string }) => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       return data;
     },
@@ -141,14 +141,17 @@ export function TiposAtividade() {
   };
 
   const handleUpdate = () => {
-    if (!editingTipo || !validateForm(editingTipo, true)) {
+    if (!editingTipo || !validateForm({
+      nome: editingTipo.nome,
+      descricao: editingTipo.descricao
+    }, true)) {
       toast.error('Corrija os erros no formulário');
       return;
     }
     updateMutation.mutate({
       id: editingTipo.id,
       nome: editingTipo.nome.trim(),
-      descricao: editingTipo.descricao?.trim() || ''
+      descricao: editingTipo.descricao?.trim()
     });
   };
 

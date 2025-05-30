@@ -257,7 +257,7 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
           const finalY = (doc as any).lastAutoTable.finalY + 10;
           doc.setFontSize(10);
           doc.setTextColor(100, 100, 100);
-          doc.text(`Exibindo primeiras 100 atividades de ${filteredActividades.length} total.`, margin, finalY);
+          doc.text(`Exibindo primeiras 100 atividades de ${filteredActivities.length} total.`, margin, finalY);
         }
       }
       
