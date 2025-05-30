@@ -14,7 +14,7 @@ import { format, subDays, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { memo } from 'react';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar, linearGradient } from 'recharts';
+import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 
 // Componente memoizado para os cards de estatísticas
 const StatCardMemo = memo(({ title, value, icon: Icon, description, color }: {
@@ -213,6 +213,16 @@ export function Dashboard() {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={activityData}>
+                <defs>
+                  <linearGradient id="primaryGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(270, 40%, 60%)" />
+                    <stop offset="100%" stopColor="hsl(270, 40%, 70%)" />
+                  </linearGradient>
+                  <linearGradient id="secondaryGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(200, 60%, 65%)" />
+                    <stop offset="100%" stopColor="hsl(200, 60%, 75%)" />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="name" stroke="#666" />
                 <YAxis stroke="#666" />
@@ -228,16 +238,6 @@ export function Dashboard() {
                 />
                 <Bar dataKey="atividades" fill="url(#primaryGradient)" name="atividades" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="presenca" fill="url(#secondaryGradient)" name="presenca" radius={[4, 4, 0, 0]} />
-                <defs>
-                  <linearGradient id="primaryGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(270, 40%, 60%)" />
-                    <stop offset="100%" stopColor="hsl(270, 40%, 70%)" />
-                  </linearGradient>
-                  <linearGradient id="secondaryGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(200, 60%, 65%)" />
-                    <stop offset="100%" stopColor="hsl(200, 60%, 75%)" />
-                  </linearGradient>
-                </defs>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
