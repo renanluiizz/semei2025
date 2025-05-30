@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dbHelpers } from '@/lib/supabase';
@@ -54,10 +55,13 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
   const [activityType, setActivityType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const { data: activities, isLoading, error } = useQuery({
+  const { data: activitiesData, isLoading, error } = useQuery({
     queryKey: ['activities'],
     queryFn: () => dbHelpers.getAtividades(),
   });
+
+  // Extract activities array from the response data
+  const activities: Activity[] = activitiesData?.data || [];
 
   const formatDate = (dateString: string): string => {
     try {
@@ -68,27 +72,25 @@ export function ReportGenerator({ open, onClose }: ReportGeneratorProps) {
     }
   };
 
-  const filteredActivities = activities
-    ? activities.filter((atividade) => {
-        const activityDate = new Date(atividade.data_atividade);
-        const start = startDate ? new Date(startDate) : null;
-        const end = endDate ? new Date(endDate) : null;
+  const filteredActivities = activities.filter((atividade) => {
+    const activityDate = new Date(atividade.data_atividade);
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
 
-        if (start && activityDate < start) {
-          return false;
-        }
-        if (end && activityDate > end) {
-          return false;
-        }
-        if (activityType !== 'all' && atividade.tipo_atividade !== activityType) {
-          return false;
-        }
-        if (searchTerm && !atividade.idoso?.nome.toLowerCase().includes(searchTerm.toLowerCase()) && !atividade.tipo_atividade.toLowerCase().includes(searchTerm.toLowerCase())) {
-          return false;
-        }
-        return true;
-      })
-    : [];
+    if (start && activityDate < start) {
+      return false;
+    }
+    if (end && activityDate > end) {
+      return false;
+    }
+    if (activityType !== 'all' && atividade.tipo_atividade !== activityType) {
+      return false;
+    }
+    if (searchTerm && !atividade.idoso?.nome.toLowerCase().includes(searchTerm.toLowerCase()) && !atividade.tipo_atividade.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
+    return true;
+  });
 
   const filteredIdosos: Idoso[] = filteredActivities.reduce((uniqueIdosos: Idoso[], atividade) => {
     if (atividade.idoso && !uniqueIdosos.find(idoso => idoso.id === atividade.idoso!.id)) {

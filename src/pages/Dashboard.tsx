@@ -1,8 +1,10 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dbHelpers } from '@/lib/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/dashboard/DashboardStats';
 import { ActivityChart } from '@/components/dashboard/ActivityChart';
 import { QuickActions } from '@/components/dashboard/QuickActions';
