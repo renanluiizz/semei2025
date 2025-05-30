@@ -1,8 +1,10 @@
 
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { GlobalSearch } from '@/components/GlobalSearch';
 import { 
   User,
   BarChart3, 
@@ -12,13 +14,17 @@ import {
   LogOut,
   UserPlus,
   Activity,
-  Heart
+  Heart,
+  Search,
+  FileSpreadsheet,
+  RotateCcw
 } from 'lucide-react';
 
 export function Layout() {
   const { userProfile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -31,7 +37,11 @@ export function Layout() {
     { icon: UserPlus, label: 'Novo Cadastro', path: '/idosos/novo' },
     { icon: Calendar, label: 'Atividades', path: '/atividades' },
     { icon: Activity, label: 'Tipos de Atividade', path: '/tipos-atividade' },
-    { icon: Settings, label: 'Configurações', path: '/configuracoes' },
+    ...(userProfile?.role === 'admin' ? [
+      { icon: FileSpreadsheet, label: 'Importar Planilha', path: '/importar' },
+      { icon: RotateCcw, label: 'Resetar Estatísticas', path: '/resetar' },
+      { icon: Settings, label: 'Configurações', path: '/configuracoes' }
+    ] : [])
   ];
 
   return (
@@ -53,6 +63,18 @@ export function Layout() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Busca Global */}
+        <div className="p-4">
+          <Button
+            variant="outline"
+            className="w-full justify-start rounded-xl border-primary/20 hover:bg-primary/5 text-left"
+            onClick={() => setShowGlobalSearch(true)}
+          >
+            <Search className="h-4 w-4 mr-2" />
+            <span className="text-gray-500">Buscar no sistema...</span>
+          </Button>
         </div>
 
         {/* Navigation */}
@@ -123,6 +145,12 @@ export function Layout() {
           </div>
         </footer>
       </div>
+
+      {/* Global Search Modal */}
+      <GlobalSearch 
+        open={showGlobalSearch} 
+        onClose={() => setShowGlobalSearch(false)} 
+      />
     </div>
   );
 }

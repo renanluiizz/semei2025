@@ -1,110 +1,85 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { Layout } from "@/components/Layout";
-import { Login } from "@/pages/auth/Login";
-import { PageLoading } from "@/components/ui/page-loading";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy } from 'react';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Layout } from '@/components/Layout';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
-// Lazy loading das páginas para code splitting
-const Dashboard = lazy(() => import("@/pages/Dashboard").then(module => ({ default: module.Dashboard })));
-const IdososList = lazy(() => import("@/pages/idosos/IdososList").then(module => ({ default: module.IdososList })));
-const IdosoDetails = lazy(() => import("@/pages/idosos/IdosoDetails"));
-const EditIdoso = lazy(() => import("@/pages/idosos/EditIdoso"));
-const NovoIdoso = lazy(() => import("@/pages/idosos/NovoIdoso").then(module => ({ default: module.NovoIdoso })));
-const AtividadesList = lazy(() => import("@/pages/atividades/AtividadesList").then(module => ({ default: module.AtividadesList })));
-const TiposAtividade = lazy(() => import("@/pages/TiposAtividade").then(module => ({ default: module.TiposAtividade })));
-const Configuracoes = lazy(() => import("@/pages/Configuracoes"));
-const NotFound = lazy(() => import("@/pages/NotFound"));
+// Lazy loading de páginas
+const Index = lazy(() => import('@/pages/Index'));
+const Login = lazy(() => import('@/pages/auth/Login').then(module => ({ default: module.Login })));
+const Dashboard = lazy(() => import('@/pages/Dashboard').then(module => ({ default: module.Dashboard })));
+const IdososList = lazy(() => import('@/pages/idosos/IdososList'));
+const NovoIdoso = lazy(() => import('@/pages/idosos/NovoIdoso'));
+const EditIdoso = lazy(() => import('@/pages/idosos/EditIdoso'));
+const IdosoDetails = lazy(() => import('@/pages/idosos/IdosoDetails'));
+const AtividadesList = lazy(() => import('@/pages/atividades/AtividadesList'));
+const TiposAtividade = lazy(() => import('@/pages/TiposAtividade').then(module => ({ default: module.TiposAtividade })));
+const Configuracoes = lazy(() => import('@/pages/Configuracoes').then(module => ({ default: module.Configuracoes })));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Configuração otimizada do React Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutos
-      gcTime: 10 * 60 * 1000, // 10 minutos
-      retry: 2,
+      retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutos
     },
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
         <BrowserRouter>
-          <Routes>
-            {/* Auth Routes */}
-            <Route path="/auth/login" element={<Login />} />
-            
-            {/* Protected Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
+          <div className="min-h-screen bg-background font-sans antialiased">
+            <Suspense fallback={
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="text-lg font-medium text-primary">Carregando SEMEI...</span>
+                </div>
+              </div>
             }>
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={
-                <Suspense fallback={<PageLoading />}>
-                  <Dashboard />
-                </Suspense>
-              } />
-              <Route path="idosos" element={
-                <Suspense fallback={<PageLoading />}>
-                  <IdososList />
-                </Suspense>
-              } />
-              <Route path="idosos/novo" element={
-                <Suspense fallback={<PageLoading />}>
-                  <NovoIdoso />
-                </Suspense>
-              } />
-              <Route path="idosos/:id" element={
-                <Suspense fallback={<PageLoading />}>
-                  <IdosoDetails />
-                </Suspense>
-              } />
-              <Route path="idosos/:id/editar" element={
-                <Suspense fallback={<PageLoading />}>
-                  <EditIdoso />
-                </Suspense>
-              } />
-              <Route path="atividades" element={
-                <Suspense fallback={<PageLoading />}>
-                  <AtividadesList />
-                </Suspense>
-              } />
-              <Route path="tipos-atividade" element={
-                <Suspense fallback={<PageLoading />}>
-                  <TiposAtividade />
-                </Suspense>
-              } />
-              <Route path="configuracoes" element={
-                <Suspense fallback={<PageLoading />}>
-                  <Configuracoes />
-                </Suspense>
-              } />
-            </Route>
-            
-            {/* Catch-all route */}
-            <Route path="*" element={
-              <Suspense fallback={<PageLoading />}>
-                <NotFound />
-              </Suspense>
-            } />
-          </Routes>
+              <Routes>
+                {/* Rota pública - Index */}
+                <Route path="/" element={<Index />} />
+                
+                {/* Rota de autenticação */}
+                <Route path="/auth/login" element={<Login />} />
+                
+                {/* Rotas protegidas */}
+                <Route path="/" element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                }>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="idosos" element={<IdososList />} />
+                  <Route path="idosos/novo" element={<NovoIdoso />} />
+                  <Route path="idosos/:id/editar" element={<EditIdoso />} />
+                  <Route path="idosos/:id" element={<IdosoDetails />} />
+                  <Route path="atividades" element={<AtividadesList />} />
+                  <Route path="tipos-atividade" element={<TiposAtividade />} />
+                  <Route path="configuracoes" element={<Configuracoes />} />
+                </Route>
+                
+                {/* Redirect para dashboard se logado */}
+                <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+                
+                {/* 404 */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+            <Toaster />
+          </div>
         </BrowserRouter>
       </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+    </QueryClientProvider>
+  );
+}
 
 export default App;
