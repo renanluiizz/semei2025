@@ -20,9 +20,10 @@ const TiposAtividade = lazy(() => import('@/pages/TiposAtividade'));
 const Configuracoes = lazy(() => import('@/pages/Configuracoes').then(module => ({ default: module.Configuracoes })));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Páginas para correção dos problemas
+// Páginas administrativas
 const ImportarPage = lazy(() => import('@/pages/ImportarPage'));
 const ResetarPage = lazy(() => import('@/pages/ResetarPage'));
+const AuditoriaPage = lazy(() => import('@/pages/AuditoriaPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,12 +59,24 @@ function App() {
                   <Route path="tipos-atividade" element={<TiposAtividade />} />
                   <Route path="importar" element={<ImportarPage />} />
                   <Route path="resetar" element={<ResetarPage />} />
+                  <Route path="auditoria" element={<AuditoriaPage />} />
                   <Route path="configuracoes" element={<Configuracoes />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-            <Toaster />
+            <Toaster 
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontFamily: 'Inter, sans-serif',
+                },
+              }}
+            />
           </div>
         </Router>
       </AuthProvider>

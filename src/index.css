@@ -14,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 270 40% 60%; /* Lilás institucional */
+    --primary: 214 87% 27%; /* Azul profissional #1E3A8A */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 200 60% 85%; /* Azul claro */
+    --secondary: 214 32% 91%; /* Azul claro */
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 270 30% 90%; /* Lilás claro para acentos */
+    --accent: 214 32% 91%; /* Azul suave para acentos */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,18 +31,18 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 270 40% 60%;
+    --ring: 214 87% 27%;
 
-    --radius: 0.75rem; /* Cantos mais arredondados */
+    --radius: 0.75rem; /* Cantos arredondados */
 
-    --sidebar-background: 270 30% 98%;
+    --sidebar-background: 214 100% 97%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 270 40% 60%;
+    --sidebar-primary: 214 87% 27%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 270 20% 95%;
+    --sidebar-accent: 214 20% 95%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 270 15% 85%;
-    --sidebar-ring: 270 40% 60%;
+    --sidebar-border: 214 15% 85%;
+    --sidebar-ring: 214 87% 27%;
   }
 
   .dark {
@@ -55,16 +55,16 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 270 40% 70%;
+    --primary: 214 87% 35%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 200 60% 25%;
+    --secondary: 214 32% 25%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 270 30% 25%;
+    --accent: 214 32% 25%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -72,15 +72,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 270 40% 70%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 270 40% 70%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 270 40% 70%;
+    --ring: 214 87% 35%;
   }
 }
 
@@ -90,25 +82,81 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 /* Estilos personalizados para o SEMEI */
 @layer components {
-  .semei-button {
-    @apply rounded-2xl px-6 py-3 font-medium text-center shadow-md transition-all duration-300 hover:shadow-lg active:scale-95;
-  }
-  
   .semei-card {
-    @apply rounded-xl border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow duration-300;
+    @apply bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200;
   }
   
-  .semei-gradient {
-    @apply bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10;
+  .semei-button-primary {
+    @apply bg-blue-700 text-white hover:bg-blue-800 rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
-  .semei-header {
-    @apply bg-gradient-to-r from-primary to-secondary text-primary-foreground;
+  .semei-button-secondary {
+    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center gap-2;
+  }
+  
+  .semei-input {
+    @apply w-full rounded-xl border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-sm;
+  }
+  
+  .semei-label {
+    @apply text-sm font-medium text-gray-700 mb-1 block;
+  }
+  
+  .semei-table-header {
+    @apply bg-blue-100 text-blue-800 font-medium text-xs uppercase tracking-wider;
+  }
+  
+  .semei-status-badge {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .semei-gradient-header {
+    @apply bg-gradient-to-r from-blue-800 to-blue-900 text-white;
+  }
+  
+  .semei-skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+}
+
+/* Animações suaves */
+@layer utilities {
+  .transition-all-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .hover-lift {
+    @apply hover:shadow-lg hover:-translate-y-1 transition-all duration-200;
+  }
+  
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+}
+
+/* Responsividade aprimorada */
+@media (max-width: 640px) {
+  .mobile-padding {
+    @apply px-4 py-2;
+  }
+  
+  .mobile-text {
+    @apply text-sm;
+  }
+}
+
+/* Melhorias de acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
