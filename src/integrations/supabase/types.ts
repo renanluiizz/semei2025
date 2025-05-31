@@ -45,6 +45,39 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          id: string
+          ip_address: unknown | null
+          new_data: Json | null
+          old_data: Json | null
+          operation: string
+          table_name: string
+          timestamp: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          ip_address?: unknown | null
+          new_data?: Json | null
+          old_data?: Json | null
+          operation: string
+          table_name: string
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          ip_address?: unknown | null
+          new_data?: Json | null
+          old_data?: Json | null
+          operation?: string
+          table_name?: string
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       check_ins: {
         Row: {
           activity_type: string
@@ -302,6 +335,18 @@ export type Database = {
       get_staff_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      validate_cpf: {
+        Args: { cpf_input: string }
+        Returns: boolean
+      }
+      validate_email: {
+        Args: { email_input: string }
+        Returns: boolean
+      }
+      validate_phone: {
+        Args: { phone_input: string }
+        Returns: boolean
       }
     }
     Enums: {
