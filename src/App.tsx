@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -8,21 +7,21 @@ import { Layout } from '@/components/Layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PageLoading } from '@/components/ui/page-loading';
 
-// Lazy load pages with proper error handling
-const Dashboard = lazy(() => import('@/pages/Dashboard').then(module => ({ default: module.default || module.Dashboard || module })));
-const Login = lazy(() => import('@/pages/auth/Login').then(module => ({ default: module.default || module.Login || module })));
-const IdososList = lazy(() => import('@/pages/idosos/IdososList').then(module => ({ default: module.default || module.IdososList || module })));
-const NovoIdoso = lazy(() => import('@/pages/idosos/NovoIdoso').then(module => ({ default: module.default || module.NovoIdoso || module })));
-const EditIdoso = lazy(() => import('@/pages/idosos/EditIdoso').then(module => ({ default: module.default || module.EditIdoso || module })));
-const IdosoDetails = lazy(() => import('@/pages/idosos/IdosoDetails').then(module => ({ default: module.default || module.IdosoDetails || module })));
-const AtividadesList = lazy(() => import('@/pages/atividades/AtividadesList').then(module => ({ default: module.default || module.AtividadesList || module })));
-const TiposAtividade = lazy(() => import('@/pages/TiposAtividade').then(module => ({ default: module.default || module.TiposAtividade || module })));
-const Configuracoes = lazy(() => import('@/pages/Configuracoes').then(module => ({ default: module.default || module.Configuracoes || module })));
-const NotFound = lazy(() => import('@/pages/NotFound').then(module => ({ default: module.default || module.NotFound || module })));
+// Lazy load pages
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const Login = lazy(() => import('@/pages/auth/Login'));
+const IdososList = lazy(() => import('@/pages/idosos/IdososList'));
+const NovoIdoso = lazy(() => import('@/pages/idosos/NovoIdoso'));
+const EditIdoso = lazy(() => import('@/pages/idosos/EditIdoso'));
+const IdosoDetails = lazy(() => import('@/pages/idosos/IdosoDetails'));
+const AtividadesList = lazy(() => import('@/pages/atividades/AtividadesList'));
+const TiposAtividade = lazy(() => import('@/pages/TiposAtividade'));
+const Configuracoes = lazy(() => import('@/pages/Configuracoes'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Páginas para correção dos problemas
-const ImportarPage = lazy(() => import('@/pages/ImportarPage').then(module => ({ default: module.default || module.ImportarPage || module })));
-const ResetarPage = lazy(() => import('@/pages/ResetarPage').then(module => ({ default: module.default || module.ResetarPage || module })));
+const ImportarPage = lazy(() => import('@/pages/ImportarPage'));
+const ResetarPage = lazy(() => import('@/pages/ResetarPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
