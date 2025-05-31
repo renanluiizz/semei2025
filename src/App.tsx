@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/hooks/useAuth';
 import { Layout } from '@/components/Layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import PageLoading from '@/components/ui/page-loading';
+import { PageLoading } from '@/components/ui/page-loading';
 
 // Lazy load pages
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
