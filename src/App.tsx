@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,8 +8,8 @@ import { Layout } from '@/components/Layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PageLoading } from '@/components/ui/page-loading';
 
-// Lazy load pages - using simple imports that work with the actual exports
-const Dashboard = lazy(() => import('@/pages/Dashboard'));
+// Lazy load pages - handling both named and default exports properly
+const Dashboard = lazy(() => import('@/pages/Dashboard').then(module => ({ default: module.Dashboard })));
 const Login = lazy(() => import('@/pages/auth/Login').then(module => ({ default: module.Login })));
 const IdososList = lazy(() => import('@/pages/idosos/IdososList').then(module => ({ default: module.IdososList })));
 const NovoIdoso = lazy(() => import('@/pages/idosos/NovoIdoso').then(module => ({ default: module.NovoIdoso })));
@@ -16,7 +17,7 @@ const EditIdoso = lazy(() => import('@/pages/idosos/EditIdoso'));
 const IdosoDetails = lazy(() => import('@/pages/idosos/IdosoDetails'));
 const AtividadesList = lazy(() => import('@/pages/atividades/AtividadesList').then(module => ({ default: module.AtividadesList })));
 const TiposAtividade = lazy(() => import('@/pages/TiposAtividade'));
-const Configuracoes = lazy(() => import('@/pages/Configuracoes'));
+const Configuracoes = lazy(() => import('@/pages/Configuracoes').then(module => ({ default: module.Configuracoes })));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Páginas para correção dos problemas
