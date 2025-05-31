@@ -41,7 +41,7 @@ export function AuditLogViewer() {
     loadAuditLogs();
   }, []);
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = (key: string, value: string | number) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
