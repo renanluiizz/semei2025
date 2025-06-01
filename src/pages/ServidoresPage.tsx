@@ -189,10 +189,17 @@ export default function ServidoresPage() {
           >
             {staffList.length === 0 ? (
               <ModernTableRow>
-                <ModernTableCell className="text-center py-8" colSpan={6}>
-                  <Users className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500">Nenhum servidor encontrado</p>
+                <ModernTableCell className="text-center py-8">
+                  <div className="flex flex-col items-center">
+                    <Users className="h-8 w-8 text-gray-400 mb-2" />
+                    <p className="text-gray-500">Nenhum servidor encontrado</p>
+                  </div>
                 </ModernTableCell>
+                <ModernTableCell></ModernTableCell>
+                <ModernTableCell></ModernTableCell>
+                <ModernTableCell></ModernTableCell>
+                <ModernTableCell></ModernTableCell>
+                <ModernTableCell></ModernTableCell>
               </ModernTableRow>
             ) : (
               staffList.map((staff) => (

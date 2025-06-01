@@ -62,12 +62,19 @@ export const dashboardHelpers = {
 
   getActivityChartData: async (): Promise<{ data: any[], error: any }> => {
     try {
-      // Buscar dados dos últimos 7 dias
-      const { data, error } = await supabase.rpc('get_dashboard_activities_data');
-      
+      // Como a função SQL pode não existir, vamos fazer a query diretamente
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+
+      const { data: checkIns, error } = await supabase
+        .from('check_ins')
+        .select('check_in_time, elder_id')
+        .gte('check_in_time', sevenDaysAgo.toISOString())
+        .order('check_in_time', { ascending: true });
+
       if (error) {
         console.error('Erro ao buscar dados do gráfico:', error);
-        // Fallback para dados simulados se a função não existir
+        // Fallback para dados simulados se houver erro
         const fallbackData = Array.from({ length: 7 }, (_, i) => {
           const date = new Date();
           date.setDate(date.getDate() - (6 - i));
@@ -80,12 +87,38 @@ export const dashboardHelpers = {
         return { data: fallbackData, error: null };
       }
 
-      // Transformar dados para o formato do gráfico
-      const chartData = data?.map((item: any) => ({
-        name: item.date_label,
-        atividades: parseInt(item.activity_count),
-        presenca: parseInt(item.attendance_count)
-      })) || [];
+      // Processar dados manualmente
+      const dataMap = new Map();
+      
+      // Inicializar todos os dias dos últimos 7 dias
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateKey = date.toISOString().split('T')[0];
+        const dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        dataMap.set(dateKey, {
+          name: dateLabel,
+          atividades: 0,
+          presenca: new Set()
+        });
+      }
+
+      // Processar check-ins
+      checkIns?.forEach((checkIn) => {
+        const dateKey = checkIn.check_in_time.split('T')[0];
+        if (dataMap.has(dateKey)) {
+          const dayData = dataMap.get(dateKey);
+          dayData.atividades += 1;
+          dayData.presenca.add(checkIn.elder_id);
+        }
+      });
+
+      // Converter para array final
+      const chartData = Array.from(dataMap.values()).map(day => ({
+        name: day.name,
+        atividades: day.atividades,
+        presenca: day.presenca.size
+      }));
 
       return { data: chartData, error: null };
     } catch (error) {

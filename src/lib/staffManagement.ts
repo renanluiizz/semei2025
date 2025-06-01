@@ -30,10 +30,22 @@ export const staffManagementHelpers = {
     try {
       const { data, error } = await supabase
         .from('staff')
-        .select('*')
+        .select('id, full_name, email, cpf, phone, position, role, status, created_at, updated_at')
         .order('created_at', { ascending: false });
 
-      return { data, error };
+      if (error) throw error;
+
+      // Ensure all required fields are present with defaults
+      const staffData = data?.map(staff => ({
+        ...staff,
+        status: staff.status || 'active',
+        cpf: staff.cpf || undefined,
+        phone: staff.phone || undefined,
+        position: staff.position || undefined,
+        updated_at: staff.updated_at || undefined
+      })) as StaffMember[];
+
+      return { data: staffData, error: null };
     } catch (error) {
       return { data: null, error };
     }
@@ -118,11 +130,22 @@ export const staffManagementHelpers = {
     try {
       const { data, error } = await supabase
         .from('staff')
-        .select('*')
+        .select('id, full_name, email, cpf, phone, position, role, status, created_at, updated_at')
         .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
         .order('created_at', { ascending: false });
 
-      return { data, error };
+      if (error) throw error;
+
+      const staffData = data?.map(staff => ({
+        ...staff,
+        status: staff.status || 'active',
+        cpf: staff.cpf || undefined,
+        phone: staff.phone || undefined,
+        position: staff.position || undefined,
+        updated_at: staff.updated_at || undefined
+      })) as StaffMember[];
+
+      return { data: staffData, error: null };
     } catch (error) {
       return { data: null, error };
     }
@@ -132,7 +155,7 @@ export const staffManagementHelpers = {
     try {
       let query = supabase
         .from('staff')
-        .select('*')
+        .select('id, full_name, email, cpf, phone, position, role, status, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (status && status !== 'all') {
@@ -140,7 +163,19 @@ export const staffManagementHelpers = {
       }
 
       const { data, error } = await query;
-      return { data, error };
+      
+      if (error) throw error;
+
+      const staffData = data?.map(staff => ({
+        ...staff,
+        status: staff.status || 'active',
+        cpf: staff.cpf || undefined,
+        phone: staff.phone || undefined,
+        position: staff.position || undefined,
+        updated_at: staff.updated_at || undefined
+      })) as StaffMember[];
+
+      return { data: staffData, error: null };
     } catch (error) {
       return { data: null, error };
     }
