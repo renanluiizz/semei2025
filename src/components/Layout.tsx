@@ -1,3 +1,4 @@
+
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -77,29 +78,30 @@ export function Layout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex w-full">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/40 flex w-full">
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out flex flex-col
+        fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white/95 backdrop-blur-xl shadow-2xl border-r border-gray-200/50 transform transition-all duration-300 ease-in-out flex flex-col
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-800 to-blue-900">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-              <Shield className="h-7 w-7 text-white" />
+        <div className="p-6 border-b border-gray-200/50 bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent"></div>
+          <div className="relative flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg">
+              <Shield className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">SEMEI</h1>
-              <p className="text-xs text-blue-100">Secretaria da Melhor Idade</p>
+              <h1 className="text-2xl font-bold text-white tracking-tight">SEMEI</h1>
+              <p className="text-xs text-blue-100 font-medium">Secretaria da Melhor Idade</p>
             </div>
           </div>
         </div>
@@ -108,19 +110,20 @@ export function Layout() {
         <div className="p-4 border-b border-gray-100">
           <Button
             variant="outline"
-            className="w-full justify-start rounded-xl border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-left h-10"
+            className="w-full justify-start rounded-xl border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-left h-12 transition-all duration-200"
             onClick={() => setShowGlobalSearch(true)}
           >
-            <Search className="h-4 w-4 mr-2 text-gray-400" />
-            <span className="text-gray-500 font-normal">Buscar no sistema...</span>
+            <Search className="h-5 w-5 mr-3 text-gray-400" />
+            <span className="text-gray-500 font-medium">Buscar no sistema...</span>
           </Button>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
           {Object.entries(groupedMenuItems).map(([category, items]) => (
-            <div key={category}>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">
+            <div key={category} className="space-y-2">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 px-3 flex items-center gap-2">
+                <div className="w-4 h-0.5 bg-gradient-to-r from-blue-500 to-transparent rounded-full"></div>
                 {category}
               </h3>
               <div className="space-y-1">
@@ -133,16 +136,19 @@ export function Layout() {
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+                      className={`semei-sidebar-item ${
                         isActive
-                          ? 'bg-blue-100 text-blue-800 shadow-sm'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-blue-700'
+                          ? 'semei-sidebar-item-active'
+                          : 'semei-sidebar-item-inactive'
                       }`}
                     >
-                      <Icon size={18} className={`transition-colors ${
+                      <Icon size={20} className={`transition-colors ${
                         isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-600'
                       }`} />
-                      {item.label}
+                      <span className="font-medium">{item.label}</span>
+                      {isActive && (
+                        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-l-full"></div>
+                      )}
                     </Link>
                   );
                 })}
@@ -152,38 +158,39 @@ export function Layout() {
         </nav>
 
         {/* User Info */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200/50 bg-gray-50/50">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-between p-3 h-auto rounded-xl hover:bg-gray-100">
+              <Button variant="ghost" className="w-full justify-between p-4 h-auto rounded-xl hover:bg-white/70 transition-all duration-200 group">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-12 w-12 ring-2 ring-blue-100">
                     <AvatarImage src="" />
-                    <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-lg">
                       {userProfile?.full_name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-semibold text-gray-900 truncate">
                       {userProfile?.full_name || 'Usuário'}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                      <Shield className="h-3 w-3" />
                       {userProfile?.role === 'admin' ? 'Administrador' : 'Servidor'}
                     </p>
                   </div>
                 </div>
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64">
-              <DropdownMenuItem onClick={() => navigate('/perfil')}>
-                <User className="h-4 w-4 mr-2" />
-                Meu Perfil
+            <DropdownMenuContent align="start" className="w-64 shadow-xl border-0 bg-white/95 backdrop-blur-xl">
+              <DropdownMenuItem onClick={() => navigate('/perfil')} className="p-3 hover:bg-blue-50 rounded-lg">
+                <User className="h-4 w-4 mr-3 text-blue-600" />
+                <span className="font-medium">Meu Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair do Sistema
+              <DropdownMenuSeparator className="my-2" />
+              <DropdownMenuItem onClick={handleSignOut} className="p-3 text-red-600 hover:bg-red-50 rounded-lg">
+                <LogOut className="h-4 w-4 mr-3" />
+                <span className="font-medium">Sair do Sistema</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -193,41 +200,42 @@ export function Layout() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-4">
+        <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-4 lg:px-8 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+          <div className="flex items-center gap-6">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden rounded-xl"
+              className="lg:hidden rounded-xl w-10 h-10 hover:bg-blue-50"
             >
               <Menu className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">{getCurrentPageTitle()}</h1>
-              <p className="text-sm text-gray-500">Sistema de Monitoramento de Estruturas Institucionais</p>
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{getCurrentPageTitle()}</h1>
+              <p className="text-sm text-gray-600 font-medium">Sistema de Monitoramento de Estruturas Institucionais</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-xl">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="rounded-xl w-10 h-10 hover:bg-blue-50 relative">
               <Bell className="h-5 w-5 text-gray-500" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
             </Button>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 p-4 lg:p-8 overflow-auto">
+          <div className="max-w-7xl mx-auto animate-fade-in">
             <Outlet />
           </div>
         </main>
         
         {/* Footer */}
-        <footer className="px-4 lg:px-6 py-4 border-t border-gray-200 bg-white">
+        <footer className="px-4 lg:px-8 py-6 border-t border-gray-200/50 bg-white/60 backdrop-blur-xl">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-2">
-            <span>© 2024 Secretaria da Melhor Idade - SEMEI</span>
-            <span>Sistema de Gestão Institucional v2.0</span>
+            <span className="font-medium">© 2024 Secretaria da Melhor Idade - SEMEI</span>
+            <span className="font-medium">Sistema de Gestão Institucional v2.0</span>
           </div>
         </footer>
       </div>

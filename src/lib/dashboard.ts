@@ -15,7 +15,11 @@ export const dashboardHelpers = {
       const [idososResult, atividadesMesResult, atividadesRecentesResult] = await Promise.all([
         supabase.from('elders').select('*'),
         supabase.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
-        supabase.from('check_ins').select(`*, elder:elders(name)`).order('created_at', { ascending: false }).limit(5)
+        supabase.from('check_ins').select(`
+          *,
+          elder:elders(name),
+          staff:staff(full_name)
+        `).order('created_at', { ascending: false }).limit(5)
       ]);
 
       const { data: idosos, error: idososError } = idososResult;
@@ -56,13 +60,24 @@ export const dashboardHelpers = {
       setCache(cacheKey, stats);
       return { data: stats, error: null };
     } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
       return { data: null, error };
     }
   },
 
   getActivityChartData: async (): Promise<{ data: any[], error: any }> => {
     try {
-      // Como a função SQL pode não existir, vamos fazer a query diretamente
+      // Tentar usar a função do banco primeiro
+      const { data: chartData, error: functionError } = await supabase
+        .rpc('get_dashboard_activities_data');
+
+      if (!functionError && chartData) {
+        return { data: chartData, error: null };
+      }
+
+      console.warn('Função do banco não disponível, usando fallback manual:', functionError);
+
+      // Fallback manual se a função não estiver disponível
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
@@ -79,7 +94,7 @@ export const dashboardHelpers = {
           const date = new Date();
           date.setDate(date.getDate() - (6 - i));
           return {
-            name: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+            day_name: date.toLocaleDateString('pt-BR', { weekday: 'short' }),
             atividades: Math.floor(Math.random() * 20) + 5,
             presenca: Math.floor(Math.random() * 15) + 8
           };
@@ -95,9 +110,11 @@ export const dashboardHelpers = {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateKey = date.toISOString().split('T')[0];
-        const dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const dayName = dayNames[date.getDay()];
+        
         dataMap.set(dateKey, {
-          name: dateLabel,
+          day_name: dayName,
           atividades: 0,
           presenca: new Set()
         });
@@ -114,13 +131,13 @@ export const dashboardHelpers = {
       });
 
       // Converter para array final
-      const chartData = Array.from(dataMap.values()).map(day => ({
-        name: day.name,
+      const processedData = Array.from(dataMap.values()).map(day => ({
+        day_name: day.day_name,
         atividades: day.atividades,
         presenca: day.presenca.size
       }));
 
-      return { data: chartData, error: null };
+      return { data: processedData, error: null };
     } catch (error) {
       console.error('Erro inesperado ao buscar dados do gráfico:', error);
       return { data: [], error };

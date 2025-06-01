@@ -301,25 +301,40 @@ export type Database = {
       }
       staff: {
         Row: {
+          cpf: string | null
           created_at: string
           email: string
           full_name: string
           id: string
+          phone: string | null
+          position: string | null
           role: string
+          status: string | null
+          updated_at: string | null
         }
         Insert: {
+          cpf?: string | null
           created_at?: string
           email: string
           full_name: string
           id: string
+          phone?: string | null
+          position?: string | null
           role?: string
+          status?: string | null
+          updated_at?: string | null
         }
         Update: {
+          cpf?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          phone?: string | null
+          position?: string | null
           role?: string
+          status?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -331,6 +346,14 @@ export type Database = {
       calculate_age: {
         Args: { birth_date: string }
         Returns: number
+      }
+      get_dashboard_activities_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          day_name: string
+          atividades: number
+          presenca: number
+        }[]
       }
       get_staff_role: {
         Args: Record<PropertyKey, never>
