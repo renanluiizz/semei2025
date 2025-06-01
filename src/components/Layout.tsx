@@ -1,4 +1,3 @@
-
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,7 +26,8 @@ import {
   Menu,
   Bell,
   ChevronDown,
-  Shield
+  Shield,
+  UserCog
 } from 'lucide-react';
 
 export function Layout() {
@@ -54,6 +54,7 @@ export function Layout() {
     { icon: Calendar, label: 'Atividades', path: '/atividades', category: 'Atividades' },
     { icon: Activity, label: 'Tipos de Atividade', path: '/tipos-atividade', category: 'Atividades' },
     ...(userProfile?.role === 'admin' ? [
+      { icon: UserCog, label: 'Servidores', path: '/servidores', category: 'Administração' },
       { icon: FileSpreadsheet, label: 'Importar Planilha', path: '/importar', category: 'Administração' },
       { icon: RotateCcw, label: 'Resetar Estatísticas', path: '/resetar', category: 'Administração' },
       { icon: Shield, label: 'Logs de Auditoria', path: '/auditoria', category: 'Administração' },
