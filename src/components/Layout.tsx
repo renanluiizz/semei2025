@@ -136,7 +136,7 @@ export function Layout() {
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`semei-sidebar-item ${
+                      className={`group semei-sidebar-item ${
                         isActive
                           ? 'semei-sidebar-item-active'
                           : 'semei-sidebar-item-inactive'
