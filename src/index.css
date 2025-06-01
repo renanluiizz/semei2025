@@ -3,76 +3,93 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 214 87% 27%; /* Azul profissional #1E3A8A */
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 214 32% 91%; /* Azul claro */
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 214 32% 91%; /* Azul suave para acentos */
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 214 87% 27%;
-
-    --radius: 0.75rem; /* Cantos arredondados */
-
-    --sidebar-background: 214 100% 97%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 214 87% 27%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 214 20% 95%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 214 15% 85%;
-    --sidebar-ring: 214 87% 27%;
+    /* Sistema de cores moderno */
+    --background: 248 250 252;
+    --foreground: 15 23 42;
+    
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
+    
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
+    
+    --primary: 59 130 246; /* Blue-500 */
+    --primary-foreground: 248 250 252;
+    
+    --secondary: 241 245 249; /* Slate-100 */
+    --secondary-foreground: 51 65 85;
+    
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
+    
+    --accent: 236 254 255; /* Cyan-50 */
+    --accent-foreground: 22 78 99;
+    
+    --destructive: 239 68 68; /* Red-500 */
+    --destructive-foreground: 248 250 252;
+    
+    --border: 226 232 240; /* Slate-200 */
+    --input: 226 232 240;
+    --ring: 59 130 246;
+    
+    --success: 34 197 94; /* Green-500 */
+    --warning: 245 158 11; /* Amber-500 */
+    --info: 59 130 246; /* Blue-500 */
+    
+    --radius: 0.75rem;
+    
+    /* Sidebar específico */
+    --sidebar-background: 255 255 255;
+    --sidebar-foreground: 51 65 85;
+    --sidebar-primary: 59 130 246;
+    --sidebar-primary-foreground: 248 250 252;
+    --sidebar-accent: 241 245 249;
+    --sidebar-accent-foreground: 51 65 85;
+    --sidebar-border: 226 232 240;
+    --sidebar-ring: 59 130 246;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 214 87% 35%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 214 32% 25%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 214 32% 25%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 214 87% 35%;
+    --background: 2 6 23;
+    --foreground: 248 250 252;
+    
+    --card: 15 23 42;
+    --card-foreground: 248 250 252;
+    
+    --popover: 15 23 42;
+    --popover-foreground: 248 250 252;
+    
+    --primary: 59 130 246;
+    --primary-foreground: 15 23 42;
+    
+    --secondary: 30 41 59;
+    --secondary-foreground: 203 213 225;
+    
+    --muted: 15 23 42;
+    --muted-foreground: 100 116 139;
+    
+    --accent: 30 41 59;
+    --accent-foreground: 203 213 225;
+    
+    --destructive: 220 38 38;
+    --destructive-foreground: 248 250 252;
+    
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 59 130 246;
+    
+    --sidebar-background: 15 23 42;
+    --sidebar-foreground: 203 213 225;
+    --sidebar-primary: 59 130 246;
+    --sidebar-primary-foreground: 15 23 42;
+    --sidebar-accent: 30 41 59;
+    --sidebar-accent-foreground: 203 213 225;
+    --sidebar-border: 51 65 85;
+    --sidebar-ring: 59 130 246;
   }
 }
 
@@ -80,235 +97,320 @@
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply bg-gradient-to-br from-gray-50 to-blue-50 text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
     min-height: 100vh;
   }
-
+  
   html {
     scroll-behavior: smooth;
   }
 }
 
-/* Estilos personalizados para o SEMEI */
+/* Design System - Componentes SEMEI */
 @layer components {
+  /* Layout principal */
+  .semei-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .semei-page {
+    @apply min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20;
+  }
+  
+  /* Cards modernos */
   .semei-card {
-    @apply bg-white rounded-2xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm;
+    @apply bg-white rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-sm;
   }
   
-  .semei-button-primary {
-    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+  .semei-card-header {
+    @apply p-6 border-b border-slate-200/60 bg-gradient-to-r from-slate-50/50 to-transparent;
   }
   
-  .semei-button-secondary {
-    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-200 flex items-center gap-2;
+  .semei-card-content {
+    @apply p-6;
   }
   
+  .semei-card-footer {
+    @apply p-6 pt-0;
+  }
+  
+  /* Botões sistema */
+  .semei-btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .semei-btn-primary {
+    @apply semei-btn bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500 shadow-sm hover:shadow-md;
+  }
+  
+  .semei-btn-secondary {
+    @apply semei-btn bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400 focus:ring-slate-500 shadow-sm;
+  }
+  
+  .semei-btn-success {
+    @apply semei-btn bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 focus:ring-green-500 shadow-sm hover:shadow-md;
+  }
+  
+  .semei-btn-danger {
+    @apply semei-btn bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 focus:ring-red-500 shadow-sm hover:shadow-md;
+  }
+  
+  .semei-btn-ghost {
+    @apply semei-btn text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-500;
+  }
+  
+  /* Inputs modernos */
   .semei-input {
-    @apply w-full rounded-xl border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all duration-200 placeholder:text-gray-400;
+    @apply w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder:text-slate-400;
   }
   
   .semei-label {
-    @apply text-sm font-semibold text-gray-700 mb-2 block;
+    @apply block text-sm font-medium text-slate-700 mb-2;
+  }
+  
+  .semei-textarea {
+    @apply semei-input min-h-[80px] resize-y;
+  }
+  
+  .semei-select {
+    @apply semei-input appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDEuNUw2IDYuNUwxMSAxLjUiIHN0cm9rZT0iIzY0NzQ4YiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K')] bg-no-repeat bg-right-3 bg-center pr-10;
+  }
+  
+  /* Tabelas modernas */
+  .semei-table {
+    @apply w-full border-collapse;
   }
   
   .semei-table-header {
-    @apply bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold text-xs uppercase tracking-wider;
+    @apply bg-gradient-to-r from-slate-50 to-slate-100/50 border-b border-slate-200;
   }
   
-  .semei-status-badge {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold;
+  .semei-table-header th {
+    @apply px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider;
   }
   
-  .semei-gradient-header {
-    @apply bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-lg;
+  .semei-table-row {
+    @apply border-b border-slate-100 hover:bg-slate-50/50 transition-colors duration-150;
   }
   
-  .semei-skeleton {
-    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded;
+  .semei-table-cell {
+    @apply px-6 py-4 text-sm text-slate-900;
   }
-
-  .semei-glass {
-    @apply backdrop-blur-md bg-white/70 border border-white/20 shadow-xl;
+  
+  /* Status badges */
+  .semei-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
   }
-
+  
+  .semei-badge-success {
+    @apply semei-badge bg-green-100 text-green-800;
+  }
+  
+  .semei-badge-warning {
+    @apply semei-badge bg-amber-100 text-amber-800;
+  }
+  
+  .semei-badge-danger {
+    @apply semei-badge bg-red-100 text-red-800;
+  }
+  
+  .semei-badge-info {
+    @apply semei-badge bg-blue-100 text-blue-800;
+  }
+  
+  .semei-badge-neutral {
+    @apply semei-badge bg-slate-100 text-slate-800;
+  }
+  
+  /* Sidebar moderna */
+  .semei-sidebar {
+    @apply w-72 bg-white border-r border-slate-200/60 shadow-sm;
+  }
+  
+  .semei-sidebar-header {
+    @apply p-6 border-b border-slate-200/60 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800;
+  }
+  
+  .semei-sidebar-content {
+    @apply flex-1 px-4 py-6 space-y-8 overflow-y-auto;
+  }
+  
+  .semei-sidebar-group {
+    @apply space-y-2;
+  }
+  
+  .semei-sidebar-group-label {
+    @apply px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2;
+  }
+  
   .semei-sidebar-item {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative;
   }
-
+  
   .semei-sidebar-item-active {
-    @apply bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 shadow-sm;
+    @apply bg-gradient-to-r from-blue-50 to-blue-100/70 text-blue-700 shadow-sm;
   }
-
+  
   .semei-sidebar-item-inactive {
-    @apply text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 hover:text-blue-700;
+    @apply text-slate-600 hover:bg-slate-50 hover:text-slate-900;
+  }
+  
+  /* Header principal */
+  .semei-header {
+    @apply bg-white/95 backdrop-blur-xl border-b border-slate-200/60 px-6 py-4 shadow-sm;
+  }
+  
+  /* Estatísticas cards */
+  .semei-stat-card {
+    @apply semei-card p-6 hover:shadow-lg transition-all duration-300 border-l-4;
+  }
+  
+  .semei-stat-card-blue {
+    @apply semei-stat-card border-l-blue-500;
+  }
+  
+  .semei-stat-card-green {
+    @apply semei-stat-card border-l-green-500;
+  }
+  
+  .semei-stat-card-amber {
+    @apply semei-stat-card border-l-amber-500;
+  }
+  
+  .semei-stat-card-purple {
+    @apply semei-stat-card border-l-purple-500;
+  }
+  
+  /* Formulários */
+  .semei-form-group {
+    @apply space-y-2;
+  }
+  
+  .semei-form-row {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  }
+  
+  .semei-form-actions {
+    @apply flex items-center justify-end gap-3 pt-6 border-t border-slate-200;
+  }
+  
+  /* Modais */
+  .semei-modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50;
+  }
+  
+  .semei-modal-content {
+    @apply bg-white rounded-2xl shadow-2xl border border-slate-200/60 max-w-2xl w-full mx-4;
+  }
+  
+  .semei-modal-header {
+    @apply px-6 py-4 border-b border-slate-200/60 bg-gradient-to-r from-slate-50/50 to-transparent;
+  }
+  
+  .semei-modal-body {
+    @apply px-6 py-6;
+  }
+  
+  .semei-modal-footer {
+    @apply px-6 py-4 border-t border-slate-200/60 bg-slate-50/30;
   }
 }
 
-/* Animações avançadas */
+/* Animações e interações */
 @layer utilities {
-  .transition-all-smooth {
-    @apply transition-all duration-300 ease-in-out;
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
   }
   
   .hover-lift {
-    @apply hover:shadow-2xl hover:-translate-y-1 transition-all duration-300;
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
   }
   
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2;
   }
-
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
-
-  .animate-bounce-subtle {
-    animation: bounceSubtle 2s infinite;
-  }
-
+  
   .glass-effect {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
 }
 
-/* Animações personalizadas */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes bounceSubtle {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-5px);
-  }
-  60% {
-    transform: translateY(-3px);
-  }
-}
-
-/* Gradientes personalizados */
-.gradient-blue {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-}
-
-.gradient-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.gradient-warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.gradient-danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-}
-
-/* Responsividade aprimorada */
-@media (max-width: 640px) {
-  .mobile-padding {
-    @apply px-4 py-3;
-  }
-  
-  .mobile-text {
-    @apply text-sm;
-  }
-
-  .semei-button-primary, .semei-button-secondary {
-    @apply w-full justify-center;
-  }
-}
-
-/* Melhorias de acessibilidade */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 /* Scrollbar personalizada */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: rgb(248 250 252);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
-  border-radius: 4px;
+  background: rgb(148 163 184);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #94a3b8, #64748b);
+  background: rgb(100 116 139);
 }
 
-/* Efeitos de hover para cards */
-.card-hover {
-  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-}
-
-/* Estados de loading mais elegantes */
-.loading-shimmer {
-  background: linear-gradient(110deg, #e2e8f0 8%, #f1f5f9 18%, #e2e8f0 33%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+/* Responsividade */
+@media (max-width: 768px) {
+  .semei-sidebar {
+    @apply w-full;
   }
-  100% {
-    background-position: 200% 0;
+  
+  .semei-form-row {
+    @apply grid-cols-1;
+  }
+  
+  .semei-btn {
+    @apply w-full justify-center;
+  }
+  
+  .semei-table-cell {
+    @apply px-4 py-3;
   }
 }
 
-/* Estilo para toasts */
-.toast-success {
-  @apply bg-gradient-to-r from-green-500 to-green-600 text-white;
+/* Estados dark mode */
+.dark .semei-card {
+  @apply bg-slate-800 border-slate-700;
 }
 
-.toast-error {
-  @apply bg-gradient-to-r from-red-500 to-red-600 text-white;
+.dark .semei-input {
+  @apply bg-slate-800 border-slate-600 text-slate-100;
 }
 
-.toast-warning {
-  @apply bg-gradient-to-r from-yellow-500 to-yellow-600 text-white;
-}
-
-.toast-info {
-  @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white;
+.dark .semei-sidebar {
+  @apply bg-slate-800 border-slate-700;
 }

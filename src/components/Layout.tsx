@@ -28,7 +28,8 @@ import {
   Bell,
   ChevronDown,
   Shield,
-  UserCog
+  UserCog,
+  X
 } from 'lucide-react';
 
 export function Layout() {
@@ -43,7 +44,6 @@ export function Layout() {
     navigate('/auth/login');
   };
 
-  // Close sidebar on route change (mobile)
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
@@ -78,52 +78,62 @@ export function Layout() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/40 flex w-full">
-      {/* Overlay for mobile sidebar */}
+    <div className="semei-page flex w-full">
+      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white/95 backdrop-blur-xl shadow-2xl border-r border-gray-200/50 transform transition-all duration-300 ease-in-out flex flex-col
+        fixed lg:static inset-y-0 left-0 z-50 semei-sidebar transform transition-all duration-300 ease-in-out flex flex-col
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-gray-200/50 bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900 relative overflow-hidden">
+        <div className="semei-sidebar-header relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent"></div>
-          <div className="relative flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg">
-              <Shield className="h-8 w-8 text-white" />
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg">
+                <Shield className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white tracking-tight">SEMEI</h1>
+                <p className="text-xs text-blue-100 font-medium">Secretaria da Melhor Idade</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">SEMEI</h1>
-              <p className="text-xs text-blue-100 font-medium">Secretaria da Melhor Idade</p>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden text-white hover:bg-white/10 w-8 h-8"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         {/* Search Button */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-slate-200/60">
           <Button
             variant="outline"
-            className="w-full justify-start rounded-xl border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-left h-12 transition-all duration-200"
+            className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-left h-11 transition-all duration-200"
             onClick={() => setShowGlobalSearch(true)}
           >
-            <Search className="h-5 w-5 mr-3 text-gray-400" />
-            <span className="text-gray-500 font-medium">Buscar no sistema...</span>
+            <Search className="h-4 w-4 mr-3 text-slate-400" />
+            <span className="text-slate-500 font-medium">Buscar no sistema...</span>
           </Button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+        <nav className="semei-sidebar-content">
           {Object.entries(groupedMenuItems).map(([category, items]) => (
-            <div key={category} className="space-y-2">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 px-3 flex items-center gap-2">
-                <div className="w-4 h-0.5 bg-gradient-to-r from-blue-500 to-transparent rounded-full"></div>
+            <div key={category} className="semei-sidebar-group">
+              <h3 className="semei-sidebar-group-label">
+                <div className="w-3 h-0.5 bg-gradient-to-r from-blue-500 to-transparent rounded-full"></div>
                 {category}
               </h3>
               <div className="space-y-1">
@@ -142,12 +152,12 @@ export function Layout() {
                           : 'semei-sidebar-item-inactive'
                       }`}
                     >
-                      <Icon size={20} className={`transition-colors ${
-                        isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-600'
+                      <Icon size={18} className={`transition-colors ${
+                        isActive ? 'text-blue-600' : 'text-slate-500 group-hover:text-slate-700'
                       }`} />
                       <span className="font-medium">{item.label}</span>
                       {isActive && (
-                        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-l-full"></div>
+                        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-l-full"></div>
                       )}
                     </Link>
                   );
@@ -157,32 +167,32 @@ export function Layout() {
           ))}
         </nav>
 
-        {/* User Info */}
-        <div className="p-4 border-t border-gray-200/50 bg-gray-50/50">
+        {/* User Profile */}
+        <div className="p-4 border-t border-slate-200/60 bg-slate-50/30">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-between p-4 h-auto rounded-xl hover:bg-white/70 transition-all duration-200 group">
+              <Button variant="ghost" className="w-full justify-between p-3 h-auto rounded-xl hover:bg-white/70 transition-all duration-200 group">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12 ring-2 ring-blue-100">
+                  <Avatar className="h-10 w-10 ring-2 ring-blue-100">
                     <AvatarImage src="" />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-lg">
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
                       {userProfile?.full_name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
+                    <p className="text-sm font-semibold text-slate-900 truncate">
                       {userProfile?.full_name || 'Usuário'}
                     </p>
-                    <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                    <p className="text-xs text-slate-500 truncate flex items-center gap-1">
                       <Shield className="h-3 w-3" />
                       {userProfile?.role === 'admin' ? 'Administrador' : 'Servidor'}
                     </p>
                   </div>
                 </div>
-                <ChevronDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                <ChevronDown className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64 shadow-xl border-0 bg-white/95 backdrop-blur-xl">
+            <DropdownMenuContent align="start" className="w-56 shadow-xl border-0 bg-white/95 backdrop-blur-xl">
               <DropdownMenuItem onClick={() => navigate('/perfil')} className="p-3 hover:bg-blue-50 rounded-lg">
                 <User className="h-4 w-4 mr-3 text-blue-600" />
                 <span className="font-medium">Meu Perfil</span>
@@ -199,48 +209,48 @@ export function Layout() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-4 lg:px-8 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        {/* Header */}
+        <header className="semei-header sticky top-0 z-30 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden rounded-xl w-10 h-10 hover:bg-blue-50"
+              className="lg:hidden rounded-xl w-10 h-10 hover:bg-slate-100"
             >
               <Menu className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{getCurrentPageTitle()}</h1>
-              <p className="text-sm text-gray-600 font-medium">Sistema de Monitoramento de Estruturas Institucionais</p>
+              <h1 className="text-xl font-bold text-slate-900">{getCurrentPageTitle()}</h1>
+              <p className="text-sm text-slate-600 font-medium">Sistema de Monitoramento de Estruturas Institucionais</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="rounded-xl w-10 h-10 hover:bg-blue-50 relative">
-              <Bell className="h-5 w-5 text-gray-500" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <Button variant="ghost" size="icon" className="rounded-xl w-10 h-10 hover:bg-slate-100 relative">
+              <Bell className="h-5 w-5 text-slate-500" />
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
             </Button>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-auto">
-          <div className="max-w-7xl mx-auto animate-fade-in">
+        {/* Content */}
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+          <div className="semei-container animate-fade-in">
             <Outlet />
           </div>
         </main>
         
         {/* Footer */}
-        <footer className="px-4 lg:px-8 py-6 border-t border-gray-200/50 bg-white/60 backdrop-blur-xl">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-2">
+        <footer className="px-6 lg:px-8 py-4 border-t border-slate-200/60 bg-white/60 backdrop-blur-xl">
+          <div className="semei-container flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
             <span className="font-medium">© 2024 Secretaria da Melhor Idade - SEMEI</span>
             <span className="font-medium">Sistema de Gestão Institucional v2.0</span>
           </div>
         </footer>
       </div>
 
-      {/* Global Search Modal */}
+      {/* Global Search */}
       <GlobalSearch 
         open={showGlobalSearch} 
         onClose={() => setShowGlobalSearch(false)} 

@@ -1,54 +1,65 @@
 
 import React from 'react';
+import { cn } from '@/lib/utils';
 import { LucideIcon } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface StatsCardProps {
   title: string;
   value: string | number;
-  icon: LucideIcon;
-  trend?: {
+  change?: {
     value: number;
-    isPositive: boolean;
+    type: 'increase' | 'decrease';
   };
-  description?: string;
+  icon: LucideIcon;
+  variant?: 'blue' | 'green' | 'amber' | 'purple';
   className?: string;
 }
 
-export function StatsCard({ 
-  title, 
-  value, 
-  icon: Icon, 
-  trend, 
-  description,
-  className = "" 
+const variantClasses = {
+  blue: 'semei-stat-card-blue',
+  green: 'semei-stat-card-green',
+  amber: 'semei-stat-card-amber',
+  purple: 'semei-stat-card-purple'
+};
+
+const iconBgClasses = {
+  blue: 'bg-blue-100 text-blue-600',
+  green: 'bg-green-100 text-green-600',
+  amber: 'bg-amber-100 text-amber-600',
+  purple: 'bg-purple-100 text-purple-600'
+};
+
+export function StatsCard({
+  title,
+  value,
+  change,
+  icon: Icon,
+  variant = 'blue',
+  className
 }: StatsCardProps) {
   return (
-    <Card className={`semei-card hover-lift ${className}`}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-            <p className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{value}</p>
-            {description && (
-              <p className="text-xs text-gray-500">{description}</p>
-            )}
-            {trend && (
-              <div className={`flex items-center mt-2 text-xs font-medium ${
-                trend.isPositive ? 'text-green-600' : 'text-red-600'
-              }`}>
-                <span>{trend.isPositive ? '+' : ''}{trend.value}%</span>
-                <span className="ml-1 text-gray-500">vs. mês anterior</span>
-              </div>
-            )}
-          </div>
-          <div className="ml-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-              <Icon className="h-6 w-6 text-blue-600" />
+    <div className={cn(variantClasses[variant], className)}>
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-slate-600 mb-1">{title}</p>
+          <p className="text-3xl font-bold text-slate-900">{value}</p>
+          {change && (
+            <div className={cn(
+              'flex items-center gap-1 mt-2 text-sm font-medium',
+              change.type === 'increase' ? 'text-green-600' : 'text-red-600'
+            )}>
+              <span>{change.type === 'increase' ? '+' : '-'}{Math.abs(change.value)}%</span>
+              <span className="text-slate-500">vs mês anterior</span>
             </div>
-          </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+        <div className={cn(
+          'w-12 h-12 rounded-xl flex items-center justify-center',
+          iconBgClasses[variant]
+        )}>
+          <Icon className="w-6 h-6" />
+        </div>
+      </div>
+    </div>
   );
 }
