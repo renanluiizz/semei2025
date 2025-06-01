@@ -24,6 +24,7 @@ const NotFound = lazy(() => import('@/pages/NotFound'));
 const ImportarPage = lazy(() => import('@/pages/ImportarPage'));
 const ResetarPage = lazy(() => import('@/pages/ResetarPage'));
 const AuditoriaPage = lazy(() => import('@/pages/AuditoriaPage'));
+const ServidoresPage = lazy(() => import('@/pages/ServidoresPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,6 +61,7 @@ function App() {
                   <Route path="importar" element={<ImportarPage />} />
                   <Route path="resetar" element={<ResetarPage />} />
                   <Route path="auditoria" element={<AuditoriaPage />} />
+                  <Route path="servidores" element={<ServidoresPage />} />
                   <Route path="configuracoes" element={<Configuracoes />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />

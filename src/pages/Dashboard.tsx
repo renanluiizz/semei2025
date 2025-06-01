@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -5,7 +6,7 @@ import { dbHelpers } from '@/lib/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/dashboard/DashboardStats';
-import { ActivityChart } from '@/components/dashboard/ActivityChart';
+import { EnhancedActivityChart } from '@/components/dashboard/EnhancedActivityChart';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { AttendanceDialog } from '@/components/checkin/AttendanceDialog';
 import { ReportGenerator } from '@/components/reports/ReportGenerator';
@@ -15,7 +16,6 @@ import { format, subDays, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { memo } from 'react';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 
 // Componente memoizado para os cards de estatísticas
 const StatCardMemo = memo(({ title, value, icon: Icon, description, color }: {
@@ -91,16 +91,6 @@ export function Dashboard() {
     queryFn: () => dbHelpers.getDashboardStats(),
     staleTime: 2 * 60 * 1000,
     retry: 2,
-  });
-
-  // Dados simulados para o gráfico de atividades dos últimos 7 dias
-  const activityData = Array.from({ length: 7 }, (_, i) => {
-    const date = subDays(new Date(), 6 - i);
-    return {
-      name: format(date, 'dd/MM', { locale: ptBR }),
-      atividades: Math.floor(Math.random() * 20) + 5,
-      presenca: Math.floor(Math.random() * 15) + 8
-    };
   });
 
   if (isLoading) {
@@ -205,49 +195,8 @@ export function Dashboard() {
 
       {/* Layout responsivo para gráficos e ações rápidas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-        {/* Activity Chart melhorado */}
-        <Card className="col-span-1 lg:col-span-2 semei-card">
-          <CardHeader>
-            <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
-              <Activity className="h-5 w-5 text-primary" />
-              <span className="hidden sm:inline">Atividades vs Presença</span>
-              <span className="sm:hidden">Atividades</span>
-              <span className="text-sm font-normal text-gray-500">(7 dias)</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={activityData}>
-                <defs>
-                  <linearGradient id="primaryGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(270, 40%, 60%)" />
-                    <stop offset="100%" stopColor="hsl(270, 40%, 70%)" />
-                  </linearGradient>
-                  <linearGradient id="secondaryGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(200, 60%, 65%)" />
-                    <stop offset="100%" stopColor="hsl(200, 60%, 75%)" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" stroke="#666" fontSize={12} />
-                <YAxis stroke="#666" fontSize={12} />
-                <Tooltip 
-                  formatter={(value, name) => [value, name === 'atividades' ? 'Atividades' : 'Presença']}
-                  labelFormatter={(label) => `Dia: ${label}`}
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    fontSize: '12px'
-                  }}
-                />
-                <Bar dataKey="atividades" fill="url(#primaryGradient)" name="atividades" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="presenca" fill="url(#secondaryGradient)" name="presenca" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {/* Enhanced Activity Chart */}
+        <EnhancedActivityChart />
 
         {/* Quick Actions melhoradas */}
         <QuickActions
