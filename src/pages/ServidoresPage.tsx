@@ -195,11 +195,21 @@ export default function ServidoresPage() {
                     <p className="text-gray-500">Nenhum servidor encontrado</p>
                   </div>
                 </ModernTableCell>
-                <ModernTableCell></ModernTableCell>
-                <ModernTableCell></ModernTableCell>
-                <ModernTableCell></ModernTableCell>
-                <ModernTableCell></ModernTableCell>
-                <ModernTableCell></ModernTableCell>
+                <ModernTableCell>
+                  <span></span>
+                </ModernTableCell>
+                <ModernTableCell>
+                  <span></span>
+                </ModernTableCell>
+                <ModernTableCell>
+                  <span></span>
+                </ModernTableCell>
+                <ModernTableCell>
+                  <span></span>
+                </ModernTableCell>
+                <ModernTableCell>
+                  <span></span>
+                </ModernTableCell>
               </ModernTableRow>
             ) : (
               staffList.map((staff) => (

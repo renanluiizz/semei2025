@@ -30,20 +30,24 @@ export const staffManagementHelpers = {
     try {
       const { data, error } = await supabase
         .from('staff')
-        .select('id, full_name, email, cpf, phone, position, role, status, created_at, updated_at')
+        .select('id, full_name, email, role, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Ensure all required fields are present with defaults
-      const staffData = data?.map(staff => ({
-        ...staff,
-        status: staff.status || 'active',
-        cpf: staff.cpf || undefined,
-        phone: staff.phone || undefined,
-        position: staff.position || undefined,
-        updated_at: staff.updated_at || undefined
-      })) as StaffMember[];
+      // Transform data to match StaffMember interface
+      const staffData: StaffMember[] = data?.map(staff => ({
+        id: staff.id,
+        full_name: staff.full_name,
+        email: staff.email,
+        role: staff.role as 'admin' | 'operator',
+        created_at: staff.created_at,
+        status: 'active' as const, // Default status since column doesn't exist yet
+        cpf: undefined,
+        phone: undefined,
+        position: undefined,
+        updated_at: undefined
+      })) || [];
 
       return { data: staffData, error: null };
     } catch (error) {
@@ -68,18 +72,14 @@ export const staffManagementHelpers = {
         throw authError;
       }
 
-      // Depois inserir na tabela staff
+      // Depois inserir na tabela staff (apenas campos existentes)
       const { data, error } = await supabase
         .from('staff')
         .insert({
           id: authData.user.id,
           full_name: staffData.full_name,
           email: staffData.email,
-          cpf: staffData.cpf,
-          phone: staffData.phone,
-          position: staffData.position,
-          role: staffData.role,
-          status: staffData.status
+          role: staffData.role
         })
         .select()
         .single();
@@ -92,9 +92,15 @@ export const staffManagementHelpers = {
 
   updateStaff: async (id: string, updates: Partial<StaffMember>): Promise<{ data: any, error: any }> => {
     try {
+      // Apenas atualizar campos que existem na tabela
+      const updateData: any = {};
+      if (updates.full_name) updateData.full_name = updates.full_name;
+      if (updates.email) updateData.email = updates.email;
+      if (updates.role) updateData.role = updates.role;
+
       const { data, error } = await supabase
         .from('staff')
-        .update(updates)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
@@ -130,20 +136,24 @@ export const staffManagementHelpers = {
     try {
       const { data, error } = await supabase
         .from('staff')
-        .select('id, full_name, email, cpf, phone, position, role, status, created_at, updated_at')
+        .select('id, full_name, email, role, created_at')
         .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const staffData = data?.map(staff => ({
-        ...staff,
-        status: staff.status || 'active',
-        cpf: staff.cpf || undefined,
-        phone: staff.phone || undefined,
-        position: staff.position || undefined,
-        updated_at: staff.updated_at || undefined
-      })) as StaffMember[];
+      const staffData: StaffMember[] = data?.map(staff => ({
+        id: staff.id,
+        full_name: staff.full_name,
+        email: staff.email,
+        role: staff.role as 'admin' | 'operator',
+        created_at: staff.created_at,
+        status: 'active' as const,
+        cpf: undefined,
+        phone: undefined,
+        position: undefined,
+        updated_at: undefined
+      })) || [];
 
       return { data: staffData, error: null };
     } catch (error) {
@@ -155,25 +165,28 @@ export const staffManagementHelpers = {
     try {
       let query = supabase
         .from('staff')
-        .select('id, full_name, email, cpf, phone, position, role, status, created_at, updated_at')
+        .select('id, full_name, email, role, created_at')
         .order('created_at', { ascending: false });
 
-      if (status && status !== 'all') {
-        query = query.eq('status', status);
-      }
+      // Como a coluna status não existe, vamos retornar todos os dados
+      // e simular o filtro no frontend
 
       const { data, error } = await query;
       
       if (error) throw error;
 
-      const staffData = data?.map(staff => ({
-        ...staff,
-        status: staff.status || 'active',
-        cpf: staff.cpf || undefined,
-        phone: staff.phone || undefined,
-        position: staff.position || undefined,
-        updated_at: staff.updated_at || undefined
-      })) as StaffMember[];
+      const staffData: StaffMember[] = data?.map(staff => ({
+        id: staff.id,
+        full_name: staff.full_name,
+        email: staff.email,
+        role: staff.role as 'admin' | 'operator',
+        created_at: staff.created_at,
+        status: 'active' as const,
+        cpf: undefined,
+        phone: undefined,
+        position: undefined,
+        updated_at: undefined
+      })) || [];
 
       return { data: staffData, error: null };
     } catch (error) {

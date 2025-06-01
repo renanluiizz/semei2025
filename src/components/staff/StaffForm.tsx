@@ -111,10 +111,9 @@ export function StaffForm({ staff, onSubmit, onCancel, loading = false }: StaffF
                 className="semei-input"
                 placeholder="000.000.000-00"
                 maxLength={14}
+                disabled
               />
-              {errors.cpf && (
-                <p className="text-red-500 text-xs">{errors.cpf.message}</p>
-              )}
+              <p className="text-xs text-gray-500">Campo será habilitado em futuras versões</p>
             </div>
 
             <div className="space-y-2">
@@ -126,10 +125,9 @@ export function StaffForm({ staff, onSubmit, onCancel, loading = false }: StaffF
                 {...register('phone')}
                 className="semei-input"
                 placeholder="(00) 00000-0000"
+                disabled
               />
-              {errors.phone && (
-                <p className="text-red-500 text-xs">{errors.phone.message}</p>
-              )}
+              <p className="text-xs text-gray-500">Campo será habilitado em futuras versões</p>
             </div>
 
             <div className="space-y-2">
@@ -141,7 +139,9 @@ export function StaffForm({ staff, onSubmit, onCancel, loading = false }: StaffF
                 {...register('position')}
                 className="semei-input"
                 placeholder="Ex: Coordenador, Assistente Social"
+                disabled
               />
+              <p className="text-xs text-gray-500">Campo será habilitado em futuras versões</p>
             </div>
 
             <div className="space-y-2">
@@ -166,7 +166,7 @@ export function StaffForm({ staff, onSubmit, onCancel, loading = false }: StaffF
               <Label className="semei-label">
                 Status *
               </Label>
-              <Select value={statusValue} onValueChange={(value) => setValue('status', value as 'active' | 'inactive')}>
+              <Select value={statusValue} onValueChange={(value) => setValue('status', value as 'active' | 'inactive')} disabled>
                 <SelectTrigger className="semei-input">
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
@@ -175,9 +175,7 @@ export function StaffForm({ staff, onSubmit, onCancel, loading = false }: StaffF
                   <SelectItem value="inactive">Inativo</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.status && (
-                <p className="text-red-500 text-xs">{errors.status.message}</p>
-              )}
+              <p className="text-xs text-gray-500">Todos os usuários são criados como Ativos</p>
             </div>
 
             {!isEditing && (
