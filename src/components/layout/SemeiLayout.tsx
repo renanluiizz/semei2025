@@ -10,7 +10,7 @@ interface SemeiLayoutProps {
 
 export function SemeiLayout({ children }: SemeiLayoutProps) {
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="semei-page flex">
       {/* Sidebar */}
       <SemeiSidebar />
       
@@ -20,8 +20,8 @@ export function SemeiLayout({ children }: SemeiLayoutProps) {
         <SemeiTopbar />
         
         {/* Content */}
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="max-w-7xl mx-auto animate-fade-in">
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+          <div className="semei-container animate-fade-in">
             {children}
           </div>
         </main>

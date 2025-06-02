@@ -15,10 +15,10 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const DashboardSkeleton = () => (
-  <div className="space-y-6">
+  <div className="space-y-8 animate-fade-in">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {[...Array(4)].map((_, i) => (
-        <div key={i} className="bg-white rounded-2xl p-6 shadow-md">
+        <div key={i} className="semei-card">
           <Skeleton className="h-4 w-3/4 mb-4" />
           <Skeleton className="h-8 w-1/2 mb-2" />
           <Skeleton className="h-3 w-full" />
@@ -26,11 +26,11 @@ const DashboardSkeleton = () => (
       ))}
     </div>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-white rounded-2xl p-6 shadow-md">
+      <div className="semei-card">
         <Skeleton className="h-6 w-1/2 mb-4" />
         <Skeleton className="h-[300px] w-full" />
       </div>
-      <div className="bg-white rounded-2xl p-6 shadow-md">
+      <div className="semei-card">
         <Skeleton className="h-6 w-1/2 mb-4" />
         <Skeleton className="h-[300px] w-full" />
       </div>
@@ -53,7 +53,7 @@ export function Dashboard() {
   if (isLoading) {
     return (
       <SemeiLayout>
-        <div className="space-y-6">
+        <div className="space-y-8">
           <DashboardHeader />
           <DashboardSkeleton />
         </div>
@@ -65,11 +65,11 @@ export function Dashboard() {
     return (
       <SemeiLayout>
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center bg-white rounded-2xl p-8 shadow-md">
-            <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Erro ao carregar dados</h3>
-            <p className="text-gray-600 mb-4">Não foi possível carregar as informações do dashboard</p>
-            <Button onClick={() => window.location.reload()}>
+          <div className="text-center semei-card max-w-md mx-auto">
+            <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-6" />
+            <h3 className="text-xl font-bold text-slate-900 mb-3">Erro ao carregar dados</h3>
+            <p className="text-slate-600 mb-6">Não foi possível carregar as informações do dashboard</p>
+            <Button onClick={() => window.location.reload()} className="semei-btn-primary">
               Tentar Novamente
             </Button>
           </div>
@@ -80,7 +80,7 @@ export function Dashboard() {
 
   return (
     <SemeiLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
         <DashboardHeader />
 
@@ -104,14 +104,14 @@ export function Dashboard() {
         />
         
         {reportGeneratorOpen && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-auto shadow-2xl">
-              <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center rounded-t-2xl">
-                <h2 className="text-xl font-semibold text-gray-800">Gerador de Relatórios</h2>
+              <div className="sticky top-0 bg-white p-6 border-b border-slate-200 flex justify-between items-center rounded-t-2xl">
+                <h2 className="text-xl font-bold text-slate-900">Gerador de Relatórios</h2>
                 <Button
                   variant="ghost"
                   onClick={() => setReportGeneratorOpen(false)}
-                  className="h-8 w-8 p-0 hover:bg-gray-100 rounded-lg"
+                  className="h-8 w-8 p-0 hover:bg-slate-100 rounded-lg"
                 >
                   <X className="h-4 w-4" />
                 </Button>
