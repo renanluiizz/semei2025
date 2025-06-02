@@ -21,50 +21,50 @@ export function SemeiTopbar() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+    <header className="bg-white/95 backdrop-blur-xl border-b border-slate-200/60 px-6 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Sistema Info */}
         <div className="flex items-center gap-4 ml-12 lg:ml-0">
           <div>
-            <h1 className="text-xl font-bold text-gray-800">SEMEI — Cabo Frio</h1>
-            <p className="text-sm text-gray-600">Secretaria da Melhor Idade</p>
+            <h1 className="text-xl font-bold text-slate-900">SEMEI — Cabo Frio</h1>
+            <p className="text-sm text-slate-600">Secretaria da Melhor Idade</p>
           </div>
         </div>
 
         {/* User Actions */}
         <div className="flex items-center gap-4">
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-gray-600" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+          <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-slate-100">
+            <Bell className="h-5 w-5 text-slate-600" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
           </Button>
 
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-3 px-3 py-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+              <Button variant="ghost" className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-100">
+                <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
                   <span className="text-white text-sm font-semibold">
                     {userProfile?.full_name?.charAt(0) || 'U'}
                   </span>
                 </div>
                 <div className="text-left hidden sm:block">
-                  <p className="text-sm font-medium text-gray-800">
+                  <p className="text-sm font-medium text-slate-900">
                     {userProfile?.full_name || 'Usuário'}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-slate-500">
                     {userProfile?.role === 'admin' ? 'Administrador' : 'Servidor'}
                   </p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => navigate('/perfil')}>
+            <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl border border-slate-200/60">
+              <DropdownMenuItem onClick={() => navigate('/perfil')} className="rounded-lg">
                 <User className="h-4 w-4 mr-3" />
                 Meu Perfil
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+              <DropdownMenuItem onClick={handleSignOut} className="text-red-600 rounded-lg">
                 <LogOut className="h-4 w-4 mr-3" />
                 Sair do Sistema
               </DropdownMenuItem>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -20,6 +19,7 @@ import { HealthStep } from '@/components/idosos/HealthStep';
 import { ContactsStep } from '@/components/idosos/ContactsStep';
 import { FormActions } from '@/components/idosos/FormActions';
 import type { Idoso } from '@/types/models';
+import { SemeiLayout } from '@/components/layout/SemeiLayout';
 
 const idosoSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -173,38 +173,42 @@ export function NovoIdoso() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" onClick={() => navigate('/idosos')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Cadastrar Novo Idoso</h1>
-          <p className="text-gray-500 mt-1">Preencha os dados para cadastrar um novo idoso</p>
+    <SemeiLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={() => navigate('/idosos')} className="rounded-xl">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Cadastrar Novo Idoso</h1>
+            <p className="text-slate-600 mt-1">Preencha os dados para cadastrar um novo idoso</p>
+          </div>
         </div>
+
+        {/* Progress Steps */}
+        <Card className="modern-card">
+          <CardContent className="p-8">
+            <StepNavigation steps={steps} currentStep={currentStep} />
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="bg-slate-50/50 rounded-xl p-6 border border-slate-200/60">
+                {renderStepContent()}
+              </div>
+              
+              <FormActions
+                currentStep={currentStep}
+                totalSteps={steps.length}
+                onPrevStep={prevStep}
+                onNextStep={nextStep}
+                isSubmitting={createMutation.isPending}
+                userProfile={userProfile}
+              />
+            </form>
+          </CardContent>
+        </Card>
       </div>
-
-      {/* Progress Steps */}
-      <Card>
-        <CardContent className="p-6">
-          <StepNavigation steps={steps} currentStep={currentStep} />
-
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {renderStepContent()}
-            
-            <FormActions
-              currentStep={currentStep}
-              totalSteps={steps.length}
-              onPrevStep={prevStep}
-              onNextStep={nextStep}
-              isSubmitting={createMutation.isPending}
-              userProfile={userProfile}
-            />
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    </SemeiLayout>
   );
 }
