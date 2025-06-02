@@ -5,16 +5,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { User, Lock, Eye, EyeOff, Heart } from 'lucide-react';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.string().email('Email institucional inválido'),
   password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
 });
 
@@ -81,111 +76,153 @@ export function Login() {
   }, [signIn, navigate, from, isLoading]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5" />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      {/* Background gradiente institucional opcional */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-50" />
       
-      <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
-        <CardHeader className="space-y-4 text-center pb-8">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
-              <Heart className="h-8 w-8 text-white" />
-            </div>
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-lg p-8 animate-fade-in">
+        {/* Logo Institucional */}
+        <div className="flex justify-center mb-4">
+          <div className="h-16 w-16 bg-blue-600 rounded-xl flex items-center justify-center">
+            <span className="text-white font-bold text-xl">CF</span>
           </div>
-          <div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              SEMEI
-            </CardTitle>
-            <CardDescription className="text-lg font-medium text-gray-700 mt-2">
-              Secretaria da Melhor Idade
-            </CardDescription>
-            <p className="text-sm text-gray-500 mt-1">
-              Sistema de Gestão Institucional
-            </p>
-          </div>
-        </CardHeader>
+        </div>
         
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  {...form.register('email')}
-                  id="email"
-                  type="email"
-                  placeholder="seu.email@semei.gov.br"
-                  className="pl-10 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
-                  disabled={isLoading}
-                  autoComplete="email"
-                />
-              </div>
-              {form.formState.errors.email && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.email.message}
-                </p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  {...form.register('password')}
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  className="pl-10 pr-10 rounded-xl border-gray-200 focus:border-primary focus:ring-primary"
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent rounded-xl"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </Button>
-              </div>
-              {form.formState.errors.password && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div className="text-xs text-gray-500 bg-gradient-to-r from-primary/5 to-secondary/5 p-4 rounded-xl border border-primary/10">
-              <strong>Importante:</strong> Use apenas as credenciais fornecidas pelo administrador do sistema SEMEI. 
-              Mantenha suas informações de acesso seguras.
-            </div>
-          </CardContent>
-          
-          <CardFooter className="pt-0">
-            <Button
-              type="submit"
-              className="w-full semei-button bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium"
-              disabled={isLoading}
+        {/* Título */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-semibold text-gray-800 mb-2">
+            Acesso ao Sistema SEMEI
+          </h1>
+          <p className="text-sm text-gray-600">
+            Secretaria da Melhor Idade - Cabo Frio
+          </p>
+        </div>
+        
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Campo E-mail */}
+          <div>
+            <label 
+              htmlFor="email" 
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <LoadingSpinner size="sm" />
-                  Entrando no Sistema...
-                </div>
-              ) : (
-                'Entrar no Sistema SEMEI'
-              )}
-            </Button>
-          </CardFooter>
+              E-mail Institucional
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...form.register('email')}
+                id="email"
+                type="email"
+                placeholder="seuemail@cabofrio.rj.gov.br"
+                autoComplete="email"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                disabled={isLoading}
+                aria-describedby={form.formState.errors.email ? 'email-error' : undefined}
+              />
+            </div>
+            {form.formState.errors.email && (
+              <p 
+                id="email-error" 
+                role="alert" 
+                className="mt-1 text-sm text-red-600"
+              >
+                {form.formState.errors.email.message}
+              </p>
+            )}
+          </div>
+          
+          {/* Campo Senha */}
+          <div>
+            <label 
+              htmlFor="password" 
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Senha
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                {...form.register('password')}
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                disabled={isLoading}
+                aria-describedby={form.formState.errors.password ? 'password-error' : undefined}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                )}
+              </button>
+            </div>
+            {form.formState.errors.password && (
+              <p 
+                id="password-error" 
+                role="alert" 
+                className="mt-1 text-sm text-red-600"
+              >
+                {form.formState.errors.password.message}
+              </p>
+            )}
+            
+            {/* Link Esqueceu a senha */}
+            <div className="mt-2">
+              <a 
+                href="#" 
+                className="text-sm text-blue-600 hover:underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toast.info('Funcionalidade em desenvolvimento', {
+                    description: 'Entre em contato com o administrador do sistema.'
+                  });
+                }}
+              >
+                Esqueceu a senha?
+              </a>
+            </div>
+          </div>
+          
+          {/* Botão Entrar */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Entrando...
+              </div>
+            ) : (
+              'Entrar'
+            )}
+          </button>
         </form>
-      </Card>
+        
+        {/* Informações adicionais */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500">
+            Sistema de Gestão da Secretaria da Melhor Idade
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            Prefeitura Municipal de Cabo Frio
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
