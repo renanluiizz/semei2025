@@ -51,7 +51,7 @@
   }
 }
 
-/* SEMEI Design System - Consolidado e Limpo */
+/* SEMEI Design System - Moderno e Limpo */
 @layer components {
   /* Layout Principal */
   .semei-layout {
@@ -76,30 +76,30 @@
   
   /* Header da Sidebar */
   .semei-sidebar-header {
-    padding: 24px 16px;
+    padding: 24px 20px;
     border-bottom: 1px solid #f3f4f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   }
   
   .semei-sidebar-logo {
-    @apply flex items-center gap-3 mb-2;
+    @apply flex items-center gap-3;
   }
   
   .semei-sidebar-logo-icon {
-    @apply w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center;
+    @apply w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm;
   }
   
   .semei-sidebar-title {
-    @apply text-lg font-semibold text-gray-900;
+    @apply text-lg font-bold text-white tracking-tight;
   }
   
   .semei-sidebar-subtitle {
-    @apply text-sm text-gray-500 font-medium;
+    @apply text-sm text-blue-100 font-medium;
   }
   
   /* Conteúdo da Sidebar */
   .semei-sidebar-content {
-    @apply flex-1 overflow-y-auto;
-    padding: 16px;
+    @apply flex-1 overflow-y-auto p-4;
   }
   
   .semei-sidebar-section {
@@ -107,7 +107,7 @@
   }
   
   .semei-sidebar-section-title {
-    @apply text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-3;
+    @apply text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-3 flex items-center gap-2;
   }
   
   /* Items da Sidebar */
@@ -115,23 +115,25 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px;
-    border-radius: 8px;
-    transition: background 0.2s;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: all 0.2s ease-in-out;
     @apply text-sm font-medium mb-1 relative;
     min-height: 44px;
   }
   
   .semei-sidebar-item:hover {
     background-color: #eff6ff;
+    transform: translateX(4px);
   }
   
   .semei-sidebar-item-active {
-    @apply text-blue-600 font-semibold bg-blue-50 border-l-4 border-blue-600;
+    @apply text-blue-600 font-bold bg-blue-50;
+    border-left: 4px solid #3b82f6;
   }
   
   .semei-sidebar-item-inactive {
-    @apply text-gray-600;
+    @apply text-gray-700;
   }
   
   .semei-sidebar-icon {
@@ -146,7 +148,7 @@
     padding: 16px 24px;
     background-color: #ffffff;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    height: 64px;
+    height: 72px;
     @apply sticky top-0 z-30;
   }
   
@@ -155,28 +157,37 @@
   }
   
   .semei-topbar-logo {
-    @apply w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center;
+    @apply w-10 h-10 rounded-xl flex items-center justify-center;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  }
+  
+  .semei-topbar-brand {
+    @apply flex flex-col;
   }
   
   .semei-topbar-title {
-    @apply text-lg font-semibold text-gray-900;
+    @apply text-lg font-bold text-gray-900;
   }
   
   .semei-topbar-subtitle {
     @apply text-sm text-gray-500 font-medium;
   }
   
+  .semei-topbar-center {
+    @apply flex-1 max-w-md mx-8;
+  }
+  
   .semei-topbar-right {
     @apply flex items-center gap-3;
   }
   
-  /* Campo de Busca */
+  /* Campo de Busca Centralizado */
   .semei-search-container {
-    @apply relative;
+    @apply relative w-full;
   }
   
   .semei-search-input {
-    @apply w-80 pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors;
+    @apply w-full pl-10 pr-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200;
   }
   
   .semei-search-input::placeholder {
@@ -193,11 +204,12 @@
   }
   
   .semei-notification-badge {
-    @apply absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full;
+    @apply absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse;
   }
   
   .semei-user-avatar {
-    @apply w-8 h-8 rounded-lg bg-gray-600 flex items-center justify-center text-white text-sm font-semibold;
+    @apply w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   }
   
   /* Área Principal */
@@ -223,11 +235,11 @@
   }
   
   .semei-page-title {
-    @apply text-2xl font-semibold text-gray-900 mb-1;
+    @apply text-2xl font-bold text-gray-900 mb-2;
   }
   
   .semei-page-subtitle {
-    @apply text-sm text-gray-500 font-medium flex items-center gap-2;
+    @apply text-sm text-gray-600 font-medium flex items-center gap-2;
   }
   
   /* Sistema de Cards */
@@ -235,12 +247,13 @@
     background-color: #ffffff;
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    padding: 16px;
+    padding: 20px;
     @apply transition-all duration-200;
   }
   
   .semei-card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
   }
   
   /* Cards de Estatísticas */
@@ -248,7 +261,7 @@
     background-color: #ffffff;
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    padding: 16px;
+    padding: 20px;
     @apply transition-all duration-200 hover:-translate-y-1;
     min-height: 140px;
   }
@@ -273,78 +286,65 @@
   }
   
   .semei-stat-icon-purple {
-    background-color: rgba(124, 58, 237, 0.1);
-    color: #7c3aed;
+    background-color: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
   }
   
-  .semei-stat-icon-orange {
-    background-color: rgba(249, 115, 22, 0.1);
-    color: #f97316;
+  .semei-stat-icon-yellow {
+    background-color: rgba(255, 230, 0, 0.2);
+    color: #d97706;
   }
   
   /* Texto das Estatísticas */
   .semei-stat-number {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     color: #1f2937;
     @apply mb-1;
   }
   
   .semei-stat-label {
-    @apply text-sm font-medium text-gray-600 mb-2;
+    @apply text-sm font-bold text-gray-700 mb-2;
   }
   
   .semei-stat-description {
-    @apply text-xs text-gray-500;
+    @apply text-xs text-gray-500 mb-2;
   }
   
   .semei-stat-trend {
-    @apply text-xs font-medium mt-2;
+    @apply text-xs font-bold mt-2;
   }
   
   .semei-stat-trend-positive {
     @apply text-green-600;
   }
   
-  .semei-stat-trend-neutral {
-    @apply text-gray-500;
+  .semei-stat-trend-negative {
+    @apply text-red-600;
   }
   
   /* Sistema de Botões */
   .semei-btn {
-    background-color: #7c3aed;
-    color: #ffffff;
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    @apply inline-flex items-center justify-center gap-2 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
     min-height: 44px;
   }
   
-  .semei-btn:hover {
-    background-color: #5b21b6;
-  }
-  
   .semei-btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 focus:ring-blue-500;
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
   }
   
   .semei-btn-purple {
-    background-color: #7c3aed;
+    @apply bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500;
   }
   
-  .semei-btn-purple:hover {
-    background-color: #5b21b6;
+  .semei-btn-yellow {
+    background-color: #ffe600;
+    color: #1f2937;
+    @apply hover:bg-yellow-400 focus:ring-yellow-500;
   }
   
   .semei-btn-secondary {
     @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500;
-  }
-  
-  .semei-btn-ghost {
-    @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-500 bg-transparent;
   }
   
   /* Ações Rápidas */
@@ -371,7 +371,7 @@
   
   /* Grids Responsivos */
   .semei-grid-stats {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6;
   }
   
   .semei-grid-content {
@@ -463,6 +463,10 @@
   .semei-grid-content {
     @apply grid-cols-1 gap-4;
   }
+  
+  .semei-topbar-center {
+    @apply hidden sm:block;
+  }
 }
 
 @media (max-width: 640px) {
@@ -475,7 +479,7 @@
     min-height: 40px;
   }
   
-  .semei-search-input {
-    @apply w-full;
+  .semei-grid-stats {
+    @apply grid-cols-1 gap-3;
   }
 }

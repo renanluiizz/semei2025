@@ -12,7 +12,8 @@ import {
   RotateCcw,
   Shield,
   UserCog,
-  X
+  X,
+  Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -71,7 +72,7 @@ export function SemeiSidebar({ onClose }: SemeiSidebarProps) {
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="lg:hidden text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 rounded-lg"
+              className="lg:hidden text-white hover:bg-white/10 w-8 h-8 rounded-lg"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -84,6 +85,7 @@ export function SemeiSidebar({ onClose }: SemeiSidebarProps) {
         {menuSections.map((section) => (
           <div key={section.title} className="semei-sidebar-section">
             <h3 className="semei-sidebar-section-title">
+              <div className="w-3 h-0.5 bg-gradient-to-r from-blue-500 to-transparent rounded-full"></div>
               {section.title}
             </h3>
             <div className="space-y-1">

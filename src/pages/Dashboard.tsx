@@ -12,17 +12,17 @@ export function Dashboard() {
         {/* Header */}
         <DashboardHeader />
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Grid com 4 colunas */}
         <StatCards />
 
         {/* Content Grid */}
         <div className="semei-grid-content">
-          {/* Quick Actions */}
+          {/* Quick Actions - Ocupa 2 colunas */}
           <div className="lg:col-span-2">
             <QuickActions />
           </div>
           
-          {/* Recent Activities */}
+          {/* Recent Activities - 1 coluna */}
           <div>
             <div className="semei-card">
               <div className="flex items-center gap-4 mb-6">
@@ -30,8 +30,8 @@ export function Dashboard() {
                   <Activity className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Últimas Atividades</h3>
-                  <p className="text-sm text-gray-500 font-medium">Ações recentes no sistema</p>
+                  <h3 className="text-lg font-bold text-gray-900">Últimas Atividades</h3>
+                  <p className="text-sm text-gray-600 font-medium">Ações recentes no sistema</p>
                 </div>
               </div>
               
@@ -39,7 +39,7 @@ export function Dashboard() {
                 <div className="semei-activity-item">
                   <div className="semei-activity-status semei-activity-status-active"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">Sistema iniciado</p>
+                    <p className="text-sm font-bold text-gray-900">Sistema iniciado</p>
                     <p className="text-xs text-gray-500">há 2 minutos</p>
                   </div>
                 </div>
@@ -47,7 +47,7 @@ export function Dashboard() {
                 <div className="semei-activity-item">
                   <div className="semei-activity-status semei-activity-status-completed"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">Backup realizado</p>
+                    <p className="text-sm font-bold text-gray-900">Backup realizado</p>
                     <p className="text-xs text-gray-500">há 1 hora</p>
                   </div>
                 </div>
@@ -55,7 +55,7 @@ export function Dashboard() {
                 <div className="semei-activity-item">
                   <div className="semei-activity-status semei-activity-status-active"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">Novo idoso cadastrado</p>
+                    <p className="text-sm font-bold text-gray-900">Novo idoso cadastrado</p>
                     <p className="text-xs text-gray-500">há 3 horas</p>
                   </div>
                 </div>

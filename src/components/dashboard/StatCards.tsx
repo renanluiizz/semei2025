@@ -1,5 +1,5 @@
 
-import { Users, Calendar, Activity, TrendingUp } from 'lucide-react';
+import { Users, Calendar, Activity, Gift } from 'lucide-react';
 
 interface StatCard {
   icon: React.ElementType;
@@ -8,7 +8,7 @@ interface StatCard {
   label: string;
   description: string;
   trend: string;
-  trendColor: string;
+  trendType: 'positive' | 'negative';
 }
 
 export function StatCards() {
@@ -20,7 +20,7 @@ export function StatCards() {
       label: 'Total de Idosos',
       description: 'Cadastrados no sistema',
       trend: '+5% este mês',
-      trendColor: 'semei-stat-trend-positive'
+      trendType: 'positive'
     },
     {
       icon: Activity,
@@ -29,7 +29,7 @@ export function StatCards() {
       label: 'Presentes Hoje',
       description: 'Check-ins realizados',
       trend: '+12% que ontem',
-      trendColor: 'semei-stat-trend-positive'
+      trendType: 'positive'
     },
     {
       icon: Calendar,
@@ -37,17 +37,17 @@ export function StatCards() {
       value: '24',
       label: 'Atividades do Mês',
       description: 'Realizadas este mês',
-      trend: '8 agendadas',
-      trendColor: 'semei-stat-trend-neutral'
+      trend: '-3% vs anterior',
+      trendType: 'negative'
     },
     {
-      icon: TrendingUp,
-      iconBg: 'semei-stat-icon-orange',
+      icon: Gift,
+      iconBg: 'semei-stat-icon-yellow',
       value: '15',
       label: 'Aniversariantes',
       description: 'Neste mês',
       trend: '3 esta semana',
-      trendColor: 'semei-stat-trend-neutral'
+      trendType: 'positive'
     }
   ];
 
@@ -64,7 +64,9 @@ export function StatCards() {
               <div className="semei-stat-number">{stat.value}</div>
               <div className="semei-stat-label">{stat.label}</div>
               <div className="semei-stat-description">{stat.description}</div>
-              <div className={`semei-stat-trend ${stat.trendColor}`}>
+              <div className={`semei-stat-trend ${
+                stat.trendType === 'positive' ? 'semei-stat-trend-positive' : 'semei-stat-trend-negative'
+              }`}>
                 {stat.trend}
               </div>
             </div>

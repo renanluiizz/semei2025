@@ -27,15 +27,14 @@ export function SemeiTopbar() {
         <div className="semei-topbar-logo">
           <span className="text-white font-bold text-sm">S</span>
         </div>
-        <div>
+        <div className="semei-topbar-brand">
           <h1 className="semei-topbar-title">SEMEI — Cabo Frio</h1>
           <p className="semei-topbar-subtitle">Secretaria da Melhor Idade</p>
         </div>
       </div>
 
-      {/* Right Side - Search and User Actions */}
-      <div className="semei-topbar-right">
-        {/* Search */}
+      {/* Center - Search */}
+      <div className="semei-topbar-center">
         <div className="semei-search-container">
           <Search className="semei-search-icon" />
           <input
@@ -44,7 +43,10 @@ export function SemeiTopbar() {
             className="semei-search-input"
           />
         </div>
+      </div>
 
+      {/* Right Side - User Actions */}
+      <div className="semei-topbar-right">
         {/* Notifications */}
         <button className="semei-icon-button">
           <Bell className="h-5 w-5" />

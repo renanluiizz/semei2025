@@ -22,7 +22,7 @@ export function SemeiLayout({ children }: SemeiLayoutProps) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Única */}
       <div className={`semei-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <SemeiSidebar onClose={() => setSidebarOpen(false)} />
       </div>
@@ -36,7 +36,7 @@ export function SemeiLayout({ children }: SemeiLayoutProps) {
               <span className="text-white font-bold text-sm">S</span>
             </div>
             <div>
-              <h1 className="text-base font-semibold text-gray-900">SEMEI</h1>
+              <h1 className="text-base font-bold text-gray-900">SEMEI</h1>
               <p className="text-xs text-gray-500">Sistema de Monitoramento</p>
             </div>
           </div>
@@ -50,7 +50,7 @@ export function SemeiLayout({ children }: SemeiLayoutProps) {
           </Button>
         </div>
 
-        {/* Topbar */}
+        {/* Topbar - Única */}
         <SemeiTopbar />
         
         {/* Content */}
