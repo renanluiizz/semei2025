@@ -99,7 +99,7 @@
   }
   
   .semei-sidebar-item {
-    @apply flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 mb-2 relative group;
+    @apply flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 mb-2 relative;
     min-height: 48px;
   }
   

@@ -3,6 +3,7 @@ import { SemeiLayout } from '@/components/layout/SemeiLayout';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { StatCards } from '@/components/dashboard/StatCards';
 import { QuickActions } from '@/components/dashboard/QuickActions';
+import { Activity } from 'lucide-react';
 
 export function Dashboard() {
   return (
