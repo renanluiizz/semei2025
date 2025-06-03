@@ -8,7 +8,7 @@ import { Activity } from 'lucide-react';
 export function Dashboard() {
   return (
     <SemeiLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Header */}
         <DashboardHeader />
 
@@ -23,15 +23,15 @@ export function Dashboard() {
           </div>
           
           {/* Recent Activities */}
-          <div className="space-y-6">
+          <div>
             <div className="semei-card">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Activity className="h-6 w-6 text-white" />
+                <div className="semei-stat-icon semei-stat-icon-green">
+                  <Activity className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Últimas Atividades</h3>
-                  <p className="text-sm text-slate-600 font-medium">Ações recentes no sistema</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Últimas Atividades</h3>
+                  <p className="text-sm text-gray-500 font-medium">Ações recentes no sistema</p>
                 </div>
               </div>
               
@@ -39,24 +39,24 @@ export function Dashboard() {
                 <div className="semei-activity-item">
                   <div className="semei-activity-status semei-activity-status-active"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-slate-900">Sistema iniciado</p>
-                    <p className="text-xs text-slate-500">Há 2 minutos</p>
+                    <p className="text-sm font-medium text-gray-900">Sistema iniciado</p>
+                    <p className="text-xs text-gray-500">há 2 minutos</p>
                   </div>
                 </div>
                 
                 <div className="semei-activity-item">
                   <div className="semei-activity-status semei-activity-status-completed"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-slate-900">Backup realizado</p>
-                    <p className="text-xs text-slate-500">Há 1 hora</p>
+                    <p className="text-sm font-medium text-gray-900">Backup realizado</p>
+                    <p className="text-xs text-gray-500">há 1 hora</p>
                   </div>
                 </div>
                 
                 <div className="semei-activity-item">
                   <div className="semei-activity-status semei-activity-status-active"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-slate-900">Novo idoso cadastrado</p>
-                    <p className="text-xs text-slate-500">Há 3 horas</p>
+                    <p className="text-sm font-medium text-gray-900">Novo idoso cadastrado</p>
+                    <p className="text-xs text-gray-500">há 3 horas</p>
                   </div>
                 </div>
               </div>

@@ -56,7 +56,7 @@ export function StatCards() {
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <div key={index} className="semei-card-stat hover-lift animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+          <div key={index} className="semei-card-stat animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
             <div className={`semei-stat-icon ${stat.iconBg}`}>
               <Icon className="h-6 w-6" />
             </div>

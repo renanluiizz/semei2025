@@ -2,8 +2,7 @@
 import { ReactNode, useState } from 'react';
 import { SemeiSidebar } from './SemeiSidebar';
 import { SemeiTopbar } from './SemeiTopbar';
-import { SemeiFooter } from './SemeiFooter';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SemeiLayoutProps {
@@ -30,19 +29,22 @@ export function SemeiLayout({ children }: SemeiLayoutProps) {
 
       {/* Main Content */}
       <div className="semei-main">
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden p-4 bg-white border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+        {/* Mobile Header */}
+        <div className="semei-mobile-header">
+          <div className="semei-mobile-logo">
+            <div className="semei-topbar-logo">
               <span className="text-white font-bold text-sm">S</span>
             </div>
-            <h1 className="text-lg font-bold text-slate-900">SEMEI</h1>
+            <div>
+              <h1 className="text-base font-semibold text-gray-900">SEMEI</h1>
+              <p className="text-xs text-gray-500">Sistema de Monitoramento</p>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(true)}
-            className="semei-btn-ghost rounded-xl"
+            className="semei-mobile-menu-btn"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -57,9 +59,6 @@ export function SemeiLayout({ children }: SemeiLayoutProps) {
             {children}
           </div>
         </main>
-
-        {/* Footer */}
-        <SemeiFooter />
       </div>
     </div>
   );

@@ -1,17 +1,17 @@
 
-import { TrendingUp, UserCheck, Activity } from 'lucide-react';
+import { TrendingUp, UserCheck, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function QuickActions() {
   return (
     <div className="semei-card">
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-          <TrendingUp className="h-6 w-6 text-white" />
+        <div className="semei-stat-icon semei-stat-icon-purple">
+          <TrendingUp className="h-6 w-6" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-slate-900">Ações Rápidas</h3>
-          <p className="text-sm text-slate-600 font-medium">Ferramentas do dia a dia</p>
+          <h3 className="text-lg font-semibold text-gray-900">Ações Rápidas</h3>
+          <p className="text-sm text-gray-500 font-medium">Ferramentas do dia a dia</p>
         </div>
       </div>
       
@@ -21,7 +21,7 @@ export function QuickActions() {
           Chamada de Presença
         </Button>
         <Button className="semei-btn semei-btn-secondary justify-start">
-          <Activity className="h-5 w-5" />
+          <FileSpreadsheet className="h-5 w-5" />
           Gerar Relatórios
         </Button>
       </div>
