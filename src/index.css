@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,16 +27,6 @@
     --input: 226 232 240;
     --ring: 59 130 246;
     --radius: 0.75rem;
-    
-    /* SEMEI Design System Colors */
-    --semei-white: 255 255 255;
-    --semei-gray-light: 248 249 250;
-    --semei-blue-royal: 59 130 246;
-    --semei-purple: 124 58 237;
-    --semei-green: 16 185 129;
-    --semei-orange: 249 115 22;
-    --semei-gray-text: 71 85 105;
-    --semei-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 }
 
@@ -45,11 +36,14 @@
   }
   
   body {
-    @apply bg-gray-50 text-foreground antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+    color: #1f2937;
+    margin: 0;
     min-height: 100vh;
     line-height: 1.6;
     font-size: 16px;
+    @apply antialiased;
   }
   
   html {
@@ -57,17 +51,19 @@
   }
 }
 
-/* SEMEI Design System */
+/* SEMEI Design System - Consolidado e Limpo */
 @layer components {
-  /* Layout Structure */
+  /* Layout Principal */
   .semei-layout {
     @apply min-h-screen bg-gray-50 flex w-full;
   }
   
+  /* Sidebar Única */
   .semei-sidebar {
-    @apply fixed lg:static inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out;
     width: 280px;
-    box-shadow: var(--semei-shadow);
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    @apply fixed lg:static inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-in-out;
   }
   
   .semei-sidebar.open {
@@ -78,13 +74,10 @@
     @apply -translate-x-full lg:translate-x-0;
   }
   
-  .semei-main {
-    @apply flex-1 flex flex-col min-w-0;
-  }
-  
-  /* Sidebar Components */
+  /* Header da Sidebar */
   .semei-sidebar-header {
-    @apply p-6 bg-white border-b border-gray-100;
+    padding: 24px 16px;
+    border-bottom: 1px solid #f3f4f6;
   }
   
   .semei-sidebar-logo {
@@ -92,8 +85,7 @@
   }
   
   .semei-sidebar-logo-icon {
-    @apply w-10 h-10 rounded-lg flex items-center justify-center;
-    background: linear-gradient(135deg, rgb(var(--semei-blue-royal)), rgb(var(--semei-purple)));
+    @apply w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center;
   }
   
   .semei-sidebar-title {
@@ -104,45 +96,58 @@
     @apply text-sm text-gray-500 font-medium;
   }
   
+  /* Conteúdo da Sidebar */
   .semei-sidebar-content {
-    @apply flex-1 p-6 overflow-y-auto;
+    @apply flex-1 overflow-y-auto;
+    padding: 16px;
   }
   
   .semei-sidebar-section {
-    @apply mb-8;
+    @apply mb-6;
   }
   
   .semei-sidebar-section-title {
-    @apply text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 px-3;
+    @apply text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-3;
   }
   
+  /* Items da Sidebar */
   .semei-sidebar-item {
-    @apply flex items-center gap-4 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 mb-1 relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    @apply text-sm font-medium mb-1 relative;
     min-height: 44px;
   }
   
+  .semei-sidebar-item:hover {
+    background-color: #eff6ff;
+  }
+  
   .semei-sidebar-item-active {
-    @apply text-blue-600 font-semibold;
-    background-color: rgba(59, 130, 246, 0.1);
+    @apply text-blue-600 font-semibold bg-blue-50 border-l-4 border-blue-600;
   }
   
   .semei-sidebar-item-inactive {
-    @apply text-gray-600 hover:text-gray-900;
-    background-color: transparent;
-  }
-  
-  .semei-sidebar-item-inactive:hover {
-    background-color: rgba(59, 130, 246, 0.05);
+    @apply text-gray-600;
   }
   
   .semei-sidebar-icon {
-    @apply w-6 h-6 flex-shrink-0;
+    @apply w-5 h-5 flex-shrink-0;
   }
   
-  /* Topbar */
+  /* Topbar Única */
   .semei-topbar {
-    @apply bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30;
-    box-shadow: var(--semei-shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    height: 64px;
+    @apply sticky top-0 z-30;
   }
   
   .semei-topbar-left {
@@ -150,8 +155,7 @@
   }
   
   .semei-topbar-logo {
-    @apply w-8 h-8 rounded-lg flex items-center justify-center;
-    background: linear-gradient(135deg, rgb(var(--semei-blue-royal)), rgb(var(--semei-purple)));
+    @apply w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center;
   }
   
   .semei-topbar-title {
@@ -166,18 +170,24 @@
     @apply flex items-center gap-3;
   }
   
+  /* Campo de Busca */
   .semei-search-container {
-    @apply relative hidden md:block;
+    @apply relative;
   }
   
   .semei-search-input {
-    @apply w-80 pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors placeholder:text-gray-400;
+    @apply w-80 pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors;
+  }
+  
+  .semei-search-input::placeholder {
+    color: #9ca3af;
   }
   
   .semei-search-icon {
     @apply absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400;
   }
   
+  /* Botões de Ação */
   .semei-icon-button {
     @apply w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 relative;
   }
@@ -187,23 +197,29 @@
   }
   
   .semei-user-avatar {
-    @apply w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-semibold;
-    background: linear-gradient(135deg, rgb(var(--semei-blue-royal)), rgb(var(--semei-purple)));
+    @apply w-8 h-8 rounded-lg bg-gray-600 flex items-center justify-center text-white text-sm font-semibold;
   }
   
-  /* Content Area */
+  /* Área Principal */
+  .semei-main {
+    @apply flex-1 flex flex-col min-w-0;
+  }
+  
   .semei-content {
-    @apply flex-1 p-6 overflow-auto bg-gray-50;
+    @apply flex-1 p-6 overflow-auto;
   }
   
   .semei-container {
     @apply max-w-7xl mx-auto;
   }
   
-  /* Page Header */
+  /* Header da Página */
   .semei-page-header {
-    @apply bg-white rounded-2xl border border-gray-200 p-6 mb-6;
-    box-shadow: var(--semei-shadow);
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 24px;
+    @apply mb-6;
   }
   
   .semei-page-title {
@@ -214,19 +230,26 @@
     @apply text-sm text-gray-500 font-medium flex items-center gap-2;
   }
   
-  /* Cards System */
+  /* Sistema de Cards */
   .semei-card {
-    @apply bg-white rounded-2xl border border-gray-200 p-6 transition-all duration-200;
-    box-shadow: var(--semei-shadow);
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 16px;
+    @apply transition-all duration-200;
   }
   
   .semei-card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
   
+  /* Cards de Estatísticas */
   .semei-card-stat {
-    @apply bg-white rounded-2xl border border-gray-200 p-6 transition-all duration-200 hover:-translate-y-1;
-    box-shadow: var(--semei-shadow);
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 16px;
+    @apply transition-all duration-200 hover:-translate-y-1;
     min-height: 140px;
   }
   
@@ -234,33 +257,37 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
   
-  /* Stats Cards */
+  /* Ícones das Estatísticas */
   .semei-stat-icon {
     @apply w-12 h-12 rounded-xl flex items-center justify-center mb-4;
   }
   
   .semei-stat-icon-blue {
     background-color: rgba(59, 130, 246, 0.1);
-    color: rgb(59, 130, 246);
+    color: #3b82f6;
   }
   
   .semei-stat-icon-green {
     background-color: rgba(16, 185, 129, 0.1);
-    color: rgb(16, 185, 129);
+    color: #10b981;
   }
   
   .semei-stat-icon-purple {
     background-color: rgba(124, 58, 237, 0.1);
-    color: rgb(124, 58, 237);
+    color: #7c3aed;
   }
   
   .semei-stat-icon-orange {
     background-color: rgba(249, 115, 22, 0.1);
-    color: rgb(249, 115, 22);
+    color: #f97316;
   }
   
+  /* Texto das Estatísticas */
   .semei-stat-number {
-    @apply text-2xl font-semibold text-gray-900 mb-1;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    @apply mb-1;
   }
   
   .semei-stat-label {
@@ -283,24 +310,33 @@
     @apply text-gray-500;
   }
   
-  /* Button System */
+  /* Sistema de Botões */
   .semei-btn {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    background-color: #7c3aed;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    @apply inline-flex items-center justify-center gap-2 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
     min-height: 44px;
   }
   
+  .semei-btn:hover {
+    background-color: #5b21b6;
+  }
+  
   .semei-btn-primary {
-    background-color: rgb(var(--semei-blue-royal));
-    @apply text-white hover:bg-blue-700 focus:ring-blue-500;
+    @apply bg-blue-600 hover:bg-blue-700 focus:ring-blue-500;
   }
   
   .semei-btn-purple {
-    background-color: rgb(var(--semei-purple));
-    @apply text-white focus:ring-purple-500;
+    background-color: #7c3aed;
   }
   
   .semei-btn-purple:hover {
-    background-color: rgb(109, 40, 217);
+    background-color: #5b21b6;
   }
   
   .semei-btn-secondary {
@@ -308,15 +344,15 @@
   }
   
   .semei-btn-ghost {
-    @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-500;
+    @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-500 bg-transparent;
   }
   
-  /* Quick Actions */
+  /* Ações Rápidas */
   .semei-quick-actions {
     @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
   }
   
-  /* Recent Activities */
+  /* Atividades Recentes */
   .semei-activity-item {
     @apply flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200;
   }
@@ -326,14 +362,14 @@
   }
   
   .semei-activity-status-active {
-    background-color: rgb(var(--semei-blue-royal));
+    @apply bg-blue-500;
   }
   
   .semei-activity-status-completed {
-    background-color: rgb(var(--semei-green));
+    @apply bg-green-500;
   }
   
-  /* Grid Systems */
+  /* Grids Responsivos */
   .semei-grid-stats {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6;
   }
@@ -342,7 +378,7 @@
     @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
   }
   
-  /* Mobile Menu Button */
+  /* Header Mobile */
   .semei-mobile-header {
     @apply lg:hidden p-4 bg-white border-b border-gray-200 flex items-center justify-between;
   }
@@ -355,7 +391,7 @@
     @apply w-10 h-10 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors;
   }
   
-  /* Animations */
+  /* Animações */
   .animate-fade-in {
     animation: fadeIn 0.4s ease-out;
   }
@@ -391,26 +427,26 @@
   }
 }
 
-/* Custom Scrollbar */
+/* Scrollbar Customizada */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(248 250 252);
+  background: #f9fafb;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(148 163 184);
+  background: #d1d5db;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(100 116 139);
+  background: #9ca3af;
 }
 
-/* Mobile Responsive */
+/* Responsividade */
 @media (max-width: 1024px) {
   .semei-content {
     @apply p-4;
