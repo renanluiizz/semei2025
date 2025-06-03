@@ -16,7 +16,7 @@ export function StatCards() {
     {
       icon: Users,
       iconBg: 'semei-stat-icon-blue',
-      value: '1',
+      value: '1.247',
       label: 'Total de Idosos',
       description: 'Cadastrados no sistema',
       trend: '+5% este mês',
@@ -25,7 +25,7 @@ export function StatCards() {
     {
       icon: Activity,
       iconBg: 'semei-stat-icon-green', 
-      value: '0',
+      value: '89',
       label: 'Presentes Hoje',
       description: 'Check-ins realizados',
       trend: '+12% que ontem',
@@ -34,7 +34,7 @@ export function StatCards() {
     {
       icon: Calendar,
       iconBg: 'semei-stat-icon-purple',
-      value: '0',
+      value: '24',
       label: 'Atividades do Mês',
       description: 'Realizadas este mês',
       trend: '8 agendadas',
@@ -43,7 +43,7 @@ export function StatCards() {
     {
       icon: TrendingUp,
       iconBg: 'semei-stat-icon-orange',
-      value: '0',
+      value: '15',
       label: 'Aniversariantes',
       description: 'Neste mês',
       trend: '3 esta semana',
@@ -52,11 +52,11 @@ export function StatCards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div className="semei-grid-stats">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <div key={index} className="semei-card-stat">
+          <div key={index} className="semei-card-stat hover-lift animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
             <div className={`semei-stat-icon ${stat.iconBg}`}>
               <Icon className="h-6 w-6" />
             </div>

@@ -7,29 +7,55 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 export function Dashboard() {
   return (
     <SemeiLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
         <DashboardHeader />
 
         {/* Stats Cards */}
         <StatCards />
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Content Grid */}
+        <div className="semei-grid-content">
+          {/* Quick Actions */}
           <div className="lg:col-span-2">
             <QuickActions />
           </div>
           
-          {/* Additional content can go here */}
+          {/* Recent Activities */}
           <div className="space-y-6">
             <div className="semei-card">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Últimas Atividades</h3>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Activity className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Últimas Atividades</h3>
+                  <p className="text-sm text-slate-600 font-medium">Ações recentes no sistema</p>
+                </div>
+              </div>
+              
               <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="semei-activity-item">
+                  <div className="semei-activity-status semei-activity-status-active"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">Sistema iniciado</p>
+                    <p className="text-sm font-semibold text-slate-900">Sistema iniciado</p>
                     <p className="text-xs text-slate-500">Há 2 minutos</p>
+                  </div>
+                </div>
+                
+                <div className="semei-activity-item">
+                  <div className="semei-activity-status semei-activity-status-completed"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-slate-900">Backup realizado</p>
+                    <p className="text-xs text-slate-500">Há 1 hora</p>
+                  </div>
+                </div>
+                
+                <div className="semei-activity-item">
+                  <div className="semei-activity-status semei-activity-status-active"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-slate-900">Novo idoso cadastrado</p>
+                    <p className="text-xs text-slate-500">Há 3 horas</p>
                   </div>
                 </div>
               </div>
