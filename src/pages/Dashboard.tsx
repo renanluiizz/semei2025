@@ -6,21 +6,21 @@ import { RecentActivities } from '@/components/dashboard/RecentActivities';
 
 export function Dashboard() {
   return (
-    <div className="semei-dashboard">
-      {/* Header */}
+    <div className="space-y-6">
+      {/* Page Header */}
       <DashboardHeader />
 
-      {/* Stats Cards */}
+      {/* Statistics Cards */}
       <StatCards />
 
       {/* Content Grid */}
-      <div className="semei-grid-content">
-        {/* Quick Actions - Ocupa 2 colunas */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Quick Actions - Spans 2 columns on large screens */}
         <div className="lg:col-span-2">
           <QuickActions />
         </div>
         
-        {/* Recent Activities - 1 coluna */}
+        {/* Recent Activities - 1 column */}
         <div>
           <RecentActivities />
         </div>

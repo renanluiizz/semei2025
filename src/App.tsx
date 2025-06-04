@@ -8,7 +8,7 @@ import { SemeiLayout } from '@/components/layout/SemeiLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PageLoading } from '@/components/ui/page-loading';
 
-// Lazy load pages - handling both named and default exports properly
+// Lazy load pages
 const Dashboard = lazy(() => import('@/pages/Dashboard').then(module => ({ default: module.Dashboard })));
 const Login = lazy(() => import('@/pages/auth/Login').then(module => ({ default: module.Login })));
 const IdososList = lazy(() => import('@/pages/idosos/IdososList').then(module => ({ default: module.IdososList })));
@@ -20,7 +20,7 @@ const TiposAtividade = lazy(() => import('@/pages/TiposAtividade'));
 const Configuracoes = lazy(() => import('@/pages/Configuracoes').then(module => ({ default: module.Configuracoes })));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Páginas administrativas
+// Administrative pages
 const ImportarPage = lazy(() => import('@/pages/ImportarPage'));
 const ResetarPage = lazy(() => import('@/pages/ResetarPage'));
 const AuditoriaPage = lazy(() => import('@/pages/AuditoriaPage'));
@@ -45,7 +45,7 @@ function App() {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth/login" element={<Login />} />
-                <Route path="/" element={
+                <Route path="/*" element={
                   <ProtectedRoute>
                     <SemeiLayout>
                       <Routes>
@@ -62,11 +62,11 @@ function App() {
                         <Route path="auditoria" element={<AuditoriaPage />} />
                         <Route path="servidores" element={<ServidoresPage />} />
                         <Route path="configuracoes" element={<Configuracoes />} />
+                        <Route path="*" element={<NotFound />} />
                       </Routes>
                     </SemeiLayout>
                   </ProtectedRoute>
                 } />
-                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
             <Toaster 

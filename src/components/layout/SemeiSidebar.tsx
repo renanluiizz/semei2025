@@ -12,8 +12,7 @@ import {
   RotateCcw,
   Shield,
   UserCog,
-  X,
-  Plus
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -54,17 +53,17 @@ export function SemeiSidebar({ onClose }: SemeiSidebarProps) {
   ];
 
   return (
-    <>
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="semei-sidebar-header">
+      <div className="p-6 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="flex items-center justify-between">
-          <div className="semei-sidebar-logo">
-            <div className="semei-sidebar-logo-icon">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="semei-sidebar-title">SEMEI</h1>
-              <p className="semei-sidebar-subtitle">Sistema de Monitoramento</p>
+              <h1 className="text-lg font-bold text-white">SEMEI</h1>
+              <p className="text-sm text-blue-100 font-medium">Sistema de Monitoramento</p>
             </div>
           </div>
           {onClose && (
@@ -81,10 +80,10 @@ export function SemeiSidebar({ onClose }: SemeiSidebarProps) {
       </div>
 
       {/* Navigation */}
-      <div className="semei-sidebar-content">
+      <div className="flex-1 p-6 overflow-y-auto">
         {menuSections.map((section) => (
-          <div key={section.title} className="semei-sidebar-section">
-            <h3 className="semei-sidebar-section-title">
+          <div key={section.title} className="mb-8">
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 px-3 flex items-center gap-2">
               <div className="w-3 h-0.5 bg-gradient-to-r from-blue-500 to-transparent rounded-full"></div>
               {section.title}
             </h3>
@@ -99,11 +98,14 @@ export function SemeiSidebar({ onClose }: SemeiSidebarProps) {
                     key={item.path}
                     to={item.path}
                     onClick={onClose}
-                    className={`semei-sidebar-item ${
-                      isActive ? 'semei-sidebar-item-active' : 'semei-sidebar-item-inactive'
+                    className={`flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium 
+                              transition-all duration-200 mb-1 relative min-h-[44px] ${
+                      isActive 
+                        ? 'text-blue-600 font-semibold bg-blue-50' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
-                    <Icon className="semei-sidebar-icon" />
+                    <Icon className="w-5 h-5 flex-shrink-0" />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -112,6 +114,6 @@ export function SemeiSidebar({ onClose }: SemeiSidebarProps) {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }
