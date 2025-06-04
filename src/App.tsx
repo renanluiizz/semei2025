@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/hooks/useAuth';
-import { Layout } from '@/components/Layout';
+import { SemeiLayout } from '@/components/layout/SemeiLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PageLoading } from '@/components/ui/page-loading';
 
@@ -40,30 +40,32 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <div className="App">
+          <div className="App min-h-screen bg-gray-50">
             <Suspense fallback={<PageLoading />}>
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth/login" element={<Login />} />
                 <Route path="/" element={
                   <ProtectedRoute>
-                    <Layout />
+                    <SemeiLayout>
+                      <Routes>
+                        <Route index element={<Dashboard />} />
+                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="idosos" element={<IdososList />} />
+                        <Route path="idosos/novo" element={<NovoIdoso />} />
+                        <Route path="idosos/:id" element={<IdosoDetails />} />
+                        <Route path="idosos/:id/editar" element={<EditIdoso />} />
+                        <Route path="atividades" element={<AtividadesList />} />
+                        <Route path="tipos-atividade" element={<TiposAtividade />} />
+                        <Route path="importar" element={<ImportarPage />} />
+                        <Route path="resetar" element={<ResetarPage />} />
+                        <Route path="auditoria" element={<AuditoriaPage />} />
+                        <Route path="servidores" element={<ServidoresPage />} />
+                        <Route path="configuracoes" element={<Configuracoes />} />
+                      </Routes>
+                    </SemeiLayout>
                   </ProtectedRoute>
-                }>
-                  <Route index element={<Dashboard />} />
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="idosos" element={<IdososList />} />
-                  <Route path="idosos/novo" element={<NovoIdoso />} />
-                  <Route path="idosos/:id" element={<IdosoDetails />} />
-                  <Route path="idosos/:id/editar" element={<EditIdoso />} />
-                  <Route path="atividades" element={<AtividadesList />} />
-                  <Route path="tipos-atividade" element={<TiposAtividade />} />
-                  <Route path="importar" element={<ImportarPage />} />
-                  <Route path="resetar" element={<ResetarPage />} />
-                  <Route path="auditoria" element={<AuditoriaPage />} />
-                  <Route path="servidores" element={<ServidoresPage />} />
-                  <Route path="configuracoes" element={<Configuracoes />} />
-                </Route>
+                } />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
