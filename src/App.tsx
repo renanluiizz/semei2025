@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/hooks/useAuth';
-import { SemeiLayout } from '@/components/layout/SemeiLayout';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PageLoading } from '@/components/ui/page-loading';
 
@@ -47,7 +47,7 @@ function App() {
                 <Route path="/auth/login" element={<Login />} />
                 <Route path="/*" element={
                   <ProtectedRoute>
-                    <SemeiLayout>
+                    <AppLayout>
                       <Routes>
                         <Route index element={<Dashboard />} />
                         <Route path="dashboard" element={<Dashboard />} />
@@ -64,7 +64,7 @@ function App() {
                         <Route path="configuracoes" element={<Configuracoes />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
-                    </SemeiLayout>
+                    </AppLayout>
                   </ProtectedRoute>
                 } />
               </Routes>
