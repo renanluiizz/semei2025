@@ -14,7 +14,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
 
   return (
-    <div className="semei-page flex w-full">
+    <div className="semei-page flex w-full min-h-screen">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div 
@@ -36,8 +36,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         <AppHeader onOpenSidebar={() => setSidebarOpen(true)} />
 
         {/* Content */}
-        <main className="flex-1 p-6 lg:p-8 overflow-auto">
-          <div className="semei-container animate-fade-in">
+        <main className="flex-1 overflow-auto">
+          <div className="animate-fade-in">
             {children}
           </div>
         </main>

@@ -229,3 +229,63 @@
 .semei-badge-neutral {
   @apply bg-slate-100 text-slate-700 border border-slate-200;
 }
+
+/* Form Styles */
+.semei-form-group {
+  @apply space-y-2;
+}
+
+.semei-label {
+  @apply text-sm font-semibold text-slate-700;
+}
+
+.semei-input {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder:text-slate-400;
+}
+
+.semei-textarea {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder:text-slate-400 resize-none;
+  min-height: 120px;
+}
+
+.semei-select {
+  @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200;
+}
+
+/* Table Styles */
+.semei-table {
+  @apply w-full border-collapse;
+}
+
+.semei-table-header {
+  @apply bg-slate-50/80 backdrop-blur-sm;
+}
+
+.semei-table-header th {
+  @apply px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200/60;
+}
+
+.semei-table-row {
+  @apply border-b border-slate-200/40 transition-colors;
+}
+
+.semei-table-cell {
+  @apply px-6 py-4 text-sm text-slate-900;
+}
+
+/* Stats Card Components */
+.semei-stat-card-blue {
+  @apply semei-card-stat;
+}
+
+.semei-stat-card-green {
+  @apply semei-card-stat;
+}
+
+.semei-stat-card-amber {
+  @apply semei-card-stat;
+}
+
+.semei-stat-card-purple {
+  @apply semei-card-stat;
+}
