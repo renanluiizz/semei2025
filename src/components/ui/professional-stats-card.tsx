@@ -13,7 +13,7 @@ interface ProfessionalStatsCardProps {
     period?: string;
   };
   icon: LucideIcon;
-  variant?: 'blue' | 'green' | 'amber' | 'purple';
+  variant?: 'blue' | 'green' | 'orange' | 'purple';
   className?: string;
   style?: React.CSSProperties;
 }
@@ -21,7 +21,7 @@ interface ProfessionalStatsCardProps {
 const iconVariants = {
   blue: 'semei-stat-icon-blue',
   green: 'semei-stat-icon-green',
-  amber: 'semei-stat-icon-yellow',
+  orange: 'semei-stat-icon-orange',
   purple: 'semei-stat-icon-purple'
 };
 

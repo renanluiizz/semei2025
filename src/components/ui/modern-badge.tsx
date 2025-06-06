@@ -19,7 +19,7 @@ const variantClasses = {
 
 const dotClasses = {
   success: 'bg-green-500',
-  warning: 'bg-amber-500',
+  warning: 'bg-orange-500',
   danger: 'bg-red-500',
   info: 'bg-blue-500',
   neutral: 'bg-slate-500'

@@ -77,9 +77,9 @@
   box-shadow: 0 8px 25px -8px rgba(139, 92, 246, 0.6);
 }
 
-.semei-stat-icon-yellow {
-  @apply bg-gradient-to-br from-amber-500 to-amber-600 text-white;
-  box-shadow: 0 8px 25px -8px rgba(245, 158, 11, 0.6);
+.semei-stat-icon-orange {
+  @apply bg-gradient-to-br from-orange-500 to-orange-600 text-white;
+  box-shadow: 0 8px 25px -8px rgba(249, 115, 22, 0.6);
 }
 
 .semei-stat-number {
@@ -140,9 +140,9 @@
   box-shadow: 0 8px 25px -8px rgba(139, 92, 246, 0.6);
 }
 
-.semei-btn-yellow {
-  @apply bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 focus:ring-amber-500/50;
-  box-shadow: 0 8px 25px -8px rgba(245, 158, 11, 0.6);
+.semei-btn-orange {
+  @apply bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 focus:ring-orange-500/50;
+  box-shadow: 0 8px 25px -8px rgba(249, 115, 22, 0.6);
 }
 
 /* Activity Items */
@@ -210,7 +210,7 @@
 }
 
 .semei-badge-warning {
-  @apply bg-amber-100 text-amber-700 border border-amber-200;
+  @apply bg-orange-100 text-orange-700 border border-orange-200;
 }
 
 .semei-badge-danger {
@@ -267,3 +267,9 @@
 .semei-table-cell {
   @apply px-6 py-4 text-sm text-slate-900;
 }
+
+/* Status Badge */
+.semei-status-badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+}
+

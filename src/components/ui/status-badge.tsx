@@ -11,19 +11,19 @@ export function StatusBadge({ status, children, className = "" }: StatusBadgePro
   const statusStyles = {
     active: 'bg-green-100 text-green-800',
     inactive: 'bg-gray-100 text-gray-800',
-    pending: 'bg-yellow-100 text-yellow-800',
+    pending: 'bg-orange-100 text-orange-800',
     success: 'bg-green-100 text-green-800',
     error: 'bg-red-100 text-red-800',
-    warning: 'bg-yellow-100 text-yellow-800',
+    warning: 'bg-orange-100 text-orange-800',
   };
 
   const dotStyles = {
     active: 'bg-green-500',
     inactive: 'bg-gray-500',
-    pending: 'bg-yellow-500',
+    pending: 'bg-orange-500',
     success: 'bg-green-500',
     error: 'bg-red-500',
-    warning: 'bg-yellow-500',
+    warning: 'bg-orange-500',
   };
 
   return (

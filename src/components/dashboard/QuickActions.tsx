@@ -30,7 +30,7 @@ export function QuickActions() {
         </ProfessionalButton>
         
         <ProfessionalButton 
-          variant="yellow" 
+          variant="orange" 
           size="lg"
           icon={<FileSpreadsheet className="h-5 w-5" />}
           className="justify-start"

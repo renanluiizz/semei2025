@@ -50,7 +50,7 @@ export function StatCards() {
         period: 'esta semana'
       },
       icon: Gift,
-      variant: 'amber' as const
+      variant: 'orange' as const
     }
   ];
 

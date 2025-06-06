@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
 interface ProfessionalButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'ghost' | 'purple' | 'yellow';
+  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'ghost' | 'purple' | 'orange';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   icon?: React.ReactNode;
@@ -25,7 +25,7 @@ const variantClasses = {
   danger: 'semei-btn-danger',
   ghost: 'semei-btn-ghost',
   purple: 'semei-btn-purple',
-  yellow: 'semei-btn-yellow'
+  orange: 'semei-btn-orange'
 };
 
 export function ProfessionalButton({
