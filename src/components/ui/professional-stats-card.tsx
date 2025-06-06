@@ -15,6 +15,7 @@ interface ProfessionalStatsCardProps {
   icon: LucideIcon;
   variant?: 'blue' | 'green' | 'amber' | 'purple';
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const iconVariants = {
@@ -31,10 +32,11 @@ export function ProfessionalStatsCard({
   change,
   icon: Icon,
   variant = 'blue',
-  className
+  className,
+  style
 }: ProfessionalStatsCardProps) {
   return (
-    <div className={cn('semei-card-stat animate-fade-in', className)}>
+    <div className={cn('semei-card-stat animate-fade-in', className)} style={style}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className={cn('semei-stat-icon', iconVariants[variant])}>
