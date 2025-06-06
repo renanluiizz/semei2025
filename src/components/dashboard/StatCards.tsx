@@ -1,78 +1,74 @@
 
 import { Users, Calendar, Activity, Gift } from 'lucide-react';
-
-interface StatCard {
-  icon: React.ElementType;
-  iconBg: string;
-  value: string;
-  label: string;
-  description: string;
-  trend: string;
-  trendType: 'positive' | 'negative';
-}
+import { ProfessionalStatsCard } from '@/components/ui/professional-stats-card';
 
 export function StatCards() {
-  const stats: StatCard[] = [
+  const stats = [
     {
-      icon: Users,
-      iconBg: 'semei-stat-icon-blue',
+      title: 'Total de Idosos',
       value: '1.247',
-      label: 'Total de Idosos',
       description: 'Cadastrados no sistema',
-      trend: '+5% este mês',
-      trendType: 'positive'
+      change: {
+        value: 5,
+        type: 'increase' as const,
+        period: 'este mês'
+      },
+      icon: Users,
+      variant: 'blue' as const
     },
     {
-      icon: Activity,
-      iconBg: 'semei-stat-icon-green', 
+      title: 'Presentes Hoje',
       value: '89',
-      label: 'Presentes Hoje',
       description: 'Check-ins realizados',
-      trend: '+12% que ontem',
-      trendType: 'positive'
+      change: {
+        value: 12,
+        type: 'increase' as const,
+        period: 'que ontem'
+      },
+      icon: Activity,
+      variant: 'green' as const
     },
     {
-      icon: Calendar,
-      iconBg: 'semei-stat-icon-purple',
+      title: 'Atividades do Mês',
       value: '24',
-      label: 'Atividades do Mês',
       description: 'Realizadas este mês',
-      trend: '-3% vs anterior',
-      trendType: 'negative'
+      change: {
+        value: 3,
+        type: 'decrease' as const,
+        period: 'vs anterior'
+      },
+      icon: Calendar,
+      variant: 'purple' as const
     },
     {
-      icon: Gift,
-      iconBg: 'semei-stat-icon-yellow',
+      title: 'Aniversariantes',
       value: '15',
-      label: 'Aniversariantes',
       description: 'Neste mês',
-      trend: '3 esta semana',
-      trendType: 'positive'
+      change: {
+        value: 3,
+        type: 'increase' as const,
+        period: 'esta semana'
+      },
+      icon: Gift,
+      variant: 'amber' as const
     }
   ];
 
   return (
     <div className="semei-grid-stats">
-      {stats.map((stat, index) => {
-        const Icon = stat.icon;
-        return (
-          <div key={index} className="semei-card-stat animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-            <div className={`semei-stat-icon ${stat.iconBg}`}>
-              <Icon className="h-6 w-6" />
-            </div>
-            <div className="space-y-1">
-              <div className="semei-stat-number">{stat.value}</div>
-              <div className="semei-stat-label">{stat.label}</div>
-              <div className="semei-stat-description">{stat.description}</div>
-              <div className={`semei-stat-trend ${
-                stat.trendType === 'positive' ? 'semei-stat-trend-positive' : 'semei-stat-trend-negative'
-              }`}>
-                {stat.trend}
-              </div>
-            </div>
-          </div>
-        );
-      })}
+      {stats.map((stat, index) => (
+        <ProfessionalStatsCard
+          key={index}
+          title={stat.title}
+          value={stat.value}
+          description={stat.description}
+          change={stat.change}
+          icon={stat.icon}
+          variant={stat.variant}
+          className="animate-fade-in"
+          style={{ animationDelay: `${index * 100}ms` }}
+        />
+      ))}
     </div>
   );
 }

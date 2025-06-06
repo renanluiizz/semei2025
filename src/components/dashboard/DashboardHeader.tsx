@@ -16,6 +16,12 @@ export function DashboardHeader() {
             <p className="capitalize">{currentDate}</p>
           </div>
         </div>
+        <div className="flex items-center gap-4">
+          <div className="semei-badge semei-badge-success">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            Sistema Online
+          </div>
+        </div>
       </div>
     </div>
   );

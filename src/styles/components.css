@@ -145,11 +145,6 @@
   box-shadow: 0 8px 25px -8px rgba(245, 158, 11, 0.6);
 }
 
-/* Quick Actions Grid */
-.semei-quick-actions {
-  @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
-}
-
 /* Activity Items */
 .semei-activity-item {
   @apply flex items-center gap-3 p-3 rounded-xl bg-slate-50/50 border border-slate-200/60 hover:bg-slate-100/50 transition-colors;
@@ -271,21 +266,4 @@
 
 .semei-table-cell {
   @apply px-6 py-4 text-sm text-slate-900;
-}
-
-/* Stats Card Components */
-.semei-stat-card-blue {
-  @apply semei-card-stat;
-}
-
-.semei-stat-card-green {
-  @apply semei-card-stat;
-}
-
-.semei-stat-card-amber {
-  @apply semei-card-stat;
-}
-
-.semei-stat-card-purple {
-  @apply semei-card-stat;
 }
