@@ -1,9 +1,8 @@
 
 import { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabaseClient } from '@/lib/supabase-client';
+import { supabase } from '@/integrations/supabase/client';
 import { Usuario } from '@/types/models';
-import type { Staff } from '@/types/supabase-manual';
 
 interface AuthContextType {
   user: User | null;
@@ -23,24 +22,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    // Verificar sessão inicial
+    // Get initial session
     const getSession = async () => {
       try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (!mounted) return;
         
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Buscar perfil do usuário com timeout
+          // Fetch user profile with timeout
           const timeoutId = setTimeout(() => {
             if (mounted) {
               setLoading(false);
             }
           }, 5000);
 
-          const { data: profile, error } = await supabaseClient
+          const { data: profile, error } = await supabase
             .from('staff')
             .select('*')
             .eq('id', session.user.id)
@@ -58,9 +57,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 created_at: profile.created_at
               });
             } else if (error) {
-              console.error('Erro ao buscar perfil do usuário:', error);
-              // Se não encontrar o perfil na tabela staff, fazer logout
-              await supabaseClient.auth.signOut();
+              console.error('Error fetching user profile:', error);
+              // If profile not found in staff table, sign out
+              await supabase.auth.signOut();
             }
           }
         }
@@ -69,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
+        console.error('Error checking session:', error);
         if (mounted) {
           setLoading(false);
         }
@@ -78,8 +77,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getSession();
 
-    // Listener para mudanças de auth
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
         
@@ -88,12 +87,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user && event !== 'SIGNED_OUT') {
-          // Buscar perfil do usuário de forma assíncrona
+          // Fetch user profile asynchronously
           setTimeout(async () => {
             if (!mounted) return;
             
             try {
-              const { data: profile, error } = await supabaseClient
+              const { data: profile, error } = await supabase
                 .from('staff')
                 .select('*')
                 .eq('id', session.user.id)
@@ -109,13 +108,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     created_at: profile.created_at
                   });
                 } else if (error) {
-                  console.error('Erro ao buscar perfil:', error);
-                  // Se não encontrar o perfil na tabela staff, fazer logout
-                  await supabaseClient.auth.signOut();
+                  console.error('Error fetching profile:', error);
+                  // If profile not found in staff table, sign out
+                  await supabase.auth.signOut();
                 }
               }
             } catch (error) {
-              console.error('Erro ao buscar perfil:', error);
+              console.error('Error fetching profile:', error);
             }
           }, 0);
         } else {
@@ -136,27 +135,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) {
-        console.error('Erro no signIn:', error);
+        console.error('Error signing in:', error);
         return { error };
       }
 
-      // Verificar se o usuário existe na tabela staff
+      // Check if user exists in staff table
       if (data.user) {
-        const { data: staffProfile, error: staffError } = await supabaseClient
+        const { data: staffProfile, error: staffError } = await supabase
           .from('staff')
           .select('*')
           .eq('id', data.user.id)
           .maybeSingle();
 
         if (staffError || !staffProfile) {
-          console.error('Usuário não encontrado na tabela staff:', staffError);
-          await supabaseClient.auth.signOut();
+          console.error('User not found in staff table:', staffError);
+          await supabase.auth.signOut();
           return { 
             error: { 
               message: 'User not authorized',
@@ -168,7 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return { error: null };
     } catch (error) {
-      console.error('Erro inesperado no signIn:', error);
+      console.error('Unexpected error signing in:', error);
       return { error };
     } finally {
       setLoading(false);
@@ -178,11 +177,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      await supabaseClient.auth.signOut();
+      await supabase.auth.signOut();
       setUser(null);
       setUserProfile(null);
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
+      console.error('Error signing out:', error);
     } finally {
       setLoading(false);
     }

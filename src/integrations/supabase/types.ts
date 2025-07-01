@@ -9,7 +9,266 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      activity_types: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          new_data: Json | null
+          old_data: Json | null
+          operation: string
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          operation: string
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          operation?: string
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      check_ins: {
+        Row: {
+          activity_type: string
+          check_in_time: string
+          created_at: string
+          elder_id: string
+          id: string
+          observation: string | null
+          staff_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          activity_type: string
+          check_in_time: string
+          created_at?: string
+          elder_id: string
+          id?: string
+          observation?: string | null
+          staff_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activity_type?: string
+          check_in_time?: string
+          created_at?: string
+          elder_id?: string
+          id?: string
+          observation?: string | null
+          staff_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "check_ins_elder_id_fkey"
+            columns: ["elder_id"]
+            isOneToOne: false
+            referencedRelation: "elders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "check_ins_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      elders: {
+        Row: {
+          address: string | null
+          age: number | null
+          birth_date: string
+          birthplace: string | null
+          blood_type: string | null
+          cpf: string
+          created_at: string
+          emergency_phone: string | null
+          family_constitution: string | null
+          father_name: string | null
+          gender: string
+          guardian_name: string | null
+          has_allergy: boolean | null
+          has_children: boolean | null
+          has_illness: boolean | null
+          health_plan: string | null
+          id: string
+          marital_status: string | null
+          medication_type: string | null
+          mobile_phone: string | null
+          mother_name: string | null
+          name: string
+          neighborhood: string | null
+          notes: string | null
+          phone: string | null
+          photo_url: string | null
+          registration_date: string | null
+          responsible_staff_id: string | null
+          rg: string | null
+          state: string | null
+          time_in_cabo_frio: string | null
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          address?: string | null
+          age?: number | null
+          birth_date: string
+          birthplace?: string | null
+          blood_type?: string | null
+          cpf: string
+          created_at?: string
+          emergency_phone?: string | null
+          family_constitution?: string | null
+          father_name?: string | null
+          gender: string
+          guardian_name?: string | null
+          has_allergy?: boolean | null
+          has_children?: boolean | null
+          has_illness?: boolean | null
+          health_plan?: string | null
+          id?: string
+          marital_status?: string | null
+          medication_type?: string | null
+          mobile_phone?: string | null
+          mother_name?: string | null
+          name: string
+          neighborhood?: string | null
+          notes?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          registration_date?: string | null
+          responsible_staff_id?: string | null
+          rg?: string | null
+          state?: string | null
+          time_in_cabo_frio?: string | null
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          address?: string | null
+          age?: number | null
+          birth_date?: string
+          birthplace?: string | null
+          blood_type?: string | null
+          cpf?: string
+          created_at?: string
+          emergency_phone?: string | null
+          family_constitution?: string | null
+          father_name?: string | null
+          gender?: string
+          guardian_name?: string | null
+          has_allergy?: boolean | null
+          has_children?: boolean | null
+          has_illness?: boolean | null
+          health_plan?: string | null
+          id?: string
+          marital_status?: string | null
+          medication_type?: string | null
+          mobile_phone?: string | null
+          mother_name?: string | null
+          name?: string
+          neighborhood?: string | null
+          notes?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          registration_date?: string | null
+          responsible_staff_id?: string | null
+          rg?: string | null
+          state?: string | null
+          time_in_cabo_frio?: string | null
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "elders_responsible_staff_id_fkey"
+            columns: ["responsible_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
