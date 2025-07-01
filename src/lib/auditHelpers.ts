@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import type { AuditLog } from '@/types/supabase-manual';
 
 export interface AuditLogEntry {
   id: string;
@@ -25,7 +26,7 @@ export const auditHelpers = {
     let query = supabase
       .from('audit_log')
       .select('*')
-      .order('timestamp', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (filters?.table_name) {
       query = query.eq('table_name', filters.table_name);
@@ -40,18 +41,18 @@ export const auditHelpers = {
     }
 
     if (filters?.from_date) {
-      query = query.gte('timestamp', filters.from_date);
+      query = query.gte('created_at', filters.from_date);
     }
 
     if (filters?.to_date) {
-      query = query.lte('timestamp', filters.to_date);
+      query = query.lte('created_at', filters.to_date);
     }
 
     if (filters?.limit) {
       query = query.limit(filters.limit);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: AuditLog[] | null, error: any };
     return { data: data as AuditLogEntry[], error };
   },
 
@@ -59,9 +60,9 @@ export const auditHelpers = {
   getAuditSummary: async () => {
     const { data, error } = await supabase
       .from('audit_log')
-      .select('table_name, operation, timestamp')
-      .gte('timestamp', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-      .order('timestamp', { ascending: false });
+      .select('table_name, operation, created_at')
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      .order('created_at', { ascending: false }) as { data: AuditLog[] | null, error: any };
 
     if (error) return { data: null, error };
 

@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getCacheKey, getCache, setCache } from './cache';
 import type { DashboardStats, Idoso, Atividade } from '@/types/models';
+import type { Elder, CheckIn } from '@/types/supabase-manual';
 
 // Dashboard statistics
 export const dashboardHelpers = {
@@ -13,13 +14,13 @@ export const dashboardHelpers = {
     try {
       // Usar Promise.all para requests paralelos
       const [idososResult, atividadesMesResult, atividadesRecentesResult] = await Promise.all([
-        supabase.from('elders').select('*'),
-        supabase.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+        supabase.from('elders').select('*') as Promise<{ data: Elder[] | null, error: any }>,
+        supabase.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()) as Promise<{ data: CheckIn[] | null, error: any }>,
         supabase.from('check_ins').select(`
           *,
           elder:elders(name),
           staff:staff(full_name)
-        `).order('created_at', { ascending: false }).limit(5)
+        `).order('created_at', { ascending: false }).limit(5) as Promise<{ data: any[] | null, error: any }>
       ]);
 
       const { data: idosos, error: idososError } = idososResult;
@@ -85,7 +86,7 @@ export const dashboardHelpers = {
         .from('check_ins')
         .select('check_in_time, elder_id')
         .gte('check_in_time', sevenDaysAgo.toISOString())
-        .order('check_in_time', { ascending: true });
+        .order('check_in_time', { ascending: true }) as { data: CheckIn[] | null, error: any };
 
       if (error) {
         console.error('Erro ao buscar dados do gráfico:', error);

@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getCacheKey, getCache, setCache, clearCache } from './cache';
 import type { Idoso } from '@/types/models';
+import type { Elder } from '@/types/supabase-manual';
 
 // Idosos database operations
 export const idososHelpers = {
@@ -13,7 +14,7 @@ export const idososHelpers = {
     const { data, error } = await supabase
       .from('elders')
       .select('*')
-      .order('name');
+      .order('name') as { data: Elder[] | null, error: any };
     
     if (data && !error) {
       setCache(cacheKey, data);
@@ -31,7 +32,7 @@ export const idososHelpers = {
       .from('elders')
       .select('*')
       .eq('id', id)
-      .maybeSingle();
+      .maybeSingle() as { data: Elder | null, error: any };
     
     if (data && !error) {
       setCache(cacheKey, data);
@@ -79,7 +80,7 @@ export const idososHelpers = {
       .from('elders')
       .insert([dbData])
       .select()
-      .single();
+      .single() as { data: Elder | null, error: any };
     
     // Limpar cache relacionado
     clearCache(getCacheKey('idosos'));
@@ -93,7 +94,7 @@ export const idososHelpers = {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .single() as { data: Elder | null, error: any };
     
     // Limpar cache relacionado
     clearCache(getCacheKey('idosos'));
@@ -120,7 +121,7 @@ export const idososHelpers = {
       .from('elders')
       .select('id')
       .eq('cpf', cpf)
-      .maybeSingle();
+      .maybeSingle() as { data: Elder | null, error: any };
     
     return { exists: !!data, error };
   },

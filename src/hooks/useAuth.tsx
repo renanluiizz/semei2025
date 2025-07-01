@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Usuario } from '@/types/models';
+import type { Staff } from '@/types/supabase-manual';
 
 interface AuthContextType {
   user: User | null;
@@ -43,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .from('staff')
             .select('*')
             .eq('id', session.user.id)
-            .single();
+            .single() as { data: Staff | null, error: any };
           
           clearTimeout(timeoutId);
           
@@ -96,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .from('staff')
                 .select('*')
                 .eq('id', session.user.id)
-                .single();
+                .single() as { data: Staff | null, error: any };
               
               if (mounted) {
                 if (profile && !error) {
@@ -151,7 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .from('staff')
           .select('*')
           .eq('id', data.user.id)
-          .single();
+          .single() as { data: Staff | null, error: any };
 
         if (staffError || !staffProfile) {
           console.error('Usuário não encontrado na tabela staff:', staffError);

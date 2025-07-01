@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { User, Save, X } from 'lucide-react';
+import type { Staff } from '@/types/supabase-manual';
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -59,7 +60,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
       const { error: staffError } = await supabase
         .from('staff')
         .update(updates)
-        .eq('id', userProfile?.id);
+        .eq('id', userProfile?.id) as { error: any };
 
       if (staffError) throw staffError;
 

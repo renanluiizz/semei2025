@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getCacheKey, getCache, setCache, clearCache } from './cache';
 import type { Atividade, Activity } from '@/types/models';
+import type { CheckIn, Elder, Staff } from '@/types/supabase-manual';
 
 // Atividades database operations
 export const atividadesHelpers = {
@@ -23,7 +24,7 @@ export const atividadesHelpers = {
       query = query.eq('elder_id', idosoId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query as { data: any[] | null, error: any };
     
     if (data && !error) {
       // Transformar os dados para o formato compatível com ReportGenerator
@@ -60,7 +61,7 @@ export const atividadesHelpers = {
       .from('check_ins')
       .insert([dbData])
       .select()
-      .single();
+      .single() as { data: CheckIn | null, error: any };
     
     // Limpar cache relacionado
     clearCache(getCacheKey('atividades'));
@@ -74,7 +75,7 @@ export const atividadesHelpers = {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .single() as { data: CheckIn | null, error: any };
     
     // Limpar cache relacionado
     clearCache(getCacheKey('atividades'));
