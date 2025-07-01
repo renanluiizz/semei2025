@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 import { getCacheKey, getCache, setCache } from './cache';
 import type { DashboardStats, Idoso, Atividade } from '@/types/models';
 import type { Elder, CheckIn } from '@/types/supabase-manual';
@@ -14,13 +14,13 @@ export const dashboardHelpers = {
     try {
       // Usar Promise.all para requests paralelos
       const [idososResult, atividadesMesResult, atividadesRecentesResult] = await Promise.all([
-        supabase.from('elders').select('*') as Promise<{ data: Elder[] | null, error: any }>,
-        supabase.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()) as Promise<{ data: CheckIn[] | null, error: any }>,
-        supabase.from('check_ins').select(`
+        supabaseClient.from('elders').select('*'),
+        supabaseClient.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+        supabaseClient.from('check_ins').select(`
           *,
           elder:elders(name),
           staff:staff(full_name)
-        `).order('created_at', { ascending: false }).limit(5) as Promise<{ data: any[] | null, error: any }>
+        `).order('created_at', { ascending: false }).limit(5)
       ]);
 
       const { data: idosos, error: idososError } = idososResult;
@@ -69,7 +69,7 @@ export const dashboardHelpers = {
   getActivityChartData: async (): Promise<{ data: any[], error: any }> => {
     try {
       // Tentar usar a função do banco primeiro
-      const { data: chartData, error: functionError } = await supabase
+      const { data: chartData, error: functionError } = await supabaseClient
         .rpc('get_dashboard_activities_data');
 
       if (!functionError && chartData) {
@@ -82,11 +82,11 @@ export const dashboardHelpers = {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
-      const { data: checkIns, error } = await supabase
+      const { data: checkIns, error } = await supabaseClient
         .from('check_ins')
         .select('check_in_time, elder_id')
         .gte('check_in_time', sevenDaysAgo.toISOString())
-        .order('check_in_time', { ascending: true }) as { data: CheckIn[] | null, error: any };
+        .order('check_in_time', { ascending: true });
 
       if (error) {
         console.error('Erro ao buscar dados do gráfico:', error);

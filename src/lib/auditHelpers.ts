@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 import type { AuditLog } from '@/types/supabase-manual';
 
 export interface AuditLogEntry {
@@ -23,7 +23,7 @@ export const auditHelpers = {
     to_date?: string;
     limit?: number;
   }) => {
-    let query = supabase
+    let query = supabaseClient
       .from('audit_log')
       .select('*')
       .order('created_at', { ascending: false });
@@ -52,17 +52,34 @@ export const auditHelpers = {
       query = query.limit(filters.limit);
     }
 
-    const { data, error } = await query as { data: AuditLog[] | null, error: any };
-    return { data: data as AuditLogEntry[], error };
+    const { data, error } = await query;
+    
+    if (data && !error) {
+      // Transformar dados para formato esperado
+      const transformedData: AuditLogEntry[] = data.map(log => ({
+        id: log.id,
+        table_name: log.table_name,
+        operation: log.operation,
+        old_data: log.old_data,
+        new_data: log.new_data,
+        user_id: log.user_id,
+        timestamp: log.created_at,
+        ip_address: log.ip_address
+      }));
+      
+      return { data: transformedData, error: null };
+    }
+    
+    return { data: [], error };
   },
 
   // Get audit summary for dashboard
   getAuditSummary: async () => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('audit_log')
       .select('table_name, operation, created_at')
       .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-      .order('created_at', { ascending: false }) as { data: AuditLog[] | null, error: any };
+      .order('created_at', { ascending: false });
 
     if (error) return { data: null, error };
 

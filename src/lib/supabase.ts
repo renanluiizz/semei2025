@@ -1,6 +1,6 @@
 
 // Main supabase library with re-exports for backward compatibility
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 
 // Re-export all helpers for backward compatibility
 export { authHelpers } from './auth';
@@ -40,4 +40,4 @@ export const dbHelpers = {
 };
 
 // Re-export the supabase client for convenience
-export { supabase };
+export { supabaseClient as supabase };

@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 import { Usuario } from '@/types/models';
 import type { Staff } from '@/types/supabase-manual';
 
@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Verificar sessão inicial
     const getSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         
         if (!mounted) return;
         
@@ -40,11 +40,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           }, 5000);
 
-          const { data: profile, error } = await supabase
+          const { data: profile, error } = await supabaseClient
             .from('staff')
             .select('*')
             .eq('id', session.user.id)
-            .single() as { data: Staff | null, error: any };
+            .maybeSingle();
           
           clearTimeout(timeoutId);
           
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } else if (error) {
               console.error('Erro ao buscar perfil do usuário:', error);
               // Se não encontrar o perfil na tabela staff, fazer logout
-              await supabase.auth.signOut();
+              await supabaseClient.auth.signOut();
             }
           }
         }
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getSession();
 
     // Listener para mudanças de auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
         
@@ -93,11 +93,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (!mounted) return;
             
             try {
-              const { data: profile, error } = await supabase
+              const { data: profile, error } = await supabaseClient
                 .from('staff')
                 .select('*')
                 .eq('id', session.user.id)
-                .single() as { data: Staff | null, error: any };
+                .maybeSingle();
               
               if (mounted) {
                 if (profile && !error) {
@@ -111,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else if (error) {
                   console.error('Erro ao buscar perfil:', error);
                   // Se não encontrar o perfil na tabela staff, fazer logout
-                  await supabase.auth.signOut();
+                  await supabaseClient.auth.signOut();
                 }
               }
             } catch (error) {
@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
@@ -148,15 +148,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Verificar se o usuário existe na tabela staff
       if (data.user) {
-        const { data: staffProfile, error: staffError } = await supabase
+        const { data: staffProfile, error: staffError } = await supabaseClient
           .from('staff')
           .select('*')
           .eq('id', data.user.id)
-          .single() as { data: Staff | null, error: any };
+          .maybeSingle();
 
         if (staffError || !staffProfile) {
           console.error('Usuário não encontrado na tabela staff:', staffError);
-          await supabase.auth.signOut();
+          await supabaseClient.auth.signOut();
           return { 
             error: { 
               message: 'User not authorized',
@@ -178,7 +178,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
       setUser(null);
       setUserProfile(null);
     } catch (error) {

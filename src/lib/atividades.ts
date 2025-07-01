@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 import { getCacheKey, getCache, setCache, clearCache } from './cache';
 import type { Atividade, Activity } from '@/types/models';
 import type { CheckIn, Elder, Staff } from '@/types/supabase-manual';
@@ -11,7 +11,7 @@ export const atividadesHelpers = {
     const cached = getCache(cacheKey);
     if (cached) return { data: cached, error: null };
 
-    let query = supabase
+    let query = supabaseClient
       .from('check_ins')
       .select(`
         *,
@@ -24,7 +24,7 @@ export const atividadesHelpers = {
       query = query.eq('elder_id', idosoId);
     }
 
-    const { data, error } = await query as { data: any[] | null, error: any };
+    const { data, error } = await query;
     
     if (data && !error) {
       // Transformar os dados para o formato compatível com ReportGenerator
@@ -57,11 +57,11 @@ export const atividadesHelpers = {
       observation: atividade.observation,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('check_ins')
       .insert([dbData])
       .select()
-      .single() as { data: CheckIn | null, error: any };
+      .single();
     
     // Limpar cache relacionado
     clearCache(getCacheKey('atividades'));
@@ -70,12 +70,12 @@ export const atividadesHelpers = {
   },
 
   updateAtividade: async (id: string, updates: Partial<Atividade>) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('check_ins')
       .update(updates)
       .eq('id', id)
       .select()
-      .single() as { data: CheckIn | null, error: any };
+      .single();
     
     // Limpar cache relacionado
     clearCache(getCacheKey('atividades'));
@@ -84,7 +84,7 @@ export const atividadesHelpers = {
   },
 
   deleteAtividade: async (id: string) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('check_ins')
       .delete()
       .eq('id', id);

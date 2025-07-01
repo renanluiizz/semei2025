@@ -1,10 +1,10 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 
 // Auth helper functions
 export const authHelpers = {
   signIn: async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password,
     });
@@ -12,12 +12,12 @@ export const authHelpers = {
   },
 
   signOut: async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
     return { error };
   },
 
   getCurrentUser: async () => {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
     return { user, error };
   },
 };

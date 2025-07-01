@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabaseClient } from '@/lib/supabase-client';
 import { useAuth } from '@/hooks/useAuth';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -52,21 +52,21 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileForm) => {
       // Atualizar dados na tabela staff
-      const updates: any = {
+      const updates = {
         full_name: data.full_name,
         email: data.email,
       };
 
-      const { error: staffError } = await supabase
+      const { error: staffError } = await supabaseClient
         .from('staff')
         .update(updates)
-        .eq('id', userProfile?.id) as { error: any };
+        .eq('id', userProfile?.id);
 
       if (staffError) throw staffError;
 
       // Se uma nova senha foi fornecida, atualizar a senha de autenticação
       if (data.password && data.password.trim() !== '') {
-        const { error: authError } = await supabase.auth.updateUser({
+        const { error: authError } = await supabaseClient.auth.updateUser({
           email: data.email,
           password: data.password,
         });
@@ -74,7 +74,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
         if (authError) throw authError;
       } else {
         // Apenas atualizar o email se não há mudança de senha
-        const { error: authError } = await supabase.auth.updateUser({
+        const { error: authError } = await supabaseClient.auth.updateUser({
           email: data.email,
         });
 

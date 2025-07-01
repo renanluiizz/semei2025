@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 import { getCacheKey, getCache, setCache, clearCache } from './cache';
 import type { Idoso } from '@/types/models';
 import type { Elder } from '@/types/supabase-manual';
@@ -11,10 +11,10 @@ export const idososHelpers = {
     const cached = getCache(cacheKey);
     if (cached) return { data: cached, error: null };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('elders')
       .select('*')
-      .order('name') as { data: Elder[] | null, error: any };
+      .order('name');
     
     if (data && !error) {
       setCache(cacheKey, data);
@@ -28,11 +28,11 @@ export const idososHelpers = {
     const cached = getCache(cacheKey);
     if (cached) return { data: cached, error: null };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('elders')
       .select('*')
       .eq('id', id)
-      .maybeSingle() as { data: Elder | null, error: any };
+      .maybeSingle();
     
     if (data && !error) {
       setCache(cacheKey, data);
@@ -76,11 +76,11 @@ export const idososHelpers = {
       responsible_staff_id: idoso.responsible_staff_id,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('elders')
       .insert([dbData])
       .select()
-      .single() as { data: Elder | null, error: any };
+      .single();
     
     // Limpar cache relacionado
     clearCache(getCacheKey('idosos'));
@@ -89,12 +89,12 @@ export const idososHelpers = {
   },
 
   updateIdoso: async (id: string, updates: Partial<Idoso>) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('elders')
       .update(updates)
       .eq('id', id)
       .select()
-      .single() as { data: Elder | null, error: any };
+      .single();
     
     // Limpar cache relacionado
     clearCache(getCacheKey('idosos'));
@@ -104,7 +104,7 @@ export const idososHelpers = {
   },
 
   deleteIdoso: async (id: string) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('elders')
       .delete()
       .eq('id', id);
@@ -117,11 +117,11 @@ export const idososHelpers = {
   },
 
   checkCPFExists: async (cpf: string) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('elders')
       .select('id')
       .eq('cpf', cpf)
-      .maybeSingle() as { data: Elder | null, error: any };
+      .maybeSingle();
     
     return { exists: !!data, error };
   },
