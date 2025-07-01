@@ -35,13 +35,18 @@ export const staffManagementHelpers = {
 
       if (error) throw error;
 
-      // Map the data to include default values for missing properties
+      // Map the data to ensure proper type handling
       const mappedData = data?.map(staff => ({
-        ...staff,
-        status: staff.status || 'active',
+        id: staff.id,
+        full_name: staff.full_name,
+        email: staff.email,
+        role: staff.role as 'admin' | 'operator',
         cpf: staff.cpf || '',
         phone: staff.phone || '',
-        position: staff.position || ''
+        position: staff.position || '',
+        status: (staff.status || 'active') as 'active' | 'inactive',
+        created_at: staff.created_at,
+        updated_at: staff.updated_at
       })) as StaffMember[];
 
       return { data: mappedData, error: null };
@@ -128,13 +133,18 @@ export const staffManagementHelpers = {
 
       if (error) throw error;
 
-      // Map the data to include default values for missing properties
+      // Map the data to ensure proper type handling
       const mappedData = data?.map(staff => ({
-        ...staff,
-        status: staff.status || 'active',
+        id: staff.id,
+        full_name: staff.full_name,
+        email: staff.email,
+        role: staff.role as 'admin' | 'operator',
         cpf: staff.cpf || '',
         phone: staff.phone || '',
-        position: staff.position || ''
+        position: staff.position || '',
+        status: (staff.status || 'active') as 'active' | 'inactive',
+        created_at: staff.created_at,
+        updated_at: staff.updated_at
       })) as StaffMember[];
 
       return { data: mappedData, error: null };
@@ -153,13 +163,18 @@ export const staffManagementHelpers = {
         
       if (error) throw error;
 
-      // Map the data to include default values for missing properties
+      // Map the data to ensure proper type handling
       const mappedData = data?.map(staff => ({
-        ...staff,
-        status: staff.status || 'active',
+        id: staff.id,
+        full_name: staff.full_name,
+        email: staff.email,
+        role: staff.role as 'admin' | 'operator',
         cpf: staff.cpf || '',
         phone: staff.phone || '',
-        position: staff.position || ''
+        position: staff.position || '',
+        status: (staff.status || 'active') as 'active' | 'inactive',
+        created_at: staff.created_at,
+        updated_at: staff.updated_at
       })) as StaffMember[];
 
       return { data: mappedData, error: null };
