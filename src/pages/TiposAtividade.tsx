@@ -13,7 +13,7 @@ import { Plus, Edit, Trash2, Save, X, Activity, CheckCircle2, AlertCircle } from
 import { tiposAtividadeHelpers, type TipoAtividade } from '@/lib/tiposAtividade';
 
 export default function TiposAtividade() {
-  const [novoTipo, setNovoTipo] = useState({ nome: '', descricao: '' });
+  const [novoTipo, setNovoTipo] = useState({ name: '', description: '' });
   const [editingTipo, setEditingTipo] = useState<TipoAtividade | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const queryClient = useQueryClient();
@@ -27,27 +27,27 @@ export default function TiposAtividade() {
     },
   });
 
-  const validateForm = (data: { nome: string; descricao?: string }, isEditing = false) => {
+  const validateForm = (data: { name: string; description?: string }, isEditing = false) => {
     const newErrors: { [key: string]: string } = {};
     
-    if (!data.nome.trim()) {
-      newErrors.nome = 'Nome é obrigatório';
-    } else if (data.nome.trim().length < 2) {
-      newErrors.nome = 'Nome deve ter pelo menos 2 caracteres';
+    if (!data.name.trim()) {
+      newErrors.name = 'Nome é obrigatório';
+    } else if (data.name.trim().length < 2) {
+      newErrors.name = 'Nome deve ter pelo menos 2 caracteres';
     }
     
-    if (data.descricao && data.descricao.length > 500) {
-      newErrors.descricao = 'Descrição deve ter no máximo 500 caracteres';
+    if (data.description && data.description.length > 500) {
+      newErrors.description = 'Descrição deve ter no máximo 500 caracteres';
     }
 
     // Verificar duplicatas
     const exists = tiposAtividade?.some(tipo => 
-      tipo.nome.toLowerCase() === data.nome.trim().toLowerCase() &&
+      tipo.name.toLowerCase() === data.name.trim().toLowerCase() &&
       (!isEditing || tipo.id !== editingTipo?.id)
     );
     
     if (exists) {
-      newErrors.nome = 'Já existe um tipo de atividade com este nome';
+      newErrors.name = 'Já existe um tipo de atividade com este nome';
     }
 
     setErrors(newErrors);
@@ -55,18 +55,18 @@ export default function TiposAtividade() {
   };
 
   const createMutation = useMutation({
-    mutationFn: (data: { nome: string; descricao?: string }) => 
+    mutationFn: (data: { name: string; description?: string }) => 
       tiposAtividadeHelpers.createTipoAtividade({
-        nome: data.nome.trim(),
-        descricao: data.descricao?.trim(),
-        ativo: true
+        name: data.name.trim(),
+        description: data.description?.trim(),
+        is_active: true
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tipos-atividade'] });
       toast.success('Tipo de atividade criado com sucesso!', {
         description: 'O novo tipo está disponível para uso.'
       });
-      setNovoTipo({ nome: '', descricao: '' });
+      setNovoTipo({ name: '', description: '' });
       setErrors({});
     },
     onError: (error: any) => {
@@ -77,10 +77,10 @@ export default function TiposAtividade() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: { id: string; nome: string; descricao?: string }) =>
+    mutationFn: (data: { id: string; name: string; description?: string }) =>
       tiposAtividadeHelpers.updateTipoAtividade(data.id, {
-        nome: data.nome.trim(),
-        descricao: data.descricao?.trim()
+        name: data.name.trim(),
+        description: data.description?.trim()
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tipos-atividade'] });
@@ -120,21 +120,21 @@ export default function TiposAtividade() {
 
   const handleUpdate = () => {
     if (!editingTipo || !validateForm({
-      nome: editingTipo.nome,
-      descricao: editingTipo.descricao
+      name: editingTipo.name,
+      description: editingTipo.description
     }, true)) {
       toast.error('Corrija os erros no formulário');
       return;
     }
     updateMutation.mutate({
       id: editingTipo.id,
-      nome: editingTipo.nome,
-      descricao: editingTipo.descricao
+      name: editingTipo.name,
+      description: editingTipo.description
     });
   };
 
-  const handleDelete = (id: string, nome: string) => {
-    if (window.confirm(`Tem certeza que deseja remover o tipo "${nome}"?`)) {
+  const handleDelete = (id: string, name: string) => {
+    if (window.confirm(`Tem certeza que deseja remover o tipo "${name}"?`)) {
       deleteMutation.mutate(id);
     }
   };
@@ -189,20 +189,20 @@ export default function TiposAtividade() {
               <Input
                 id="nome"
                 placeholder="Ex: Exercícios Físicos"
-                value={novoTipo.nome}
+                value={novoTipo.name}
                 onChange={(e) => {
-                  setNovoTipo(prev => ({ ...prev, nome: e.target.value }));
-                  if (errors.nome) {
-                    setErrors(prev => ({ ...prev, nome: '' }));
+                  setNovoTipo(prev => ({ ...prev, name: e.target.value }));
+                  if (errors.name) {
+                    setErrors(prev => ({ ...prev, name: '' }));
                   }
                 }}
-                className={`rounded-xl ${errors.nome ? 'border-red-500' : ''}`}
+                className={`rounded-xl ${errors.name ? 'border-red-500' : ''}`}
                 disabled={isSubmitting}
               />
-              {errors.nome && (
+              {errors.name && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
-                  {errors.nome}
+                  {errors.name}
                 </p>
               )}
             </div>
@@ -211,21 +211,21 @@ export default function TiposAtividade() {
               <Textarea
                 id="descricao"
                 placeholder="Descreva brevemente este tipo de atividade..."
-                value={novoTipo.descricao}
+                value={novoTipo.description}
                 onChange={(e) => {
-                  setNovoTipo(prev => ({ ...prev, descricao: e.target.value }));
-                  if (errors.descricao) {
-                    setErrors(prev => ({ ...prev, descricao: '' }));
+                  setNovoTipo(prev => ({ ...prev, description: e.target.value }));
+                  if (errors.description) {
+                    setErrors(prev => ({ ...prev, description: '' }));
                   }
                 }}
-                className={`rounded-xl resize-none ${errors.descricao ? 'border-red-500' : ''}`}
+                className={`rounded-xl resize-none ${errors.description ? 'border-red-500' : ''}`}
                 rows={3}
                 disabled={isSubmitting}
               />
-              {errors.descricao && (
+              {errors.description && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" />
-                  {errors.descricao}
+                  {errors.description}
                 </p>
               )}
             </div>
@@ -234,7 +234,7 @@ export default function TiposAtividade() {
           <div className="flex justify-end">
             <Button 
               onClick={handleCreate}
-              disabled={isSubmitting || !novoTipo.nome.trim()}
+              disabled={isSubmitting || !novoTipo.name.trim()}
               className="rounded-xl bg-gradient-to-r from-primary to-secondary text-white"
             >
               {createMutation.isPending ? (
@@ -279,20 +279,20 @@ export default function TiposAtividade() {
                           <Label htmlFor={`edit-nome-${tipo.id}`}>Nome *</Label>
                           <Input
                             id={`edit-nome-${tipo.id}`}
-                            value={editingTipo.nome}
+                            value={editingTipo.name}
                             onChange={(e) => {
-                              setEditingTipo(prev => prev ? { ...prev, nome: e.target.value } : null);
-                              if (errors.nome) {
-                                setErrors(prev => ({ ...prev, nome: '' }));
+                              setEditingTipo(prev => prev ? { ...prev, name: e.target.value } : null);
+                              if (errors.name) {
+                                setErrors(prev => ({ ...prev, name: '' }));
                               }
                             }}
-                            className={`rounded-xl ${errors.nome ? 'border-red-500' : ''}`}
+                            className={`rounded-xl ${errors.name ? 'border-red-500' : ''}`}
                             disabled={isSubmitting}
                           />
-                          {errors.nome && (
+                          {errors.name && (
                             <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                               <AlertCircle className="h-3 w-3" />
-                              {errors.nome}
+                              {errors.name}
                             </p>
                           )}
                         </div>
@@ -300,21 +300,21 @@ export default function TiposAtividade() {
                           <Label htmlFor={`edit-descricao-${tipo.id}`}>Descrição</Label>
                           <Textarea
                             id={`edit-descricao-${tipo.id}`}
-                            value={editingTipo.descricao || ''}
+                            value={editingTipo.description || ''}
                             onChange={(e) => {
-                              setEditingTipo(prev => prev ? { ...prev, descricao: e.target.value } : null);
-                              if (errors.descricao) {
-                                setErrors(prev => ({ ...prev, descricao: '' }));
+                              setEditingTipo(prev => prev ? { ...prev, description: e.target.value } : null);
+                              if (errors.description) {
+                                setErrors(prev => ({ ...prev, description: '' }));
                               }
                             }}
-                            className={`rounded-xl resize-none ${errors.descricao ? 'border-red-500' : ''}`}
+                            className={`rounded-xl resize-none ${errors.description ? 'border-red-500' : ''}`}
                             rows={2}
                             disabled={isSubmitting}
                           />
-                          {errors.descricao && (
+                          {errors.description && (
                             <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                               <AlertCircle className="h-3 w-3" />
-                              {errors.descricao}
+                              {errors.description}
                             </p>
                           )}
                         </div>
@@ -337,7 +337,7 @@ export default function TiposAtividade() {
                         <Button
                           size="sm"
                           onClick={handleUpdate}
-                          disabled={isSubmitting || !editingTipo.nome.trim()}
+                          disabled={isSubmitting || !editingTipo.name.trim()}
                           className="rounded-xl bg-green-600 hover:bg-green-700 text-white"
                         >
                           {updateMutation.isPending ? (
@@ -359,9 +359,9 @@ export default function TiposAtividade() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-gray-900">{tipo.nome}</h3>
-                          <Badge variant={tipo.ativo ? "default" : "secondary"} className="rounded-full">
-                            {tipo.ativo ? (
+                          <h3 className="font-semibold text-gray-900">{tipo.name}</h3>
+                          <Badge variant={tipo.is_active ? "default" : "secondary"} className="rounded-full">
+                            {tipo.is_active ? (
                               <>
                                 <CheckCircle2 className="h-3 w-3 mr-1" />
                                 Ativo
@@ -371,11 +371,11 @@ export default function TiposAtividade() {
                             )}
                           </Badge>
                         </div>
-                        {tipo.descricao && (
-                          <p className="text-gray-600 text-sm mb-2">{tipo.descricao}</p>
+                        {tipo.description && (
+                          <p className="text-gray-600 text-sm mb-2">{tipo.description}</p>
                         )}
                         <p className="text-xs text-gray-500">
-                          Criado em: {new Date(tipo.criado_em).toLocaleDateString('pt-BR')}
+                          Criado em: {new Date(tipo.created_at).toLocaleDateString('pt-BR')}
                         </p>
                       </div>
                       
@@ -395,7 +395,7 @@ export default function TiposAtividade() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(tipo.id, tipo.nome)}
+                          onClick={() => handleDelete(tipo.id, tipo.name)}
                           disabled={isSubmitting}
                           className="rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
