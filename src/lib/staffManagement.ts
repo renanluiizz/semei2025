@@ -6,6 +6,10 @@ export interface StaffMember {
   full_name: string;
   email: string;
   role: 'admin' | 'operator';
+  cpf?: string;
+  phone?: string;
+  position?: string;
+  status: 'active' | 'inactive';
   created_at: string;
   updated_at: string;
 }
@@ -14,6 +18,10 @@ export interface CreateStaffData {
   full_name: string;
   email: string;
   role: 'admin' | 'operator';
+  cpf?: string;
+  phone?: string;
+  position?: string;
+  status: 'active' | 'inactive';
   password: string;
 }
 
@@ -27,7 +35,16 @@ export const staffManagementHelpers = {
 
       if (error) throw error;
 
-      return { data: data as StaffMember[], error: null };
+      // Map the data to include default values for missing properties
+      const mappedData = data?.map(staff => ({
+        ...staff,
+        status: staff.status || 'active',
+        cpf: staff.cpf || '',
+        phone: staff.phone || '',
+        position: staff.position || ''
+      })) as StaffMember[];
+
+      return { data: mappedData, error: null };
     } catch (error) {
       console.error('Error fetching staff:', error);
       return { data: null, error };
@@ -43,7 +60,11 @@ export const staffManagementHelpers = {
         options: {
           data: {
             full_name: staffData.full_name,
-            role: staffData.role
+            role: staffData.role,
+            cpf: staffData.cpf,
+            phone: staffData.phone,
+            position: staffData.position,
+            status: staffData.status
           }
         }
       });
@@ -107,7 +128,16 @@ export const staffManagementHelpers = {
 
       if (error) throw error;
 
-      return { data: data as StaffMember[], error: null };
+      // Map the data to include default values for missing properties
+      const mappedData = data?.map(staff => ({
+        ...staff,
+        status: staff.status || 'active',
+        cpf: staff.cpf || '',
+        phone: staff.phone || '',
+        position: staff.position || ''
+      })) as StaffMember[];
+
+      return { data: mappedData, error: null };
     } catch (error) {
       console.error('Error searching staff:', error);
       return { data: null, error };
@@ -123,7 +153,16 @@ export const staffManagementHelpers = {
         
       if (error) throw error;
 
-      return { data: data as StaffMember[], error: null };
+      // Map the data to include default values for missing properties
+      const mappedData = data?.map(staff => ({
+        ...staff,
+        status: staff.status || 'active',
+        cpf: staff.cpf || '',
+        phone: staff.phone || '',
+        position: staff.position || ''
+      })) as StaffMember[];
+
+      return { data: mappedData, error: null };
     } catch (error) {
       console.error('Error filtering staff:', error);
       return { data: null, error };
