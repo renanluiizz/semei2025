@@ -2,7 +2,6 @@
 import { supabaseClient } from '@/lib/supabase-client';
 import { getCacheKey, getCache, setCache } from './cache';
 import type { DashboardStats, Idoso, Atividade } from '@/types/models';
-import type { Elder, CheckIn } from '@/types/supabase-manual';
 
 // Dashboard statistics
 export const dashboardHelpers = {
@@ -13,7 +12,7 @@ export const dashboardHelpers = {
 
     try {
       // Usar Promise.all para requests paralelos
-      const [idososResult, atividadesMesResult, atividadesRecentesResult] = await Promise.all([
+      const [idososResult, checkInsMesResult, checkInsRecentesResult] = await Promise.all([
         supabaseClient.from('elders').select('*'),
         supabaseClient.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
         supabaseClient.from('check_ins').select(`
@@ -52,10 +51,10 @@ export const dashboardHelpers = {
       const stats: DashboardStats = {
         total_idosos: idosos?.length || 0,
         idosos_ativos: idosos?.length || 0,
-        atividades_mes: atividadesMesResult.data?.length || 0,
+        atividades_mes: checkInsMesResult.data?.length || 0,
         aniversariantes_mes: aniversariantes as Idoso[],
         distribuicao_idade: distribuicaoIdade,
-        atividades_recentes: (atividadesRecentesResult.data || []) as Atividade[],
+        atividades_recentes: (checkInsRecentesResult.data || []) as Atividade[],
       };
 
       setCache(cacheKey, stats);
@@ -68,17 +67,7 @@ export const dashboardHelpers = {
 
   getActivityChartData: async (): Promise<{ data: any[], error: any }> => {
     try {
-      // Tentar usar a função do banco primeiro
-      const { data: chartData, error: functionError } = await supabaseClient
-        .rpc('get_dashboard_activities_data');
-
-      if (!functionError && chartData) {
-        return { data: chartData, error: null };
-      }
-
-      console.warn('Função do banco não disponível, usando fallback manual:', functionError);
-
-      // Fallback manual se a função não estiver disponível
+      // Fallback manual para dados do gráfico
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 

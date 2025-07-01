@@ -5,23 +5,15 @@ export interface StaffMember {
   id: string;
   full_name: string;
   email: string;
-  cpf?: string;
-  phone?: string;
-  position?: string;
   role: 'admin' | 'operator';
-  status: 'active' | 'inactive';
   created_at: string;
-  updated_at?: string;
+  updated_at: string;
 }
 
 export interface CreateStaffData {
   full_name: string;
   email: string;
-  cpf?: string;
-  phone?: string;
-  position?: string;
   role: 'admin' | 'operator';
-  status: 'active' | 'inactive';
   password: string;
 }
 
@@ -44,14 +36,15 @@ export const staffManagementHelpers = {
 
   createStaff: async (staffData: CreateStaffData): Promise<{ data: any, error: any }> => {
     try {
-      // Primeiro criar o usuário no auth
-      const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
+      // Criar usuário no auth com dados do staff
+      const { data: authData, error: authError } = await supabaseClient.auth.signUp({
         email: staffData.email,
         password: staffData.password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: staffData.full_name,
-          role: staffData.role
+        options: {
+          data: {
+            full_name: staffData.full_name,
+            role: staffData.role
+          }
         }
       });
 
@@ -59,20 +52,11 @@ export const staffManagementHelpers = {
         throw authError;
       }
 
-      // Depois inserir na tabela staff com todos os campos
+      // O trigger handle_new_user irá inserir automaticamente na tabela staff
       const { data, error } = await supabaseClient
         .from('staff')
-        .insert({
-          id: authData.user.id,
-          full_name: staffData.full_name,
-          email: staffData.email,
-          cpf: staffData.cpf,
-          phone: staffData.phone,
-          position: staffData.position,
-          role: staffData.role,
-          status: staffData.status || 'active'
-        })
         .select()
+        .eq('id', authData.user?.id)
         .single();
 
       return { data, error };
@@ -100,20 +84,13 @@ export const staffManagementHelpers = {
 
   deleteStaff: async (id: string): Promise<{ error: any }> => {
     try {
-      // Primeiro deletar da tabela staff
-      const { error: staffError } = await supabaseClient
+      // Deletar da tabela staff (o trigger de auth será acionado automaticamente)
+      const { error } = await supabaseClient
         .from('staff')
         .delete()
         .eq('id', id);
 
-      if (staffError) {
-        throw staffError;
-      }
-
-      // Depois deletar do auth
-      const { error: authError } = await supabaseClient.auth.admin.deleteUser(id);
-
-      return { error: authError };
+      return { error };
     } catch (error) {
       console.error('Error deleting staff:', error);
       return { error };
@@ -125,7 +102,7 @@ export const staffManagementHelpers = {
       const { data, error } = await supabaseClient
         .from('staff')
         .select('*')
-        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,position.ilike.%${query}%`)
+        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -139,17 +116,11 @@ export const staffManagementHelpers = {
 
   filterStaffByStatus: async (status: string): Promise<{ data: StaffMember[] | null, error: any }> => {
     try {
-      let query = supabaseClient
+      const { data, error } = await supabaseClient
         .from('staff')
         .select('*')
         .order('created_at', { ascending: false });
-
-      if (status !== 'all') {
-        query = query.eq('status', status);
-      }
-
-      const { data, error } = await query;
-      
+        
       if (error) throw error;
 
       return { data: data as StaffMember[], error: null };

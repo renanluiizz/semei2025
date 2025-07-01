@@ -20,10 +20,10 @@ export const resetStatisticsHelpers = {
         throw new Error('Permissão insuficiente para realizar esta operação');
       }
 
-      // Reset statistics data (this will be logged by audit triggers)
+      // Reset statistics data using existing tables
       const operations = [
         supabaseClient.from('check_ins').delete().neq('id', '00000000-0000-0000-0000-000000000000'),
-        supabaseClient.from('elder_activities').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+        supabaseClient.from('audit_log').delete().neq('id', '00000000-0000-0000-0000-000000000000')
       ];
 
       const results = await Promise.allSettled(operations);
