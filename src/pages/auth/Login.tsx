@@ -44,7 +44,7 @@ export function Login() {
     try {
       if (isSignUp) {
         // Handle signup
-        const { error } = await supabase.auth.signUp({
+        const { data: authData, error } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
           options: {
@@ -71,10 +71,31 @@ export function Login() {
           return;
         }
 
-        toast.success('Conta criada com sucesso!', {
-          description: 'Você foi logado automaticamente.',
-        });
-        navigate(from, { replace: true });
+        if (authData.user) {
+          // Manually insert into staff table if trigger didn't work
+          const { error: staffError } = await supabase
+            .from('staff')
+            .insert({
+              id: authData.user.id,
+              email: authData.user.email!,
+              full_name: data.fullName || authData.user.email!.split('@')[0],
+              role: 'operator',
+              status: 'active'
+            });
+
+          if (staffError && !staffError.message.includes('duplicate key')) {
+            console.error('Error creating staff record:', staffError);
+            toast.error('Erro ao criar perfil de usuário', {
+              description: 'Tente novamente ou contate o administrador.',
+            });
+            return;
+          }
+
+          toast.success('Conta criada com sucesso!', {
+            description: 'Você foi logado automaticamente.',
+          });
+          navigate(from, { replace: true });
+        }
       } else {
         // Handle signin
         const { error } = await signIn(data.email, data.password);

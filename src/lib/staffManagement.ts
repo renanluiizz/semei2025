@@ -1,5 +1,5 @@
 
-import { supabaseClient } from '@/lib/supabase-client';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface StaffMember {
   id: string;
@@ -28,7 +28,7 @@ export interface CreateStaffData {
 export const staffManagementHelpers = {
   getAllStaff: async (): Promise<{ data: StaffMember[] | null, error: any }> => {
     try {
-      const { data, error } = await supabaseClient
+      const { data, error } = await supabase
         .from('staff')
         .select('*')
         .order('created_at', { ascending: false });
@@ -59,7 +59,7 @@ export const staffManagementHelpers = {
   createStaff: async (staffData: CreateStaffData): Promise<{ data: any, error: any }> => {
     try {
       // Criar usuário no auth com dados do staff
-      const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: staffData.email,
         password: staffData.password,
         options: {
@@ -78,14 +78,27 @@ export const staffManagementHelpers = {
         throw authError;
       }
 
-      // O trigger handle_new_user irá inserir automaticamente na tabela staff
-      const { data, error } = await supabaseClient
-        .from('staff')
-        .select()
-        .eq('id', authData.user?.id)
-        .single();
+      // Inserir manualmente na tabela staff se o trigger não funcionar
+      if (authData.user) {
+        const { data, error } = await supabase
+          .from('staff')
+          .insert({
+            id: authData.user.id,
+            email: staffData.email,
+            full_name: staffData.full_name,
+            role: staffData.role,
+            cpf: staffData.cpf,
+            phone: staffData.phone,
+            position: staffData.position,
+            status: staffData.status
+          })
+          .select()
+          .single();
 
-      return { data, error };
+        return { data, error };
+      }
+
+      return { data: null, error: new Error('Failed to create user') };
     } catch (error) {
       console.error('Error creating staff:', error);
       return { data: null, error };
@@ -94,7 +107,7 @@ export const staffManagementHelpers = {
 
   updateStaff: async (id: string, updates: Partial<StaffMember>): Promise<{ data: any, error: any }> => {
     try {
-      const { data, error } = await supabaseClient
+      const { data, error } = await supabase
         .from('staff')
         .update(updates)
         .eq('id', id)
@@ -111,7 +124,7 @@ export const staffManagementHelpers = {
   deleteStaff: async (id: string): Promise<{ error: any }> => {
     try {
       // Deletar da tabela staff (o trigger de auth será acionado automaticamente)
-      const { error } = await supabaseClient
+      const { error } = await supabase
         .from('staff')
         .delete()
         .eq('id', id);
@@ -125,7 +138,7 @@ export const staffManagementHelpers = {
 
   searchStaff: async (query: string): Promise<{ data: StaffMember[] | null, error: any }> => {
     try {
-      const { data, error } = await supabaseClient
+      const { data, error } = await supabase
         .from('staff')
         .select('*')
         .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
@@ -156,7 +169,7 @@ export const staffManagementHelpers = {
 
   filterStaffByStatus: async (status: string): Promise<{ data: StaffMember[] | null, error: any }> => {
     try {
-      const { data, error } = await supabaseClient
+      const { data, error } = await supabase
         .from('staff')
         .select('*')
         .order('created_at', { ascending: false });

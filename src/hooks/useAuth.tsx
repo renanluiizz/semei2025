@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Usuario } from '@/types/models';
 
@@ -58,8 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               });
             } else if (error) {
               console.error('Error fetching user profile:', error);
-              // If profile not found in staff table, sign out
-              await supabase.auth.signOut();
             }
           }
         }
@@ -109,14 +107,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   });
                 } else if (error) {
                   console.error('Error fetching profile:', error);
-                  // If profile not found in staff table, sign out
-                  await supabase.auth.signOut();
                 }
               }
             } catch (error) {
               console.error('Error fetching profile:', error);
             }
-          }, 0);
+          }, 100);
         } else {
           setUserProfile(null);
         }
