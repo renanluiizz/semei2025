@@ -3,6 +3,9 @@ import { supabaseClient } from '@/lib/supabase-client';
 import { getCacheKey, getCache, setCache, clearCache } from './cache';
 import type { ActivityType } from '@/types/supabase-manual';
 
+// Export the type for backward compatibility
+export type TipoAtividade = ActivityType;
+
 export const tiposAtividadeHelpers = {
   getTiposAtividade: async () => {
     const cacheKey = getCacheKey('tipos-atividade');

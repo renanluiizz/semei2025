@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 
 export interface StaffMember {
   id: string;
@@ -28,7 +28,7 @@ export interface CreateStaffData {
 export const staffManagementHelpers = {
   getAllStaff: async (): Promise<{ data: StaffMember[] | null, error: any }> => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('staff')
         .select('*')
         .order('created_at', { ascending: false });
@@ -45,7 +45,7 @@ export const staffManagementHelpers = {
   createStaff: async (staffData: CreateStaffData): Promise<{ data: any, error: any }> => {
     try {
       // Primeiro criar o usuário no auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
         email: staffData.email,
         password: staffData.password,
         email_confirm: true,
@@ -60,7 +60,7 @@ export const staffManagementHelpers = {
       }
 
       // Depois inserir na tabela staff com todos os campos
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('staff')
         .insert({
           id: authData.user.id,
@@ -84,7 +84,7 @@ export const staffManagementHelpers = {
 
   updateStaff: async (id: string, updates: Partial<StaffMember>): Promise<{ data: any, error: any }> => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('staff')
         .update(updates)
         .eq('id', id)
@@ -101,7 +101,7 @@ export const staffManagementHelpers = {
   deleteStaff: async (id: string): Promise<{ error: any }> => {
     try {
       // Primeiro deletar da tabela staff
-      const { error: staffError } = await supabase
+      const { error: staffError } = await supabaseClient
         .from('staff')
         .delete()
         .eq('id', id);
@@ -111,7 +111,7 @@ export const staffManagementHelpers = {
       }
 
       // Depois deletar do auth
-      const { error: authError } = await supabase.auth.admin.deleteUser(id);
+      const { error: authError } = await supabaseClient.auth.admin.deleteUser(id);
 
       return { error: authError };
     } catch (error) {
@@ -122,7 +122,7 @@ export const staffManagementHelpers = {
 
   searchStaff: async (query: string): Promise<{ data: StaffMember[] | null, error: any }> => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('staff')
         .select('*')
         .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,position.ilike.%${query}%`)
@@ -139,7 +139,7 @@ export const staffManagementHelpers = {
 
   filterStaffByStatus: async (status: string): Promise<{ data: StaffMember[] | null, error: any }> => {
     try {
-      let query = supabase
+      let query = supabaseClient
         .from('staff')
         .select('*')
         .order('created_at', { ascending: false });

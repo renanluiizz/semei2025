@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/supabase-client';
 import { securityHelpers } from '@/lib/security';
 
 export const resetStatisticsHelpers = {
@@ -7,10 +7,10 @@ export const resetStatisticsHelpers = {
   resetStatistics: async () => {
     try {
       // Check if user has admin role before proceeding
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      const { data: staffProfile } = await supabase
+      const { data: staffProfile } = await supabaseClient
         .from('staff')
         .select('role')
         .eq('id', user.id)
@@ -22,8 +22,8 @@ export const resetStatisticsHelpers = {
 
       // Reset statistics data (this will be logged by audit triggers)
       const operations = [
-        supabase.from('check_ins').delete().neq('id', '00000000-0000-0000-0000-000000000000'),
-        supabase.from('elder_activities').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+        supabaseClient.from('check_ins').delete().neq('id', '00000000-0000-0000-0000-000000000000'),
+        supabaseClient.from('elder_activities').delete().neq('id', '00000000-0000-0000-0000-000000000000')
       ];
 
       const results = await Promise.allSettled(operations);
