@@ -146,18 +146,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: staffProfile, error: staffError } = await supabase
           .from('staff')
           .select('*')
-          .eq('id', data.user.id)
+          .eq('email', data.user.email)
           .maybeSingle();
 
         if (staffError || !staffProfile) {
           console.error('User not found in staff table:', staffError);
-          await supabase.auth.signOut();
-          return { 
-            error: { 
-              message: 'User not authorized',
-              description: 'Usuário não autorizado a acessar o sistema.'
-            } 
-          };
+          // Try to create staff record if it doesn't exist
+          const { error: insertError } = await supabase
+            .from('staff')
+            .insert({
+              id: data.user.id,
+              email: data.user.email!,
+              full_name: data.user.user_metadata?.full_name || data.user.email!.split('@')[0],
+              role: 'operator',
+              status: 'active'
+            });
+
+          if (insertError && !insertError.message.includes('duplicate key')) {
+            console.error('Error creating staff record:', insertError);
+            await supabase.auth.signOut();
+            return { 
+              error: { 
+                message: 'User not authorized',
+                description: 'Usuário não autorizado a acessar o sistema.'
+              } 
+            };
+          }
         }
       }
 
