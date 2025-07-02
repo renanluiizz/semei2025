@@ -1,5 +1,5 @@
 
-import { supabaseClient } from '@/lib/supabase-client';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
 import { securityHelpers } from '@/lib/security';
 
 export const resetStatisticsHelpers = {

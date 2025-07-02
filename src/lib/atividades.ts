@@ -1,5 +1,5 @@
 
-import { supabaseClient } from '@/lib/supabase-client';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
 import { getCacheKey, getCache, setCache, clearCache } from './cache';
 import type { Atividade, Activity } from '@/types/models';
 import type { CheckIn, Elder, Staff } from '@/types/supabase-manual';

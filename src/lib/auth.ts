@@ -1,5 +1,5 @@
 
-import { supabaseClient } from '@/lib/supabase-client';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
 
 // Auth helper functions
 export const authHelpers = {

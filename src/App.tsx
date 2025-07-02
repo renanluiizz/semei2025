@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -40,33 +39,150 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <div className="App min-h-screen bg-gray-50">
+          <div className="App min-h-screen bg-background">
             <Suspense fallback={<PageLoading />}>
               <Routes>
                 <Route path="/login" element={<Login />} />
-                <Route path="/auth/login" element={<Login />} />
-                <Route path="/*" element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <Routes>
-                        <Route index element={<Dashboard />} />
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="idosos" element={<IdososList />} />
-                        <Route path="idosos/novo" element={<NovoIdoso />} />
-                        <Route path="idosos/:id" element={<IdosoDetails />} />
-                        <Route path="idosos/:id/editar" element={<EditIdoso />} />
-                        <Route path="atividades" element={<AtividadesList />} />
-                        <Route path="tipos-atividade" element={<TiposAtividade />} />
-                        <Route path="importar" element={<ImportarPage />} />
-                        <Route path="resetar" element={<ResetarPage />} />
-                        <Route path="auditoria" element={<AuditoriaPage />} />
-                        <Route path="servidores" element={<ServidoresPage />} />
-                        <Route path="configuracoes" element={<Configuracoes />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </AppLayout>
-                  </ProtectedRoute>
-                } />
+                <Route 
+                  path="/" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Dashboard />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Dashboard />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/idosos" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <IdososList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/idosos/novo" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <NovoIdoso />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/idosos/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <IdosoDetails />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/idosos/:id/editar" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <EditIdoso />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/atividades" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <AtividadesList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/tipos-atividade" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <TiposAtividade />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/importar" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <ImportarPage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/resetar" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <ResetarPage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/auditoria" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <AuditoriaPage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/servidores" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <ServidoresPage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/configuracoes" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Configuracoes />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="*" 
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <NotFound />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </Suspense>
             <Toaster 
@@ -74,10 +190,11 @@ function App() {
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: 'white',
-                  border: '1px solid #e5e7eb',
+                  background: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
                   borderRadius: '12px',
                   fontFamily: 'Inter, sans-serif',
+                  color: 'hsl(var(--foreground))',
                 },
               }}
             />
