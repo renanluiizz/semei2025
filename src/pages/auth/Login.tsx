@@ -111,7 +111,7 @@ export function Login() {
             errorDescription = 'Email ou senha incorretos. Verifique os dados e tente novamente.';
           } else if (error.message === 'Email not confirmed') {
             errorMessage = 'Email não confirmado';
-            errorDescription = 'Verifique sua caixa de entrada e confirme seu email antes de fazer login.';
+            errorDescription = 'Email não confirmado. Contate o administrador para ativar sua conta.';
           } else if (error.message === 'Too many requests') {
             errorMessage = 'Muitas tentativas';
             errorDescription = 'Aguarde alguns minutos antes de tentar novamente.';

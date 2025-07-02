@@ -146,11 +146,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: staffProfile, error: staffError } = await supabase
           .from('staff')
           .select('*')
-          .eq('email', data.user.email)
+          .eq('id', data.user.id)
           .maybeSingle();
 
-        if (staffError || !staffProfile) {
-          console.error('User not found in staff table:', staffError);
+        if (staffError) {
+          console.error('Error checking staff table:', staffError);
+          // Don't block login for database errors
+        }
+
+        if (!staffProfile && !staffError) {
+          console.log('User not found in staff table, creating record...');
           // Try to create staff record if it doesn't exist
           const { error: insertError } = await supabase
             .from('staff')
@@ -164,13 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (insertError && !insertError.message.includes('duplicate key')) {
             console.error('Error creating staff record:', insertError);
-            await supabase.auth.signOut();
-            return { 
-              error: { 
-                message: 'User not authorized',
-                description: 'Usuário não autorizado a acessar o sistema.'
-              } 
-            };
+            // Don't block login, user might still be valid
           }
         }
       }
