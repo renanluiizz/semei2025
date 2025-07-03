@@ -25,40 +25,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     const getSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Error getting session:', sessionError);
+        }
         
         if (!mounted) return;
         
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile with timeout
-          const timeoutId = setTimeout(() => {
+          try {
+            const { data: profile, error } = await supabase
+              .from('staff')
+              .select('*')
+              .eq('id', session.user.id)
+              .maybeSingle();
+            
             if (mounted) {
-              setLoading(false);
+              if (profile && !error) {
+                setUserProfile({
+                  id: profile.id,
+                  email: profile.email,
+                  full_name: profile.full_name,
+                  role: profile.role as 'admin' | 'operator',
+                  created_at: profile.created_at
+                });
+              } else if (error) {
+                console.error('Error fetching user profile:', error);
+              }
             }
-          }, 5000);
-
-          const { data: profile, error } = await supabase
-            .from('staff')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
-          
-          clearTimeout(timeoutId);
-          
-          if (mounted) {
-            if (profile && !error) {
-              setUserProfile({
-                id: profile.id,
-                email: profile.email,
-                full_name: profile.full_name,
-                role: profile.role as 'admin' | 'operator',
-                created_at: profile.created_at
-              });
-            } else if (error) {
-              console.error('Error fetching user profile:', error);
-            }
+          } catch (profileError) {
+            console.error('Error fetching profile:', profileError);
           }
         }
         
@@ -77,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
         
         console.log('Auth state changed:', event, session?.user?.email);
@@ -85,10 +84,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user && event !== 'SIGNED_OUT') {
-          // Fetch user profile asynchronously
-          setTimeout(async () => {
-            if (!mounted) return;
-            
+          // Fetch user profile
+          const fetchProfile = async () => {
             try {
               const { data: profile, error } = await supabase
                 .from('staff')
@@ -112,12 +109,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } catch (error) {
               console.error('Error fetching profile:', error);
             }
-          }, 100);
+          };
+          
+          fetchProfile();
         } else {
           setUserProfile(null);
         }
         
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     );
 

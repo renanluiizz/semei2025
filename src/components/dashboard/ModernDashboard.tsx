@@ -1,31 +1,61 @@
 
+import { useEffect, useState } from 'react';
 import { Calendar, Clock, TrendingUp, Users, Activity, Gift, Award, Target } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { dashboardHelpers } from '@/lib/dashboard';
+import { LoadingCard } from '@/components/ui/loading-card';
 
 export function ModernDashboard() {
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const currentDate = format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await dashboardHelpers.getDashboardStats();
+        
+        if (error) {
+          console.error('Error fetching dashboard data:', error);
+          setError('Erro ao carregar dados do dashboard');
+        } else {
+          setDashboardData(data);
+        }
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        setError('Erro inesperado ao carregar dashboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const stats = [
     {
       title: 'Total de Idosos',
-      value: '1.247',
+      value: dashboardData?.total_idosos?.toString() || '0',
       description: 'Cadastrados no sistema',
       change: { value: 5, type: 'increase' as const, period: 'este mês' },
       icon: Users,
       variant: 'blue' as const
     },
     {
-      title: 'Presentes Hoje',
-      value: '89',
-      description: 'Check-ins realizados',
+      title: 'Idosos Ativos',
+      value: dashboardData?.idosos_ativos?.toString() || '0',
+      description: 'Participando de atividades',
       change: { value: 12, type: 'increase' as const, period: 'que ontem' },
       icon: Activity,
       variant: 'green' as const
     },
     {
       title: 'Atividades do Mês',
-      value: '24',
+      value: dashboardData?.atividades_mes?.toString() || '0',
       description: 'Realizadas este mês',
       change: { value: 3, type: 'decrease' as const, period: 'vs anterior' },
       icon: Target,
@@ -33,7 +63,7 @@ export function ModernDashboard() {
     },
     {
       title: 'Aniversariantes',
-      value: '15',
+      value: dashboardData?.aniversariantes_mes?.length?.toString() || '0',
       description: 'Neste mês',
       change: { value: 3, type: 'increase' as const, period: 'esta semana' },
       icon: Gift,
@@ -56,6 +86,29 @@ export function ModernDashboard() {
     { status: 'active', title: 'José Santos fez check-in', time: 'há 20 minutos' },
     { status: 'completed', title: 'Workshop de Artesanato finalizado', time: 'há 1 hora' }
   ];
+
+  if (loading) {
+    return (
+      <div className="semei-page">
+        <div className="semei-container p-6 lg:p-8">
+          <LoadingCard />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="semei-page">
+        <div className="semei-container p-6 lg:p-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-800 font-medium">⚠️ {error}</p>
+            <p className="text-red-600 text-sm mt-1">Tente recarregar a página</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="semei-page">
