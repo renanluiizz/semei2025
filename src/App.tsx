@@ -39,7 +39,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <div className="App min-h-screen bg-background">
+          <div className="App min-h-screen bg-background text-foreground">
             <Suspense fallback={<PageLoading />}>
               <Routes>
                 <Route path="/login" element={<Login />} />

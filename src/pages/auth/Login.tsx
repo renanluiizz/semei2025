@@ -140,24 +140,24 @@ export function Login() {
   }, [signIn, navigate, from, isLoading, isSignUp]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-50" />
       
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-lg p-8 animate-fade-in">
+      <div className="relative w-full max-w-md bg-card rounded-2xl shadow-lg p-8 animate-fade-in border border-border">
         {/* Logo */}
         <div className="flex justify-center mb-4">
-          <div className="h-16 w-16 bg-blue-600 rounded-xl flex items-center justify-center">
+          <div className="h-16 w-16 bg-primary rounded-xl flex items-center justify-center">
             <span className="text-white font-bold text-xl">CF</span>
           </div>
         </div>
         
         {/* Title */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-2">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
             {isSignUp ? 'Criar Conta' : 'Acesso ao Sistema SEMEI'}
           </h1>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Secretaria da Melhor Idade - Cabo Frio
           </p>
         </div>
@@ -168,7 +168,7 @@ export function Login() {
             <div>
               <label 
                 htmlFor="fullName" 
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 Nome Completo
               </label>
@@ -177,11 +177,11 @@ export function Login() {
                 id="fullName"
                 type="text"
                 placeholder="Seu nome completo"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-2 border border-input rounded-lg shadow-sm focus:ring-primary focus:border-primary transition-colors bg-background text-foreground"
                 disabled={isLoading}
               />
               {form.formState.errors.fullName && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-destructive">
                   {form.formState.errors.fullName.message}
                 </p>
               )}
@@ -192,13 +192,13 @@ export function Login() {
           <div>
             <label 
               htmlFor="email" 
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-foreground mb-2"
             >
               E-mail Institucional
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
+                <Mail className="h-5 w-5 text-muted-foreground" />
               </div>
               <input
                 {...form.register('email')}
@@ -206,12 +206,12 @@ export function Login() {
                 type="email"
                 placeholder="seuemail@cabofrio.rj.gov.br"
                 autoComplete="email"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-4 py-2 border border-input rounded-lg shadow-sm focus:ring-primary focus:border-primary transition-colors bg-background text-foreground"
                 disabled={isLoading}
               />
             </div>
             {form.formState.errors.email && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-destructive">
                 {form.formState.errors.email.message}
               </p>
             )}
@@ -221,13 +221,13 @@ export function Login() {
           <div>
             <label 
               htmlFor="password" 
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-foreground mb-2"
             >
               Senha
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+                <Lock className="h-5 w-5 text-muted-foreground" />
               </div>
               <input
                 {...form.register('password')}
@@ -235,7 +235,7 @@ export function Login() {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-12 py-2 border border-input rounded-lg shadow-sm focus:ring-primary focus:border-primary transition-colors bg-background text-foreground"
                 disabled={isLoading}
               />
               <button
@@ -245,14 +245,14 @@ export function Login() {
                 disabled={isLoading}
               >
                 {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  <EyeOff className="h-5 w-5 text-muted-foreground hover:text-foreground" />
                 ) : (
-                  <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  <Eye className="h-5 w-5 text-muted-foreground hover:text-foreground" />
                 )}
               </button>
             </div>
             {form.formState.errors.password && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-destructive">
                 {form.formState.errors.password.message}
               </p>
             )}
@@ -262,7 +262,7 @@ export function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-semibold rounded-xl shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             {isLoading ? (
               <div className="flex items-center justify-center gap-2">
@@ -285,7 +285,7 @@ export function Login() {
                 setIsSignUp(!isSignUp);
                 form.reset();
               }}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-primary hover:underline"
               disabled={isLoading}
             >
               {isSignUp 
@@ -298,10 +298,10 @@ export function Login() {
         
         {/* Footer */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Sistema de Gestão da Secretaria da Melhor Idade
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Prefeitura Municipal de Cabo Frio
           </p>
         </div>

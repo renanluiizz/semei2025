@@ -14,8 +14,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <p className="text-muted-foreground">Carregando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-muted border-t-primary"></div>
+          <div className="text-center space-y-2">
+            <p className="text-foreground font-medium">Verificando acesso...</p>
+            <p className="text-muted-foreground text-sm">Sistema SEMEI</p>
+          </div>
         </div>
       </div>
     );
