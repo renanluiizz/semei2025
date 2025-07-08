@@ -85,4 +85,58 @@ export const dashboardHelpers = {
       return { data: null, error };
     }
   },
+
+  getActivityChartData: async () => {
+    try {
+      console.log('Fetching activity chart data...');
+      
+      // Get check-ins from the last 7 days
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const { data: checkIns, error } = await supabase
+        .from('check_ins')
+        .select('check_in_time, activity_type')
+        .gte('check_in_time', sevenDaysAgo.toISOString())
+        .order('check_in_time', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching check-ins for chart:', error);
+        throw error;
+      }
+
+      // Process data to create chart format
+      const chartData = [];
+      const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dayName = days[date.getDay()];
+        
+        const dayStart = new Date(date);
+        dayStart.setHours(0, 0, 0, 0);
+        
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        const dayCheckIns = checkIns?.filter(checkin => {
+          const checkinDate = new Date(checkin.check_in_time);
+          return checkinDate >= dayStart && checkinDate <= dayEnd;
+        }) || [];
+        
+        chartData.push({
+          name: dayName,
+          atividades: dayCheckIns.length,
+          presenca: dayCheckIns.length // For now, treating check-ins as presence
+        });
+      }
+
+      console.log('Activity chart data:', chartData);
+      return { data: chartData, error: null };
+    } catch (error) {
+      console.error('Error in getActivityChartData:', error);
+      return { data: [], error };
+    }
+  },
 };
