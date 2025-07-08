@@ -11,9 +11,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading, initialized } = useAuth();
   const location = useLocation();
 
-  console.log('ProtectedRoute - user:', user?.email, 'loading:', loading, 'initialized:', initialized);
+  console.log('ProtectedRoute - user:', user?.email || 'no user', 'loading:', loading, 'initialized:', initialized);
 
-  // Show loading while auth is initializing
+  // Show loading while auth is initializing or loading
   if (!initialized || loading) {
     return <PageLoading />;
   }
