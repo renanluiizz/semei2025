@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,34 +8,134 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PageLoading } from '@/components/ui/page-loading';
 
-// Lazy load pages
-const Dashboard = lazy(() => import('@/pages/Dashboard').then(module => ({ default: module.Dashboard })));
-const Login = lazy(() => import('@/pages/auth/Login').then(module => ({ default: module.Login })));
-const IdososList = lazy(() => import('@/pages/idosos/IdososList').then(module => ({ default: module.IdososList })));
-const NovoIdoso = lazy(() => import('@/pages/idosos/NovoIdoso').then(module => ({ default: module.NovoIdoso })));
-const EditIdoso = lazy(() => import('@/pages/idosos/EditIdoso'));
-const IdosoDetails = lazy(() => import('@/pages/idosos/IdosoDetails'));
-const AtividadesList = lazy(() => import('@/pages/atividades/AtividadesList').then(module => ({ default: module.AtividadesList })));
-const TiposAtividade = lazy(() => import('@/pages/TiposAtividade'));
-const Configuracoes = lazy(() => import('@/pages/Configuracoes').then(module => ({ default: module.Configuracoes })));
-const NotFound = lazy(() => import('@/pages/NotFound'));
+// Lazy load pages with better error handling
+const Dashboard = lazy(() => 
+  import('@/pages/Dashboard').then(module => ({ default: module.Dashboard }))
+    .catch(error => {
+      console.error('Failed to load Dashboard:', error);
+      return { default: () => <div>Erro ao carregar Dashboard</div> };
+    })
+);
+
+const Login = lazy(() => 
+  import('@/pages/auth/Login').then(module => ({ default: module.Login }))
+    .catch(error => {
+      console.error('Failed to load Login:', error);
+      return { default: () => <div>Erro ao carregar Login</div> };
+    })
+);
+
+const IdososList = lazy(() => 
+  import('@/pages/idosos/IdososList').then(module => ({ default: module.IdososList }))
+    .catch(error => {
+      console.error('Failed to load IdososList:', error);
+      return { default: () => <div>Erro ao carregar Lista de Idosos</div> };
+    })
+);
+
+const NovoIdoso = lazy(() => 
+  import('@/pages/idosos/NovoIdoso').then(module => ({ default: module.NovoIdoso }))
+    .catch(error => {
+      console.error('Failed to load NovoIdoso:', error);
+      return { default: () => <div>Erro ao carregar Novo Idoso</div> };
+    })
+);
+
+const EditIdoso = lazy(() => 
+  import('@/pages/idosos/EditIdoso')
+    .catch(error => {
+      console.error('Failed to load EditIdoso:', error);
+      return { default: () => <div>Erro ao carregar Editar Idoso</div> };
+    })
+);
+
+const IdosoDetails = lazy(() => 
+  import('@/pages/idosos/IdosoDetails')
+    .catch(error => {
+      console.error('Failed to load IdosoDetails:', error);
+      return { default: () => <div>Erro ao carregar Detalhes do Idoso</div> };
+    })
+);
+
+const AtividadesList = lazy(() => 
+  import('@/pages/atividades/AtividadesList').then(module => ({ default: module.AtividadesList }))
+    .catch(error => {
+      console.error('Failed to load AtividadesList:', error);
+      return { default: () => <div>Erro ao carregar Lista de Atividades</div> };
+    })
+);
+
+const TiposAtividade = lazy(() => 
+  import('@/pages/TiposAtividade')
+    .catch(error => {
+      console.error('Failed to load TiposAtividade:', error);
+      return { default: () => <div>Erro ao carregar Tipos de Atividade</div> };
+    })
+);
+
+const Configuracoes = lazy(() => 
+  import('@/pages/Configuracoes').then(module => ({ default: module.Configuracoes }))
+    .catch(error => {
+      console.error('Failed to load Configuracoes:', error);
+      return { default: () => <div>Erro ao carregar Configurações</div> };
+    })
+);
+
+const NotFound = lazy(() => 
+  import('@/pages/NotFound')
+    .catch(error => {
+      console.error('Failed to load NotFound:', error);
+      return { default: () => <div>Página não encontrada</div> };
+    })
+);
 
 // Administrative pages
-const ImportarPage = lazy(() => import('@/pages/ImportarPage'));
-const ResetarPage = lazy(() => import('@/pages/ResetarPage'));
-const AuditoriaPage = lazy(() => import('@/pages/AuditoriaPage'));
-const ServidoresPage = lazy(() => import('@/pages/ServidoresPage'));
+const ImportarPage = lazy(() => 
+  import('@/pages/ImportarPage')
+    .catch(error => {
+      console.error('Failed to load ImportarPage:', error);
+      return { default: () => <div>Erro ao carregar Importar</div> };
+    })
+);
+
+const ResetarPage = lazy(() => 
+  import('@/pages/ResetarPage')
+    .catch(error => {
+      console.error('Failed to load ResetarPage:', error);
+      return { default: () => <div>Erro ao carregar Resetar</div> };
+    })
+);
+
+const AuditoriaPage = lazy(() => 
+  import('@/pages/AuditoriaPage')
+    .catch(error => {
+      console.error('Failed to load AuditoriaPage:', error);
+      return { default: () => <div>Erro ao carregar Auditoria</div> };
+    })
+);
+
+const ServidoresPage = lazy(() => 
+  import('@/pages/ServidoresPage')
+    .catch(error => {
+      console.error('Failed to load ServidoresPage:', error);
+      return { default: () => <div>Erro ao carregar Servidores</div> };
+    })
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: 3,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
     },
   },
 });
 
 function App() {
+  console.log('App component rendering...');
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -164,16 +265,7 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
-                <Route 
-                  path="*" 
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <NotFound />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  } 
-                />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
             <Toaster 

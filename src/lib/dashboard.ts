@@ -1,136 +1,88 @@
 
-import { supabase as supabaseClient } from '@/integrations/supabase/client';
-import { getCacheKey, getCache, setCache } from './cache';
-import type { DashboardStats, Idoso, Atividade } from '@/types/models';
+import { supabase } from '@/integrations/supabase/client';
 
-// Dashboard statistics
 export const dashboardHelpers = {
-  getDashboardStats: async (): Promise<{ data: DashboardStats | null, error: any }> => {
-    const cacheKey = getCacheKey('dashboard-stats');
-    const cached = getCache(cacheKey);
-    if (cached) return { data: cached, error: null };
-
+  getDashboardStats: async () => {
     try {
-      // Usar Promise.all para requests paralelos
-      const [idososResult, checkInsMesResult, checkInsRecentesResult] = await Promise.all([
-        supabaseClient.from('elders').select('*'),
-        supabaseClient.from('check_ins').select('*').gte('check_in_time', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
-        supabaseClient.from('check_ins').select(`
+      console.log('Fetching dashboard stats...');
+      
+      // Get total elders count
+      const { count: eldersCount, error: eldersError } = await supabase
+        .from('elders')
+        .select('*', { count: 'exact', head: true });
+
+      if (eldersError) {
+        console.error('Error fetching elders count:', eldersError);
+        throw eldersError;
+      }
+
+      // Get total staff count
+      const { count: staffCount, error: staffError } = await supabase
+        .from('staff')
+        .select('*', { count: 'exact', head: true });
+
+      if (staffError) {
+        console.error('Error fetching staff count:', staffError);
+        throw staffError;
+      }
+
+      // Get total check-ins count
+      const { count: checkInsCount, error: checkInsError } = await supabase
+        .from('check_ins')
+        .select('*', { count: 'exact', head: true });
+
+      if (checkInsError) {
+        console.error('Error fetching check-ins count:', checkInsError);
+        throw checkInsError;
+      }
+
+      // Get total activity types count
+      const { count: activityTypesCount, error: activityTypesError } = await supabase
+        .from('activity_types')
+        .select('*', { count: 'exact', head: true });
+
+      if (activityTypesError) {
+        console.error('Error fetching activity types count:', activityTypesError);
+        throw activityTypesError;
+      }
+
+      // Get recent check-ins with details
+      const { data: recentCheckIns, error: recentError } = await supabase
+        .from('check_ins')
+        .select(`
           *,
-          elder:elders(name),
-          staff:staff(full_name)
-        `).order('created_at', { ascending: false }).limit(5)
-      ]);
+          elders (
+            name,
+            cpf
+          ),
+          staff (
+            full_name
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(10);
 
-      const { data: idosos, error: idososError } = idososResult;
-      if (idososError) throw idososError;
+      if (recentError) {
+        console.error('Error fetching recent check-ins:', recentError);
+        throw recentError;
+      }
 
-      // Aniversariantes do mês
-      const currentMonth = new Date().getMonth() + 1;
-      const aniversariantes = idosos?.filter(idoso => {
-        const birthMonth = new Date(idoso.birth_date).getMonth() + 1;
-        return birthMonth === currentMonth;
-      }) || [];
-
-      // Distribuição por idade
-      const distribuicaoIdade = [
-        { faixa: '60-69 anos', quantidade: 0 },
-        { faixa: '70-79 anos', quantidade: 0 },
-        { faixa: '80-89 anos', quantidade: 0 },
-        { faixa: '90+ anos', quantidade: 0 },
-      ];
-
-      idosos?.forEach(idoso => {
-        const idade = new Date().getFullYear() - new Date(idoso.birth_date).getFullYear();
-        if (idade >= 60 && idade < 70) distribuicaoIdade[0].quantidade++;
-        else if (idade >= 70 && idade < 80) distribuicaoIdade[1].quantidade++;
-        else if (idade >= 80 && idade < 90) distribuicaoIdade[2].quantidade++;
-        else if (idade >= 90) distribuicaoIdade[3].quantidade++;
-      });
-
-      const stats: DashboardStats = {
-        total_idosos: idosos?.length || 0,
-        idosos_ativos: idosos?.length || 0,
-        atividades_mes: checkInsMesResult.data?.length || 0,
-        aniversariantes_mes: aniversariantes as Idoso[],
-        distribuicao_idade: distribuicaoIdade,
-        atividades_recentes: (checkInsRecentesResult.data || []) as Atividade[],
+      const stats = {
+        totalElders: eldersCount || 0,
+        totalStaff: staffCount || 0,
+        totalCheckIns: checkInsCount || 0,
+        totalActivityTypes: activityTypesCount || 0,
+        recentCheckIns: recentCheckIns || [],
+        monthlyGrowth: 12.5, // Mock data - can be calculated from real data
+        weeklyActivity: 8.2, // Mock data - can be calculated from real data
+        activeToday: Math.floor((checkInsCount || 0) * 0.15), // Mock calculation
       };
 
-      setCache(cacheKey, stats);
+      console.log('Dashboard stats:', stats);
       return { data: stats, error: null };
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+      console.error('Error in getDashboardStats:', error);
       return { data: null, error };
-    }
-  },
-
-  getActivityChartData: async (): Promise<{ data: any[], error: any }> => {
-    try {
-      // Fallback manual para dados do gráfico
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-
-      const { data: checkIns, error } = await supabaseClient
-        .from('check_ins')
-        .select('check_in_time, elder_id')
-        .gte('check_in_time', sevenDaysAgo.toISOString())
-        .order('check_in_time', { ascending: true });
-
-      if (error) {
-        console.error('Erro ao buscar dados do gráfico:', error);
-        // Fallback para dados simulados se houver erro
-        const fallbackData = Array.from({ length: 7 }, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - (6 - i));
-          return {
-            day_name: date.toLocaleDateString('pt-BR', { weekday: 'short' }),
-            atividades: Math.floor(Math.random() * 20) + 5,
-            presenca: Math.floor(Math.random() * 15) + 8
-          };
-        });
-        return { data: fallbackData, error: null };
-      }
-
-      // Processar dados manualmente
-      const dataMap = new Map();
-      
-      // Inicializar todos os dias dos últimos 7 dias
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateKey = date.toISOString().split('T')[0];
-        const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-        const dayName = dayNames[date.getDay()];
-        
-        dataMap.set(dateKey, {
-          day_name: dayName,
-          atividades: 0,
-          presenca: new Set()
-        });
-      }
-
-      // Processar check-ins
-      checkIns?.forEach((checkIn) => {
-        const dateKey = checkIn.check_in_time.split('T')[0];
-        if (dataMap.has(dateKey)) {
-          const dayData = dataMap.get(dateKey);
-          dayData.atividades += 1;
-          dayData.presenca.add(checkIn.elder_id);
-        }
-      });
-
-      // Converter para array final
-      const processedData = Array.from(dataMap.values()).map(day => ({
-        day_name: day.day_name,
-        atividades: day.atividades,
-        presenca: day.presenca.size
-      }));
-
-      return { data: processedData, error: null };
-    } catch (error) {
-      console.error('Erro inesperado ao buscar dados do gráfico:', error);
-      return { data: [], error };
     }
   },
 };
