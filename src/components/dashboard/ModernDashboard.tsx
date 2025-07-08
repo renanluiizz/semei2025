@@ -36,61 +36,10 @@ export function ModernDashboard() {
     fetchDashboardData();
   }, []);
 
-  const stats = [
-    {
-      title: 'Total de Idosos',
-      value: dashboardData?.total_idosos?.toString() || '0',
-      description: 'Cadastrados no sistema',
-      change: { value: 5, type: 'increase' as const, period: 'este mês' },
-      icon: Users,
-      variant: 'blue' as const
-    },
-    {
-      title: 'Idosos Ativos',
-      value: dashboardData?.idosos_ativos?.toString() || '0',
-      description: 'Participando de atividades',
-      change: { value: 12, type: 'increase' as const, period: 'que ontem' },
-      icon: Activity,
-      variant: 'green' as const
-    },
-    {
-      title: 'Atividades do Mês',
-      value: dashboardData?.atividades_mes?.toString() || '0',
-      description: 'Realizadas este mês',
-      change: { value: 3, type: 'decrease' as const, period: 'vs anterior' },
-      icon: Target,
-      variant: 'purple' as const
-    },
-    {
-      title: 'Aniversariantes',
-      value: dashboardData?.aniversariantes_mes?.length?.toString() || '0',
-      description: 'Neste mês',
-      change: { value: 3, type: 'increase' as const, period: 'esta semana' },
-      icon: Gift,
-      variant: 'orange' as const
-    }
-  ];
-
-  const quickActions = [
-    { icon: Activity, label: 'Chamada de Presença', variant: 'purple' as const },
-    { icon: Users, label: 'Novo Cadastro', variant: 'success' as const },
-    { icon: Calendar, label: 'Agendar Atividade', variant: 'primary' as const },
-    { icon: Award, label: 'Gerar Relatórios', variant: 'orange' as const },
-    { icon: TrendingUp, label: 'Ver Estatísticas', variant: 'secondary' as const },
-    { icon: Clock, label: 'Histórico', variant: 'ghost' as const }
-  ];
-
-  const recentActivities = [
-    { status: 'active', title: 'Maria Silva fez check-in', time: 'há 5 minutos' },
-    { status: 'completed', title: 'Aula de Yoga concluída', time: 'há 15 minutos' },
-    { status: 'active', title: 'José Santos fez check-in', time: 'há 20 minutos' },
-    { status: 'completed', title: 'Workshop de Artesanato finalizado', time: 'há 1 hora' }
-  ];
-
   if (loading) {
     return (
-      <div className="semei-page">
-        <div className="semei-container p-6 lg:p-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="max-w-7xl mx-auto p-6 lg:p-8">
           <LoadingCard />
         </div>
       </div>
@@ -99,99 +48,145 @@ export function ModernDashboard() {
 
   if (error) {
     return (
-      <div className="semei-page">
-        <div className="semei-container p-6 lg:p-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800 font-medium">⚠️ {error}</p>
-            <p className="text-red-600 text-sm mt-1">Tente recarregar a página</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="max-w-7xl mx-auto p-6 lg:p-8">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 shadow-sm">
+            <h3 className="text-red-800 font-semibold text-lg mb-2">⚠️ {error}</h3>
+            <p className="text-red-600">Tente recarregar a página ou contate o suporte técnico.</p>
           </div>
         </div>
       </div>
     );
   }
 
+  const stats = [
+    {
+      title: 'Total de Idosos',
+      value: dashboardData?.totalElders?.toString() || '0',
+      description: 'Cadastrados no sistema',
+      change: { value: 5, type: 'increase' as const, period: 'este mês' },
+      icon: Users,
+      color: 'blue'
+    },
+    {
+      title: 'Idosos Ativos',
+      value: dashboardData?.activeToday?.toString() || '0',
+      description: 'Participando de atividades',
+      change: { value: 12, type: 'increase' as const, period: 'que ontem' },
+      icon: Activity,
+      color: 'green'
+    },
+    {
+      title: 'Atividades do Mês',
+      value: dashboardData?.totalActivityTypes?.toString() || '0',
+      description: 'Realizadas este mês',
+      change: { value: 3, type: 'decrease' as const, period: 'vs anterior' },
+      icon: Target,
+      color: 'purple'
+    },
+    {
+      title: 'Aniversariantes',
+      value: '15',
+      description: 'Neste mês',
+      change: { value: 3, type: 'increase' as const, period: 'esta semana' },
+      icon: Gift,
+      color: 'orange'
+    }
+  ];
+
+  const quickActions = [
+    { icon: Activity, label: 'Chamada de Presença', color: 'bg-purple-500 hover:bg-purple-600' },
+    { icon: Users, label: 'Novo Cadastro', color: 'bg-green-500 hover:bg-green-600' },
+    { icon: Calendar, label: 'Agendar Atividade', color: 'bg-blue-500 hover:bg-blue-600' },
+    { icon: Award, label: 'Gerar Relatórios', color: 'bg-orange-500 hover:bg-orange-600' },
+    { icon: TrendingUp, label: 'Ver Estatísticas', color: 'bg-slate-500 hover:bg-slate-600' },
+    { icon: Clock, label: 'Histórico', color: 'bg-gray-500 hover:bg-gray-600' }
+  ];
+
+  const recentActivities = dashboardData?.recentCheckIns?.slice(0, 5) || [
+    { id: 1, title: 'Sistema iniciado com sucesso', time: 'há 1 minuto', status: 'active' },
+    { id: 2, title: 'Aguardando dados...', time: 'há 2 minutos', status: 'pending' }
+  ];
+
   return (
-    <div className="semei-page">
-      <div className="semei-container p-6 lg:p-8 space-y-8">
-        {/* Modern Header */}
-        <div className="semei-page-header">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="max-w-7xl mx-auto p-6 lg:p-8 space-y-8">
+        {/* Header Profissional */}
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 lg:p-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="animate-slide-in-left">
-              <h1 className="semei-page-title">Dashboard Executivo</h1>
-              <div className="semei-page-subtitle">
+            <div className="space-y-2">
+              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Dashboard Executivo
+              </h1>
+              <div className="flex items-center gap-3 text-slate-600">
                 <Calendar className="h-5 w-5 text-blue-600" />
-                <p className="capitalize">{currentDate}</p>
+                <p className="text-lg font-medium capitalize">{currentDate}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 animate-slide-in-right">
-              <div className="semei-badge semei-badge-success">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                Sistema Online
+                <span className="text-sm font-semibold text-green-700">Sistema Online</span>
               </div>
-              <div className="semei-badge semei-badge-info">
-                <Clock className="h-3 w-3" />
-                Última atualização: agora
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full">
+                <Clock className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-semibold text-blue-700">Atualizado: agora</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Modern Statistics Grid */}
-        <div className="semei-grid-stats">
+        {/* Cards de Estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="semei-card-stat animate-scale-in"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className={`semei-stat-icon semei-stat-icon-${stat.variant}`}>
-                    <stat.icon className="h-8 w-8" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className="semei-stat-label">{stat.title}</p>
-                    <div className="semei-stat-number">{stat.value}</div>
-                    
-                    {stat.description && (
-                      <p className="semei-stat-description">{stat.description}</p>
-                    )}
-                    
-                    {stat.change && (
-                      <div className={`semei-stat-trend ${
-                        stat.change.type === 'increase' 
-                          ? 'semei-stat-trend-positive' 
-                          : 'semei-stat-trend-negative'
-                      }`}>
-                        <span className="text-lg">
-                          {stat.change.type === 'increase' ? '↗' : '↘'}
-                        </span>
-                        <span>
-                          {stat.change.type === 'increase' ? '+' : '-'}{Math.abs(stat.change.value)}%
-                        </span>
-                        {stat.change.period && (
-                          <span className="text-slate-500 font-normal">
-                            vs {stat.change.period}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
+              <div className="flex items-start justify-between mb-4">
+                <div className={`p-3 rounded-xl ${
+                  stat.color === 'blue' ? 'bg-blue-100 text-blue-600' :
+                  stat.color === 'green' ? 'bg-green-100 text-green-600' :
+                  stat.color === 'purple' ? 'bg-purple-100 text-purple-600' :
+                  'bg-orange-100 text-orange-600'
+                }`}>
+                  <stat.icon className="h-6 w-6" />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide">
+                  {stat.title}
+                </p>
+                <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
+                <p className="text-xs text-slate-500">{stat.description}</p>
+                
+                <div className={`flex items-center gap-1 text-xs font-medium ${
+                  stat.change.type === 'increase' ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  <span className="text-base">
+                    {stat.change.type === 'increase' ? '↗' : '↘'}
+                  </span>
+                  <span>
+                    {stat.change.type === 'increase' ? '+' : '-'}{Math.abs(stat.change.value)}%
+                  </span>
+                  <span className="text-slate-500 font-normal">
+                    vs {stat.change.period}
+                  </span>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Content Grid */}
+        {/* Seção de Conteúdo */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Quick Actions */}
+          {/* Ações Rápidas */}
           <div className="lg:col-span-2">
-            <div className="semei-card animate-slide-in-bottom">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 lg:p-8">
               <div className="flex items-center gap-4 mb-6">
-                <div className="semei-stat-icon semei-stat-icon-purple">
-                  <TrendingUp className="h-6 w-6" />
+                <div className="p-3 bg-purple-100 rounded-xl">
+                  <TrendingUp className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-slate-900">Ações Rápidas</h3>
@@ -203,23 +198,22 @@ export function ModernDashboard() {
                 {quickActions.map((action, index) => (
                   <button
                     key={index}
-                    className={`semei-btn semei-btn-${action.variant} justify-start h-auto py-4`}
-                    style={{ animationDelay: `${index * 50}ms` }}
+                    className={`${action.color} text-white p-4 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-lg flex items-center gap-3`}
                   >
                     <action.icon className="h-5 w-5" />
-                    <span className="font-semibold">{action.label}</span>
+                    <span>{action.label}</span>
                   </button>
                 ))}
               </div>
             </div>
           </div>
           
-          {/* Recent Activities */}
+          {/* Atividades Recentes */}
           <div>
-            <div className="semei-card animate-slide-in-right">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
               <div className="flex items-center gap-4 mb-6">
-                <div className="semei-stat-icon semei-stat-icon-green">
-                  <Activity className="h-6 w-6" />
+                <div className="p-3 bg-green-100 rounded-xl">
+                  <Activity className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-slate-900">Atividades Recentes</h3>
@@ -229,12 +223,10 @@ export function ModernDashboard() {
               
               <div className="space-y-4">
                 {recentActivities.map((activity, index) => (
-                  <div
-                    key={index}
-                    className="semei-activity-item"
-                    style={{ animationDelay: `${index * 75}ms` }}
-                  >
-                    <div className={`semei-activity-status semei-activity-status-${activity.status}`} />
+                  <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                    <div className={`w-2 h-2 rounded-full ${
+                      activity.status === 'active' ? 'bg-green-500' : 'bg-blue-500'
+                    } animate-pulse`}></div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-slate-900 truncate">
                         {activity.title}
@@ -245,8 +237,8 @@ export function ModernDashboard() {
                 ))}
               </div>
 
-              <div className="mt-6 pt-4 border-t border-slate-100">
-                <button className="semei-btn semei-btn-ghost w-full">
+              <div className="mt-6 pt-4 border-t border-slate-200">
+                <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
                   <Activity className="h-4 w-4" />
                   Ver Todas as Atividades
                 </button>
