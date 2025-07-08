@@ -1,12 +1,15 @@
 
-import { Calendar, Clock, TrendingUp, Users, Activity, Gift, Award, Target, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, TrendingUp, Users, Activity, Gift, Award, Target, AlertCircle, UserCheck, FileText, BarChart3 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardHelpers } from '@/lib/dashboard';
 import { LoadingCard } from '@/components/ui/loading-card';
+import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 export function ModernDashboard() {
+  const { userProfile } = useAuth();
   const currentDate = format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
 
   // Usar React Query com configuração otimizada
@@ -16,14 +19,13 @@ export function ModernDashboard() {
       const result = await dashboardHelpers.getDashboardStats();
       if (result.error) {
         console.error('Dashboard error:', result.error);
-        // Retornar dados padrão em caso de erro
         return result.data;
       }
       return result.data;
     },
-    staleTime: 30000, // 30 segundos
-    refetchInterval: 60000, // Atualizar a cada minuto
-    retry: 1, // Reduzir tentativas para evitar travamentos
+    staleTime: 30000,
+    refetchInterval: 60000,
+    retry: 1,
     refetchOnWindowFocus: false,
   });
 
@@ -74,17 +76,19 @@ export function ModernDashboard() {
       icon: Users,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50',
-      textColor: 'text-blue-600'
+      textColor: 'text-blue-600',
+      href: '/idosos'
     },
     {
       title: 'Presentes Hoje',
       value: dashboardData?.activeToday?.toString() || '0',
       description: 'Participando de atividades',
       change: { value: 12, type: 'increase' as const, period: 'que ontem' },
-      icon: Activity,
+      icon: UserCheck,
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-50',
-      textColor: 'text-green-600'
+      textColor: 'text-green-600',
+      href: '/atividades'
     },
     {
       title: 'Atividades Disponíveis',
@@ -94,7 +98,8 @@ export function ModernDashboard() {
       icon: Target,
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50',
-      textColor: 'text-purple-600'
+      textColor: 'text-purple-600',
+      href: '/tipos-atividade'
     },
     {
       title: 'Check-ins Realizados',
@@ -104,17 +109,48 @@ export function ModernDashboard() {
       icon: Gift,
       color: 'from-orange-500 to-orange-600',
       bgColor: 'bg-orange-50',
-      textColor: 'text-orange-600'
+      textColor: 'text-orange-600',
+      href: '/atividades'
     }
   ];
 
   const quickActions = [
-    { icon: Activity, label: 'Chamada de Presença', color: 'from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700' },
-    { icon: Users, label: 'Novo Cadastro', color: 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' },
-    { icon: Calendar, label: 'Agendar Atividade', color: 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700' },
-    { icon: Award, label: 'Gerar Relatórios', color: 'from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700' },
-    { icon: TrendingUp, label: 'Ver Estatísticas', color: 'from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700' },
-    { icon: Clock, label: 'Histórico', color: 'from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700' }
+    { 
+      icon: Activity, 
+      label: 'Chamada de Presença', 
+      color: 'from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700',
+      href: '/atividades'
+    },
+    { 
+      icon: Users, 
+      label: 'Novo Cadastro', 
+      color: 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700',
+      href: '/idosos/novo'
+    },
+    { 
+      icon: Calendar, 
+      label: 'Agendar Atividade', 
+      color: 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700',
+      href: '/tipos-atividade'
+    },
+    { 
+      icon: FileText, 
+      label: 'Gerar Relatórios', 
+      color: 'from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700',
+      href: '/relatorios'
+    },
+    { 
+      icon: BarChart3, 
+      label: 'Ver Estatísticas', 
+      color: 'from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700',
+      href: '/dashboard'
+    },
+    { 
+      icon: Clock, 
+      label: 'Histórico', 
+      color: 'from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700',
+      href: '/atividades'
+    }
   ];
 
   const recentActivities = dashboardData?.recentCheckIns?.slice(0, 8) || [];
@@ -122,26 +158,28 @@ export function ModernDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <div className="container mx-auto px-4 py-6 space-y-8">
-        {/* Header Institucional Melhorado */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/60 p-8 relative overflow-hidden">
+        {/* Header Institucional */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/60 p-6 md:p-8 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
-                    <Award className="h-9 w-9 text-white" />
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
+                    <Award className="h-6 w-6 md:h-9 md:w-9 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                      Dashboard Executivo
+                    <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                      Dashboard SEMEI
                     </h1>
-                    <p className="text-slate-600 font-medium text-lg">Sistema de Monitoramento Institucional SEMEI</p>
+                    <p className="text-slate-600 font-medium text-sm md:text-lg">
+                      {userProfile?.role === 'admin' ? 'Painel Administrativo' : 'Painel do Servidor'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-slate-600">
                   <Calendar className="h-5 w-5 text-blue-600" />
-                  <p className="text-lg font-medium capitalize">{currentDate}</p>
+                  <p className="text-sm md:text-lg font-medium capitalize">{currentDate}</p>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -158,26 +196,27 @@ export function ModernDashboard() {
           </div>
         </div>
 
-        {/* Cards de Estatísticas Melhorados */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Cards de Estatísticas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {stats.map((stat, index) => (
-            <div
+            <Link
               key={index}
-              className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/60 p-6 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden"
+              to={stat.href}
+              className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/60 p-4 md:p-6 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden block"
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`p-4 rounded-2xl ${stat.bgColor} transition-all duration-300 group-hover:scale-110`}>
-                    <stat.icon className={`h-6 w-6 ${stat.textColor}`} />
+                  <div className={`p-3 md:p-4 rounded-2xl ${stat.bgColor} transition-all duration-300 group-hover:scale-110`}>
+                    <stat.icon className={`h-5 w-5 md:h-6 md:w-6 ${stat.textColor}`} />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide">
+                  <p className="text-xs md:text-sm font-semibold text-slate-600 uppercase tracking-wide">
                     {stat.title}
                   </p>
-                  <div className="text-4xl font-bold text-slate-900">{stat.value}</div>
+                  <div className="text-2xl md:text-4xl font-bold text-slate-900">{stat.value}</div>
                   <p className="text-xs text-slate-500">{stat.description}</p>
                   
                   <div className={`flex items-center gap-1 text-xs font-medium ${
@@ -195,15 +234,15 @@ export function ModernDashboard() {
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
-        {/* Seção de Conteúdo Melhorada */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Seção de Conteúdo */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Ações Rápidas */}
           <div className="lg:col-span-2">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/60 p-8 relative overflow-hidden">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/60 p-6 md:p-8 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-6">
@@ -211,20 +250,21 @@ export function ModernDashboard() {
                     <TrendingUp className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-slate-900">Ações Rápidas</h3>
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-900">Ações Rápidas</h3>
                     <p className="text-sm text-slate-600 font-medium">Ferramentas do dia a dia</p>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {quickActions.map((action, index) => (
-                    <button
+                    <Link
                       key={index}
+                      to={action.href}
                       className={`bg-gradient-to-r ${action.color} text-white p-4 rounded-2xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-xl flex items-center gap-3`}
                     >
-                      <action.icon className="h-5 w-5" />
-                      <span>{action.label}</span>
-                    </button>
+                      <action.icon className="h-5 w-5 flex-shrink-0" />
+                      <span className="truncate">{action.label}</span>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -241,12 +281,12 @@ export function ModernDashboard() {
                     <Activity className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">Atividades Recentes</h3>
+                    <h3 className="text-lg md:text-xl font-bold text-slate-900">Atividades Recentes</h3>
                     <p className="text-sm text-slate-600 font-medium">Últimas movimentações</p>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-3 max-h-80 overflow-y-auto">
                   {recentActivities.length > 0 ? (
                     recentActivities.map((activity, index) => (
                       <div key={activity.id || index} className="flex items-start gap-3 p-3 bg-slate-50/50 rounded-2xl hover:bg-slate-100/50 transition-colors">
@@ -270,10 +310,13 @@ export function ModernDashboard() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-200">
-                  <button className="w-full bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2">
+                  <Link 
+                    to="/atividades"
+                    className="w-full bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2"
+                  >
                     <Activity className="h-4 w-4" />
                     Ver Todas as Atividades
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

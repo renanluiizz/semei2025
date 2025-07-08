@@ -81,7 +81,7 @@ export function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-50" />
       
-      <div className="relative w-full max-w-md bg-card rounded-2xl shadow-lg p-8 animate-fade-in border border-border">
+      <div className="relative w-full max-w-md bg-card rounded-2xl shadow-lg p-6 md:p-8 animate-fade-in border border-border">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="h-16 w-16 bg-primary rounded-xl flex items-center justify-center shadow-lg">

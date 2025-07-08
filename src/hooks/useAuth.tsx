@@ -79,24 +79,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session?.user) {
             setUser(session.user);
             
-            // Fetch user profile with timeout to prevent hanging
-            const timeoutId = setTimeout(() => {
-              console.log('Profile fetch timeout, continuing without profile');
-              if (isMounted) {
-                setUserProfile(null);
-                setInitialized(true);
-                setLoading(false);
-              }
-            }, 5000);
-
             try {
               const profile = await fetchUserProfile(session.user.id);
-              clearTimeout(timeoutId);
               if (isMounted) {
                 setUserProfile(profile);
               }
             } catch (error) {
-              clearTimeout(timeoutId);
               console.error('Profile fetch error:', error);
               if (isMounted) {
                 setUserProfile(null);
@@ -123,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (!isMounted) return;
         
         console.log('Auth state changed:', event, session?.user?.email || 'no user');
@@ -131,28 +119,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           setUser(session.user);
           
-          // Fetch user profile with timeout
-          const timeoutId = setTimeout(() => {
-            console.log('Profile fetch timeout during auth change');
+          try {
+            const profile = await fetchUserProfile(session.user.id);
+            if (isMounted) {
+              setUserProfile(profile);
+            }
+          } catch (error) {
+            console.error('Profile fetch error during auth change:', error);
             if (isMounted) {
               setUserProfile(null);
             }
-          }, 5000);
-
-          fetchUserProfile(session.user.id)
-            .then(profile => {
-              clearTimeout(timeoutId);
-              if (isMounted) {
-                setUserProfile(profile);
-              }
-            })
-            .catch(error => {
-              clearTimeout(timeoutId);
-              console.error('Profile fetch error during auth change:', error);
-              if (isMounted) {
-                setUserProfile(null);
-              }
-            });
+          }
         } else {
           setUser(null);
           setUserProfile(null);

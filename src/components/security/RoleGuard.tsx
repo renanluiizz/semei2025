@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { securityHelpers } from '@/lib/security';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ShieldX } from 'lucide-react';
 
@@ -25,7 +24,15 @@ export function RoleGuard({ requiredRole, children, fallback }: RoleGuardProps) 
     );
   }
 
-  if (!securityHelpers.hasRole(userProfile.role, requiredRole)) {
+  const hasRole = (userRole: string, required: string) => {
+    if (required === 'admin') {
+      return userRole === 'admin';
+    }
+    // Operators and admins can access operator features
+    return userRole === 'admin' || userRole === 'operator';
+  };
+
+  if (!hasRole(userProfile.role, requiredRole)) {
     return fallback || (
       <Alert variant="destructive">
         <ShieldX className="h-4 w-4" />
