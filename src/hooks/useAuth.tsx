@@ -21,10 +21,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
-  // Fetch user profile from staff table
+  // Cache do perfil para evitar queries desnecessárias
+  const profileCache = useMemo(() => new Map<string, Usuario>(), []);
+
+  // Fetch user profile otimizado com cache
   const fetchUserProfile = async (userId: string): Promise<Usuario | null> => {
     try {
-      console.log('Fetching profile for user:', userId);
+      // Verificar cache primeiro
+      if (profileCache.has(userId)) {
+        console.log('📋 Using cached profile for user:', userId);
+        return profileCache.get(userId)!;
+      }
+
+      console.log('🔍 Fetching fresh profile for user:', userId);
       
       const { data: profile, error } = await supabase
         .from('staff')
@@ -33,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user profile:', error);
+        console.error('❌ Error fetching user profile:', error);
         return null;
       }
 
@@ -45,20 +54,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: profile.role as 'admin' | 'operator',
           created_at: profile.created_at
         };
-        console.log('User profile fetched:', userProfile);
+        
+        // Salvar no cache
+        profileCache.set(userId, userProfile);
+        console.log('✅ User profile cached:', userProfile);
         return userProfile;
       }
 
       return null;
     } catch (error) {
-      console.error('Unexpected error fetching profile:', error);
+      console.error('❌ Unexpected error fetching profile:', error);
       return null;
     }
   };
 
-  // Initialize auth state
+  // Initialize auth state otimizado
   useEffect(() => {
-    console.log('Initializing auth state...');
+    console.log('🚀 Initializing auth state...');
     
     let isMounted = true;
 
@@ -70,26 +82,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error('Session error:', sessionError);
+          console.error('❌ Session error:', sessionError);
         }
 
         if (isMounted) {
-          console.log('Initial session:', session?.user?.email || 'no user');
+          console.log('📋 Initial session:', session?.user?.email || 'no user');
           
           if (session?.user) {
             setUser(session.user);
             
-            try {
-              const profile = await fetchUserProfile(session.user.id);
+            // Fetch profile de forma assíncrona
+            fetchUserProfile(session.user.id).then(profile => {
               if (isMounted) {
                 setUserProfile(profile);
               }
-            } catch (error) {
-              console.error('Profile fetch error:', error);
+            }).catch(error => {
+              console.error('❌ Profile fetch error:', error);
               if (isMounted) {
                 setUserProfile(null);
               }
-            }
+            });
           } else {
             setUser(null);
             setUserProfile(null);
@@ -99,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('❌ Error initializing auth:', error);
         if (isMounted) {
           setInitialized(true);
           setLoading(false);
@@ -109,30 +121,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initializeAuth();
 
-    // Listen for auth changes
+    // Listen for auth changes otimizado
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return;
         
-        console.log('Auth state changed:', event, session?.user?.email || 'no user');
+        console.log('🔄 Auth state changed:', event, session?.user?.email || 'no user');
         
         if (session?.user) {
           setUser(session.user);
           
-          try {
-            const profile = await fetchUserProfile(session.user.id);
-            if (isMounted) {
-              setUserProfile(profile);
-            }
-          } catch (error) {
-            console.error('Profile fetch error during auth change:', error);
-            if (isMounted) {
-              setUserProfile(null);
-            }
-          }
+          // Buscar perfil de forma não bloqueante
+          setTimeout(() => {
+            fetchUserProfile(session.user.id).then(profile => {
+              if (isMounted) {
+                setUserProfile(profile);
+              }
+            }).catch(error => {
+              console.error('❌ Profile fetch error during auth change:', error);
+              if (isMounted) {
+                setUserProfile(null);
+              }
+            });
+          }, 0);
         } else {
           setUser(null);
           setUserProfile(null);
+          profileCache.clear(); // Limpar cache no logout
         }
         
         setLoading(false);
@@ -143,11 +158,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [profileCache]);
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting sign in for:', email);
+      console.log('🔐 Attempting sign in for:', email);
       setLoading(true);
       
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -156,14 +171,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
-        console.error('Sign in error:', error);
+        console.error('❌ Sign in error:', error);
         return { error };
       }
 
-      console.log('Sign in successful:', data.user?.email);
+      console.log('✅ Sign in successful:', data.user?.email);
       return { error: null };
     } catch (error) {
-      console.error('Unexpected sign in error:', error);
+      console.error('❌ Unexpected sign in error:', error);
       return { error };
     } finally {
       setLoading(false);
@@ -172,21 +187,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      console.log('Signing out...');
+      console.log('🚪 Signing out...');
       setLoading(true);
       
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error('Sign out error:', error);
+        console.error('❌ Sign out error:', error);
       }
       
       setUser(null);
       setUserProfile(null);
+      profileCache.clear(); // Limpar cache
       
-      console.log('Sign out successful');
+      console.log('✅ Sign out successful');
     } catch (error) {
-      console.error('Unexpected sign out error:', error);
+      console.error('❌ Unexpected sign out error:', error);
     } finally {
       setLoading(false);
     }

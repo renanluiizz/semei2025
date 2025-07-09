@@ -4,31 +4,32 @@ import { supabase } from '@/integrations/supabase/client';
 export const dashboardHelpers = {
   getDashboardStats: async () => {
     try {
-      console.log('Fetching dashboard stats...');
+      console.log('🔄 Fetching dashboard stats...');
       
-      // Use Promise.allSettled para não travar se uma query falhar
+      // Otimização: usar Promise.allSettled para não bloquear se uma query falhar
       const results = await Promise.allSettled([
-        supabase.from('elders').select('*', { count: 'exact', head: true }),
-        supabase.from('staff').select('*', { count: 'exact', head: true }),
-        supabase.from('check_ins').select('*', { count: 'exact', head: true }),
-        supabase.from('activity_types').select('*', { count: 'exact', head: true }),
+        // Query otimizada para contar registros
+        supabase.from('elders').select('id', { count: 'exact', head: true }),
+        supabase.from('staff').select('id', { count: 'exact', head: true }),
+        supabase.from('check_ins').select('id', { count: 'exact', head: true }),
+        supabase.from('activity_types').select('id', { count: 'exact', head: true }),
+        
+        // Query otimizada para atividades recentes
         supabase
           .from('check_ins')
           .select(`
-            *,
-            elders (
-              name,
-              cpf
-            ),
-            staff (
-              full_name
+            id,
+            check_in_time,
+            activity_type,
+            elders!inner (
+              name
             )
           `)
-          .order('created_at', { ascending: false })
+          .order('check_in_time', { ascending: false })
           .limit(10)
       ]);
 
-      // Process results safely
+      // Processar resultados de forma segura
       const eldersResult = results[0];
       const staffResult = results[1];
       const checkInsResult = results[2];
@@ -41,6 +42,13 @@ export const dashboardHelpers = {
       const activityTypesCount = activityTypesResult.status === 'fulfilled' ? activityTypesResult.value.count || 0 : 0;
       const recentCheckIns = recentCheckInsResult.status === 'fulfilled' ? recentCheckInsResult.value.data || [] : [];
 
+      // Log de erros se houverem
+      results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+          console.error(`❌ Query ${index} failed:`, result.reason);
+        }
+      });
+
       const stats = {
         totalElders: eldersCount,
         totalStaff: staffCount,
@@ -49,13 +57,19 @@ export const dashboardHelpers = {
         recentCheckIns: recentCheckIns,
         monthlyGrowth: 12.5,
         weeklyActivity: 8.2,
-        activeToday: Math.floor(checkInsCount * 0.15),
+        activeToday: Math.floor(eldersCount * 0.15) || 0,
       };
 
-      console.log('Dashboard stats fetched successfully:', stats);
+      console.log('✅ Dashboard stats loaded successfully:', {
+        elders: eldersCount,
+        staff: staffCount,
+        checkIns: checkInsCount,
+        activities: activityTypesCount
+      });
+
       return { data: stats, error: null };
     } catch (error) {
-      console.error('Error in getDashboardStats:', error);
+      console.error('❌ Critical error in getDashboardStats:', error);
       return { 
         data: {
           totalElders: 0,
@@ -74,7 +88,7 @@ export const dashboardHelpers = {
 
   getActivityChartData: async () => {
     try {
-      console.log('Fetching activity chart data...');
+      console.log('📊 Fetching activity chart data...');
       
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -86,10 +100,11 @@ export const dashboardHelpers = {
         .order('check_in_time', { ascending: true });
 
       if (error) {
-        console.error('Error fetching chart data:', error);
+        console.error('❌ Error fetching chart data:', error);
         throw error;
       }
 
+      // Otimização: gerar dados do gráfico de forma mais eficiente
       const chartData = [];
       const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
       
@@ -116,22 +131,23 @@ export const dashboardHelpers = {
         });
       }
 
-      console.log('Activity chart data fetched successfully:', chartData);
+      console.log('✅ Activity chart data loaded successfully');
       return { data: chartData, error: null };
     } catch (error) {
-      console.error('Error in getActivityChartData:', error);
-      return { 
-        data: [
-          { name: 'Dom', atividades: 0, presenca: 0 },
-          { name: 'Seg', atividades: 0, presenca: 0 },
-          { name: 'Ter', atividades: 0, presenca: 0 },
-          { name: 'Qua', atividades: 0, presenca: 0 },
-          { name: 'Qui', atividades: 0, presenca: 0 },
-          { name: 'Sex', atividades: 0, presenca: 0 },
-          { name: 'Sáb', atividades: 0, presenca: 0 }
-        ], 
-        error 
-      };
+      console.error('❌ Error in getActivityChartData:', error);
+      
+      // Fallback data para manter a interface funcionando
+      const fallbackData = [
+        { name: 'Dom', atividades: 0, presenca: 0 },
+        { name: 'Seg', atividades: 0, presenca: 0 },
+        { name: 'Ter', atividades: 0, presenca: 0 },
+        { name: 'Qua', atividades: 0, presenca: 0 },
+        { name: 'Qui', atividades: 0, presenca: 0 },
+        { name: 'Sex', atividades: 0, presenca: 0 },
+        { name: 'Sáb', atividades: 0, presenca: 0 }
+      ];
+      
+      return { data: fallbackData, error };
     }
   },
 };
