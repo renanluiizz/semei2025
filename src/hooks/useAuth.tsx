@@ -100,8 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('✅ User profile loaded:', data.email, data.role);
         // Type assertion to ensure role is properly typed
         const profile: UserProfile = {
-          ...data,
-          role: data.role as 'admin' | 'operator'
+          id: data.id,
+          email: data.email,
+          full_name: data.full_name,
+          role: data.role as 'admin' | 'operator',
+          created_at: data.created_at
         };
         setUserProfile(profile);
       }

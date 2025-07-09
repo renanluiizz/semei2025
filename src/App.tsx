@@ -10,7 +10,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { lazy, Suspense } from 'react';
 import { PageLoading } from '@/components/ui/page-loading';
 
-// Páginas lazy-loaded com exports nomeados corrigidos
+// Páginas lazy-loaded
 const Login = lazy(() => import('@/pages/auth/Login').then(module => ({ default: module.Login })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then(module => ({ default: module.Dashboard })));
 const IdososList = lazy(() => import('@/pages/idosos/IdososList').then(module => ({ default: module.IdososList })));

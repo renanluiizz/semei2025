@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Activity, Users } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardHelpers } from '@/lib/dashboard';
 import { LoadingCard } from '@/components/ui/loading-card';
@@ -15,7 +15,7 @@ export function EnhancedActivityChart() {
 
   if (isLoading) {
     return (
-      <Card className="col-span-1 lg:col-span-2 semei-card">
+      <Card className="col-span-1 lg:col-span-2">
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <Activity className="h-5 w-5 text-indigo-600" />
@@ -23,7 +23,7 @@ export function EnhancedActivityChart() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <LoadingCard title={false} lines={8} />
+          <LoadingCard lines={8} />
         </CardContent>
       </Card>
     );
@@ -31,7 +31,7 @@ export function EnhancedActivityChart() {
 
   if (error) {
     return (
-      <Card className="col-span-1 lg:col-span-2 semei-card">
+      <Card className="col-span-1 lg:col-span-2">
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <Activity className="h-5 w-5 text-red-500" />
@@ -64,7 +64,7 @@ export function EnhancedActivityChart() {
   };
 
   return (
-    <Card className="col-span-1 lg:col-span-2 semei-card">
+    <Card className="col-span-1 lg:col-span-2">
       <CardHeader>
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <Activity className="h-5 w-5 text-indigo-600" />

@@ -3,14 +3,15 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface LoadingCardProps {
-  title?: boolean;
+  showTitle?: boolean;
   lines?: number;
+  className?: string;
 }
 
-export function LoadingCard({ title = false, lines = 3 }: LoadingCardProps) {
+export function LoadingCard({ showTitle = false, lines = 3, className }: LoadingCardProps) {
   return (
-    <Card className="semei-card">
-      {title && (
+    <Card className={`animate-pulse ${className || ''}`}>
+      {showTitle && (
         <CardHeader>
           <Skeleton className="h-6 w-48" />
         </CardHeader>
