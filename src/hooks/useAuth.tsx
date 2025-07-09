@@ -1,153 +1,74 @@
 
-import { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { Usuario } from '@/types/models';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  role: 'admin' | 'operator';
+  created_at: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  userProfile: Usuario | null;
+  userProfile: UserProfile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
   initialized: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<Usuario | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
-  // Cache do perfil para evitar queries desnecessárias
-  const profileCache = useMemo(() => new Map<string, Usuario>(), []);
-
-  // Fetch user profile otimizado com cache
-  const fetchUserProfile = async (userId: string): Promise<Usuario | null> => {
-    try {
-      // Verificar cache primeiro
-      if (profileCache.has(userId)) {
-        console.log('📋 Using cached profile for user:', userId);
-        return profileCache.get(userId)!;
-      }
-
-      console.log('🔍 Fetching fresh profile for user:', userId);
-      
-      const { data: profile, error } = await supabase
-        .from('staff')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('❌ Error fetching user profile:', error);
-        return null;
-      }
-
-      if (profile) {
-        const userProfile: Usuario = {
-          id: profile.id,
-          email: profile.email,
-          full_name: profile.full_name,
-          role: profile.role as 'admin' | 'operator',
-          created_at: profile.created_at
-        };
-        
-        // Salvar no cache
-        profileCache.set(userId, userProfile);
-        console.log('✅ User profile cached:', userProfile);
-        return userProfile;
-      }
-
-      return null;
-    } catch (error) {
-      console.error('❌ Unexpected error fetching profile:', error);
-      return null;
-    }
-  };
-
-  // Initialize auth state otimizado
   useEffect(() => {
-    console.log('🚀 Initializing auth state...');
+    console.log('🔐 Initializing authentication...');
     
-    let isMounted = true;
-
+    // Get initial session
     const initializeAuth = async () => {
       try {
-        setLoading(true);
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        // Get initial session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('❌ Session error:', sessionError);
+        if (error) {
+          console.error('❌ Error getting session:', error);
+          return;
         }
 
-        if (isMounted) {
-          console.log('📋 Initial session:', session?.user?.email || 'no user');
-          
-          if (session?.user) {
-            setUser(session.user);
-            
-            // Fetch profile de forma assíncrona
-            fetchUserProfile(session.user.id).then(profile => {
-              if (isMounted) {
-                setUserProfile(profile);
-              }
-            }).catch(error => {
-              console.error('❌ Profile fetch error:', error);
-              if (isMounted) {
-                setUserProfile(null);
-              }
-            });
-          } else {
-            setUser(null);
-            setUserProfile(null);
-          }
-          
-          setInitialized(true);
-          setLoading(false);
+        if (session?.user) {
+          console.log('✅ User session found:', session.user.email);
+          setUser(session.user);
+          await loadUserProfile(session.user.id);
+        } else {
+          console.log('ℹ️ No active session found');
         }
       } catch (error) {
-        console.error('❌ Error initializing auth:', error);
-        if (isMounted) {
-          setInitialized(true);
-          setLoading(false);
-        }
+        console.error('❌ Error in auth initialization:', error);
+      } finally {
+        setLoading(false);
+        setInitialized(true);
+        console.log('✅ Authentication initialized');
       }
     };
 
     initializeAuth();
 
-    // Listen for auth changes otimizado
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!isMounted) return;
-        
         console.log('🔄 Auth state changed:', event, session?.user?.email || 'no user');
         
+        setUser(session?.user ?? null);
+        
         if (session?.user) {
-          setUser(session.user);
-          
-          // Buscar perfil de forma não bloqueante
-          setTimeout(() => {
-            fetchUserProfile(session.user.id).then(profile => {
-              if (isMounted) {
-                setUserProfile(profile);
-              }
-            }).catch(error => {
-              console.error('❌ Profile fetch error during auth change:', error);
-              if (isMounted) {
-                setUserProfile(null);
-              }
-            });
-          }, 0);
+          await loadUserProfile(session.user.id);
         } else {
-          setUser(null);
           setUserProfile(null);
-          profileCache.clear(); // Limpar cache no logout
         }
         
         setLoading(false);
@@ -155,69 +76,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     return () => {
-      isMounted = false;
       subscription.unsubscribe();
     };
-  }, [profileCache]);
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const loadUserProfile = async (userId: string) => {
     try {
-      console.log('🔐 Attempting sign in for:', email);
-      setLoading(true);
+      console.log('👤 Loading user profile for:', userId);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
+      const { data, error } = await supabase
+        .from('staff')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
       if (error) {
-        console.error('❌ Sign in error:', error);
-        return { error };
+        console.error('❌ Error loading user profile:', error);
+        return;
       }
 
-      console.log('✅ Sign in successful:', data.user?.email);
-      return { error: null };
+      if (data) {
+        console.log('✅ User profile loaded:', data.email, data.role);
+        setUserProfile(data);
+      }
     } catch (error) {
-      console.error('❌ Unexpected sign in error:', error);
-      return { error };
-    } finally {
-      setLoading(false);
+      console.error('❌ Error in loadUserProfile:', error);
     }
   };
 
   const signOut = async () => {
     try {
-      console.log('🚪 Signing out...');
+      console.log('🚪 Signing out user...');
       setLoading(true);
       
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error('❌ Sign out error:', error);
+        console.error('❌ Error signing out:', error);
+        throw error;
       }
       
       setUser(null);
       setUserProfile(null);
-      profileCache.clear(); // Limpar cache
-      
-      console.log('✅ Sign out successful');
+      console.log('✅ User signed out successfully');
     } catch (error) {
-      console.error('❌ Unexpected sign out error:', error);
+      console.error('❌ Error in signOut:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const value = useMemo(() => ({
+  const value = {
     user,
     userProfile,
     loading,
-    signIn,
-    signOut,
     initialized,
-  }), [user, userProfile, loading, initialized]);
+    signOut,
+  };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

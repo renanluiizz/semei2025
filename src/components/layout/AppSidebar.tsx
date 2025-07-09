@@ -1,182 +1,190 @@
 
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import {
-  BarChart3,
-  Users,
+import { 
+  BarChart3, 
+  Users, 
   Calendar,
   Settings,
   UserPlus,
   Activity,
+  Search,
   FileSpreadsheet,
   RotateCcw,
   Shield,
   UserCog,
-  X,
-  Search,
-  Sparkles,
-  Zap
+  Award
 } from 'lucide-react';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarFooter,
+  useSidebar
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface AppSidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
   onOpenSearch: () => void;
 }
 
-interface MenuItem {
-  icon: any;
-  label: string;
-  path: string;
-  adminOnly?: boolean;
-}
-
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
-
-export function AppSidebar({ isOpen, onClose, onOpenSearch }: AppSidebarProps) {
+export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
   const { userProfile } = useAuth();
   const location = useLocation();
+  const { collapsed } = useSidebar();
 
-  const menuSections: MenuSection[] = [
-    {
-      title: "PRINCIPAL",
-      items: [
-        { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-        { icon: Users, label: 'Idosos', path: '/idosos' },
-        { icon: UserPlus, label: 'Novo Cadastro', path: '/idosos/novo' },
-      ]
-    },
-    {
-      title: "ATIVIDADES", 
-      items: [
-        { icon: Calendar, label: 'Atividades', path: '/atividades' },
-        { icon: Activity, label: 'Tipos de Atividade', path: '/tipos-atividade' },
-      ]
-    },
-    {
-      title: "ADMINISTRAÇÃO",
-      items: [
-        { icon: UserCog, label: 'Servidores', path: '/servidores', adminOnly: true },
-        { icon: FileSpreadsheet, label: 'Importar Planilha', path: '/importar', adminOnly: true },
-        { icon: RotateCcw, label: 'Resetar Estatísticas', path: '/resetar', adminOnly: true },
-        { icon: Shield, label: 'Logs de Auditoria', path: '/auditoria', adminOnly: true },
-        { icon: Settings, label: 'Configurações', path: '/configuracoes', adminOnly: true }
-      ]
+  const isActive = (path: string) => {
+    if (path === '/' || path === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
     }
-  ];
-
-  const isAdmin = userProfile?.role === 'admin';
-  const filteredSections = menuSections.map(section => ({
-    ...section,
-    items: section.items.filter(item => !item.adminOnly || isAdmin)
-  })).filter(section => section.items.length > 0);
-
-  const isActiveRoute = (path: string) => {
-    return location.pathname === path || 
-      (path === '/idosos' && location.pathname.startsWith('/idosos'));
+    return location.pathname.startsWith(path);
   };
 
+  const mainItems = [
+    { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
+    { icon: Users, label: 'Idosos', path: '/idosos' },
+    { icon: UserPlus, label: 'Novo Cadastro', path: '/idosos/novo' },
+  ];
+
+  const activityItems = [
+    { icon: Calendar, label: 'Atividades', path: '/atividades' },
+    { icon: Activity, label: 'Tipos de Atividade', path: '/tipos-atividade' },
+  ];
+
+  const adminItems = userProfile?.role === 'admin' ? [
+    { icon: UserCog, label: 'Servidores', path: '/servidores' },
+    { icon: FileSpreadsheet, label: 'Importar Planilha', path: '/importar' },
+    { icon: RotateCcw, label: 'Resetar Estatísticas', path: '/resetar' },
+    { icon: Shield, label: 'Logs de Auditoria', path: '/auditoria' },
+    { icon: Settings, label: 'Configurações', path: '/configuracoes' }
+  ] : [];
+
   return (
-    <div className={cn(
-      "fixed lg:static inset-y-0 left-0 z-50 semei-sidebar transform transition-all duration-300 ease-in-out flex flex-col",
-      isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-    )}>
-      {/* Modern Sidebar Header */}
-      <div className="semei-sidebar-header relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20"></div>
-        <div className="relative flex items-center justify-between z-10">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg border border-white/30">
-              <Sparkles className="h-7 w-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">SEMEI</h1>
-              <div className="flex items-center gap-1">
-                <Zap className="h-3 w-3 text-blue-200" />
-                <p className="text-xs text-blue-100 font-medium">Sistema Profissional</p>
-              </div>
-            </div>
+    <Sidebar className="border-r border-gray-200 bg-white">
+      {/* Header */}
+      <SidebarHeader className="p-6 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <Award className="h-6 w-6 text-white" />
           </div>
+          {!collapsed && (
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">SEMEI</h1>
+              <p className="text-xs text-gray-600 font-medium">Secretaria da Melhor Idade</p>
+            </div>
+          )}
+        </div>
+      </SidebarHeader>
+
+      {/* Search Button */}
+      {!collapsed && (
+        <div className="p-4 border-b border-gray-200">
           <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="lg:hidden text-white hover:bg-white/10 w-8 h-8 rounded-xl"
+            variant="outline"
+            className="w-full justify-start rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-left h-11 transition-all duration-200"
+            onClick={onOpenSearch}
           >
-            <X className="h-4 w-4" />
+            <Search className="h-4 w-4 mr-3 text-gray-400" />
+            <span className="text-gray-500 font-medium">Buscar no sistema...</span>
           </Button>
         </div>
-      </div>
+      )}
 
-      {/* Modern Search Button */}
-      <div className="p-4 border-b border-slate-200/60">
-        <Button
-          variant="outline"
-          className="w-full justify-start rounded-xl border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-left h-12 transition-all duration-200 focus-ring"
-          onClick={onOpenSearch}
-        >
-          <Search className="h-4 w-4 mr-3 text-slate-400" />
-          <span className="text-slate-500 font-medium">Buscar no sistema...</span>
-        </Button>
-      </div>
+      {/* Navigation */}
+      <SidebarContent>
+        {/* Principal */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-4">
+            Principal
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainItems.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton asChild isActive={isActive(item.path)}>
+                    <Link to={item.path} className="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors">
+                      <item.icon className="h-5 w-5" />
+                      {!collapsed && <span>{item.label}</span>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-      {/* Modern Navigation */}
-      <nav className="semei-sidebar-content">
-        {filteredSections.map((section, sectionIndex) => (
-          <div key={section.title} className="semei-sidebar-group">
-            <h3 className="semei-sidebar-group-label">
-              <div className="w-4 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-              {section.title}
-            </h3>
-            <div className="space-y-1">
-              {section.items.map((item, itemIndex) => {
-                const Icon = item.icon;
-                const isActive = isActiveRoute(item.path);
-                
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={onClose}
-                    className={cn(
-                      "group semei-sidebar-item animate-slide-in-left",
-                      isActive ? 'semei-sidebar-item-active' : 'semei-sidebar-item-inactive'
-                    )}
-                    style={{ 
-                      animationDelay: `${(sectionIndex * 100) + (itemIndex * 50)}ms` 
-                    }}
-                  >
-                    <Icon size={20} className={cn(
-                      "transition-all duration-200",
-                      isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'
-                    )} />
-                    <span className="font-medium">{item.label}</span>
-                    {isActive && (
-                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-white/80 rounded-l-full shadow-lg"></div>
-                    )}
-                  </Link>
-                );
-              })}
+        {/* Atividades */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-4">
+            Atividades
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {activityItems.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton asChild isActive={isActive(item.path)}>
+                    <Link to={item.path} className="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors">
+                      <item.icon className="h-5 w-5" />
+                      {!collapsed && <span>{item.label}</span>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Administração */}
+        {adminItems.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-4">
+              Administração
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminItems.map((item) => (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton asChild isActive={isActive(item.path)}>
+                      <Link to={item.path} className="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors">
+                        <item.icon className="h-5 w-5" />
+                        {!collapsed && <span>{item.label}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+
+      {/* Footer */}
+      <SidebarFooter className="p-4 border-t border-gray-200">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-8 w-8 ring-2 ring-blue-100">
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-xs">
+              {userProfile?.full_name?.charAt(0) || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          {!collapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-gray-900 truncate">
+                {userProfile?.full_name || 'Usuário'}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {userProfile?.role === 'admin' ? 'Administrador' : 'Servidor'}
+              </p>
             </div>
-          </div>
-        ))}
-      </nav>
-
-      {/* Modern Footer */}
-      <div className="p-4 border-t border-slate-200/60 bg-gradient-to-r from-slate-50 to-blue-50">
-        <div className="text-center">
-          <p className="text-xs text-slate-500 font-medium mb-1">Sistema v3.0</p>
-          <div className="flex items-center justify-center gap-1 text-xs text-slate-400">
-            <Sparkles className="h-3 w-3" />
-            <span>Powered by SEMEI</span>
-          </div>
+          )}
         </div>
-      </div>
-    </div>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
