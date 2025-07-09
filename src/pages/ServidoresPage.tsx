@@ -222,7 +222,7 @@ export default function ServidoresPage() {
 
         {/* Lista de Servidores */}
         {isLoading ? (
-          <LoadingCard title={true} lines={5} />
+          <LoadingCard showTitle={true} lines={5} />
         ) : error ? (
           <Card className="shadow-lg border-0">
             <CardContent className="p-8 text-center">
