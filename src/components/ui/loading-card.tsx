@@ -1,21 +1,28 @@
 
-import { LoadingSpinner } from './loading-spinner';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export function LoadingCard() {
+interface LoadingCardProps {
+  title?: boolean;
+  lines?: number;
+}
+
+export function LoadingCard({ title = false, lines = 3 }: LoadingCardProps) {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-md mx-auto">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <LoadingSpinner size="lg" className="text-blue-600" />
+    <Card className="semei-card">
+      {title && (
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+      )}
+      <CardContent className="space-y-3">
+        {Array.from({ length: lines }).map((_, index) => (
+          <div key={index} className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
           </div>
-          <h3 className="text-blue-800 font-bold text-xl mb-2">Carregando Sistema</h3>
-          <p className="text-blue-700 mb-4">Aguarde enquanto carregamos os dados...</p>
-          <div className="w-full bg-blue-100 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
-          </div>
-        </div>
-      </div>
-    </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

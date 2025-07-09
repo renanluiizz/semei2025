@@ -38,7 +38,8 @@ interface AppSidebarProps {
 export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
   const { userProfile } = useAuth();
   const location = useLocation();
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
 
   const isActive = (path: string) => {
     if (path === '/' || path === '/dashboard') {
@@ -74,7 +75,7 @@ export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
           <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
             <Award className="h-6 w-6 text-white" />
           </div>
-          {!collapsed && (
+          {!isCollapsed && (
             <div>
               <h1 className="text-xl font-bold text-gray-900">SEMEI</h1>
               <p className="text-xs text-gray-600 font-medium">Secretaria da Melhor Idade</p>
@@ -84,7 +85,7 @@ export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
       </SidebarHeader>
 
       {/* Search Button */}
-      {!collapsed && (
+      {!isCollapsed && (
         <div className="p-4 border-b border-gray-200">
           <Button
             variant="outline"
@@ -111,7 +112,7 @@ export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
                   <SidebarMenuButton asChild isActive={isActive(item.path)}>
                     <Link to={item.path} className="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors">
                       <item.icon className="h-5 w-5" />
-                      {!collapsed && <span>{item.label}</span>}
+                      {!isCollapsed && <span>{item.label}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -132,7 +133,7 @@ export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
                   <SidebarMenuButton asChild isActive={isActive(item.path)}>
                     <Link to={item.path} className="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors">
                       <item.icon className="h-5 w-5" />
-                      {!collapsed && <span>{item.label}</span>}
+                      {!isCollapsed && <span>{item.label}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -154,7 +155,7 @@ export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
                     <SidebarMenuButton asChild isActive={isActive(item.path)}>
                       <Link to={item.path} className="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors">
                         <item.icon className="h-5 w-5" />
-                        {!collapsed && <span>{item.label}</span>}
+                        {!isCollapsed && <span>{item.label}</span>}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -173,7 +174,7 @@ export function AppSidebar({ onOpenSearch }: AppSidebarProps) {
               {userProfile?.full_name?.charAt(0) || 'U'}
             </AvatarFallback>
           </Avatar>
-          {!collapsed && (
+          {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-gray-900 truncate">
                 {userProfile?.full_name || 'Usuário'}

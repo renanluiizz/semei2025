@@ -16,6 +16,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   initialized: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -97,10 +98,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (data) {
         console.log('✅ User profile loaded:', data.email, data.role);
-        setUserProfile(data);
+        // Type assertion to ensure role is properly typed
+        const profile: UserProfile = {
+          ...data,
+          role: data.role as 'admin' | 'operator'
+        };
+        setUserProfile(profile);
       }
     } catch (error) {
       console.error('❌ Error in loadUserProfile:', error);
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      console.log('🔐 Attempting sign in for:', email);
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('❌ Sign in error:', error);
+        return { error };
+      }
+      
+      console.log('✅ Sign in successful');
+      return { error: null };
+    } catch (error) {
+      console.error('❌ Error in signIn:', error);
+      return { error };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,6 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userProfile,
     loading,
     initialized,
+    signIn,
     signOut,
   };
 
