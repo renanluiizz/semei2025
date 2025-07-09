@@ -10,20 +10,20 @@ import { Toaster } from '@/components/ui/sonner';
 import { lazy, Suspense } from 'react';
 import { PageLoading } from '@/components/ui/page-loading';
 
-// Páginas lazy-loaded
+// Páginas lazy-loaded com exports nomeados corrigidos
 const Login = lazy(() => import('@/pages/auth/Login').then(module => ({ default: module.Login })));
 const Dashboard = lazy(() => import('@/pages/Dashboard').then(module => ({ default: module.Dashboard })));
-const IdososList = lazy(() => import('@/pages/idosos/IdososList'));
-const NovoIdoso = lazy(() => import('@/pages/idosos/NovoIdoso'));
+const IdososList = lazy(() => import('@/pages/idosos/IdososList').then(module => ({ default: module.IdososList })));
+const NovoIdoso = lazy(() => import('@/pages/idosos/NovoIdoso').then(module => ({ default: module.NovoIdoso })));
 const EditIdoso = lazy(() => import('@/pages/idosos/EditIdoso'));
 const IdosoDetails = lazy(() => import('@/pages/idosos/IdosoDetails'));
-const AtividadesList = lazy(() => import('@/pages/atividades/AtividadesList'));
+const AtividadesList = lazy(() => import('@/pages/atividades/AtividadesList').then(module => ({ default: module.AtividadesList })));
 const TiposAtividade = lazy(() => import('@/pages/TiposAtividade'));
 const ServidoresPage = lazy(() => import('@/pages/ServidoresPage'));
 const AuditoriaPage = lazy(() => import('@/pages/AuditoriaPage'));
 const ImportarPage = lazy(() => import('@/pages/ImportarPage'));
 const ResetarPage = lazy(() => import('@/pages/ResetarPage'));
-const Configuracoes = lazy(() => import('@/pages/Configuracoes'));
+const Configuracoes = lazy(() => import('@/pages/Configuracoes').then(module => ({ default: module.Configuracoes })));
 
 // Query client otimizado
 const queryClient = new QueryClient({
